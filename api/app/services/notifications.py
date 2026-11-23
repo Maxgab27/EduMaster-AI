@@ -1,14 +1,18 @@
-"""Notificaciones DEMO: estado en memoria, sin WebSocket y sin datos institucionales."""
+"""Notificaciones DEMO: eventos en memoria y preferencias persistidas (Fase 4)."""
 
 from __future__ import annotations
 
 import threading
 
-from app.schemas import Notification, NotificationPreferences, utc_now
+from app.schemas import Notification, NotificationPreferences
+from app.services.storage import insert as storage_insert
+from app.services.storage import seed_memory as storage_seed
+from app.services.storage import select as storage_select
+from app.services.storage import update as storage_update
 
 _lock = threading.Lock()
 _notifications: dict[str, dict[str, object]] = {}
-_preferences = NotificationPreferences()
+_PREFS_TABLE = "notification_preferences"
 
 
 def _seed() -> None:
@@ -36,7 +40,7 @@ def _seed() -> None:
     ]
     for item in seeds:
         record = dict(item)
-        record["createdAt"] = utc_now()
+        record["createdAt"] = "2026-11-22T00:00:00Z"
         record["read"] = False
         record["actor"] = "sistema-demo"
         _notifications[str(record["id"])] = record
@@ -65,13 +69,37 @@ def mark_read(notification_id: str, read: bool = True) -> Notification | None:
         return Notification(**record)
 
 
-def get_preferences() -> NotificationPreferences:
-    with _lock:
-        return NotificationPreferences(**_preferences.model_dump())
+def _default_preferences_row(actor_id: str) -> dict[str, object]:
+    return {
+        "id": actor_id,
+        "actor": actor_id,
+        "email": False,
+        "inApp": True,
+        "digest": "diario",
+        "categories": ["evaluacion", "mlops", "certificados"],
+    }
 
 
-def update_preferences(payload: NotificationPreferences) -> NotificationPreferences:
-    global _preferences
+def get_preferences(actor_id: str = "demo-user") -> NotificationPreferences:
     with _lock:
-        _preferences = NotificationPreferences(**payload.model_dump())
-        return NotificationPreferences(**_preferences.model_dump())
+        storage_seed(_PREFS_TABLE, [_default_preferences_row(actor_id)])
+        rows = storage_select(_PREFS_TABLE, filters={"actor": actor_id}, limit=1)
+    if rows:
+        return NotificationPreferences(**{key: value for key, value in rows[0].items() if key != "id"})
+    return NotificationPreferences(**{
+        key: value for key, value in _default_preferences_row(actor_id).items() if key != "id"
+    })
+
+
+def update_preferences(
+    payload: NotificationPreferences,
+    actor_id: str = "demo-user",
+) -> NotificationPreferences:
+    row = {**payload.model_dump(), "id": actor_id, "actor": actor_id}
+    with _lock:
+        storage_seed(_PREFS_TABLE, [_default_preferences_row(actor_id)])
+        stored = storage_update(_PREFS_TABLE, actor_id, row)
+        if stored is None:
+            stored_rows = storage_insert(_PREFS_TABLE, [row])
+            stored = stored_rows[0] if stored_rows else row
+    return NotificationPreferences(**{key: value for key, value in stored.items() if key != "id"})

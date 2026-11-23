@@ -4,10 +4,12 @@ Backend mínimo que implementa la **lógica del documento** sin PyTorch, pensado
 
 ## Estado
 
-- **DEMO**: datos sintéticos, sin autenticación real, sin base de datos, sin entrenamiento en caliente.
+- **DEMO**: datos sintéticos, sin autenticación real (OIDC/JWT), sin base de datos, sin entrenamiento en caliente.
 - El artefacto `ml/artifacts/model.json` se entrega entrenado; la API solo carga y hace inferencia.
 - La metadata de cada respuesta lleva `source: "api"` y la etiqueta DEMO.
-- Auditoría en memoria: se pierde al reiniciar el servicio.
+- Auditoría en memoria: se pierde al reiniciar el servicio (o en Supabase si se configura).
+- **Fase 4**: autoridad RBAC/ABAC en servidor usando headers DEMO `X-Actor`/`X-Role`. No es autenticación real; `/health` reporta `auth=demo-header-rbac`. Sin `X-Role`, el rol por defecto es `estudiante`.
+- `signedBy` debe coincidir con el actor autenticado; `settings.rlsEnabled` es informativo y **no** activa RLS real.
 
 ## Lógica implementada (sección 9 del documento)
 
@@ -68,7 +70,22 @@ python api\ml\predict.py --student-id EST-0001
 | GET | `/api/v1/ml/models` | Métricas MTL vs baselines |
 | POST | `/api/v1/neural/inference` | Inferencia con features autorizadas |
 | POST | `/api/v1/recommendations/feedback` | Registro DEMO de feedback |
-| GET | `/api/v1/audit/logs` | Auditoría DEMO en memoria |
+| GET / POST | `/api/v1/audit/logs` | Auditoría enriquecida (actor, rol, tenant, estado) |
+| GET / PUT | `/api/v1/settings` | Configuración institucional del tenant |
+| GET / PUT | `/api/v1/settings/preferences` | Preferencias por actor |
+| GET / PUT | `/api/v1/notification-preferences` | Alias legacy actor-scoped |
+| GET / POST | `/api/v1/courses` | Catálogo e inscripción (RBAC) |
+| GET / POST | `/api/v1/learning-paths` | Rutas y progreso (ABAC por actor) |
+| GET / POST | `/api/v1/assessments`, `/api/v1/submissions` | Evaluaciones y firma docente (ABAC) |
+| GET / POST | `/api/v1/sandbox/attempts` | Analizador estático; nunca ejecuta código |
+
+### Variables de entorno Fase 4
+
+| Variable | Default | Uso |
+|---|---|---|
+| `RBAC_ENFORCE` | `1` | Aplica 403 cuando el rol carece de permiso. `0` solo registra la denegación. |
+| `DEMO_DEFAULT_ROLE` | `estudiante` | Rol cuando falta `X-Role` o no está en la allowlist. |
+| `TENANT_ID` | `org-ute-peru-2026` | Tenant DEMO usado en settings y auditoría. |
 
 ## Railway Free
 

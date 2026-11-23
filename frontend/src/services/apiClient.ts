@@ -38,15 +38,28 @@ export function delay(ms = DEMO_DELAY_MS): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function actor(): string {
+export interface DemoActor {
+  name: string;
+  role: string;
+}
+
+/** Identidad DEMO persistida por App.tsx; la API la valida contra su allowlist. */
+export function getDemoActor(): DemoActor {
   try {
     const raw = localStorage.getItem('edumaster_demo_user');
-    if (!raw) return 'demo-user';
-    const parsed = JSON.parse(raw) as { name?: string };
-    return parsed.name || 'demo-user';
+    if (!raw) return { name: 'demo-user', role: 'estudiante' };
+    const parsed = JSON.parse(raw) as { name?: string; role?: string };
+    return {
+      name: parsed.name || 'demo-user',
+      role: parsed.role || 'estudiante',
+    };
   } catch {
-    return 'demo-user';
+    return { name: 'demo-user', role: 'estudiante' };
   }
+}
+
+function actor(): string {
+  return getDemoActor().name;
 }
 
 export interface RequestOptions extends Omit<RequestInit, 'headers'> {
@@ -73,6 +86,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     Accept: 'application/json',
     'X-Correlation-ID': correlationId,
     'X-Actor': actor(),
+    'X-Role': getDemoActor().role,
     ...(init.body ? { 'Content-Type': 'application/json' } : {}),
     ...headers,
   };

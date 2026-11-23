@@ -22,8 +22,18 @@ export function getAuditLogs(filters: AuditFilters = {}, signal?: AbortSignal) {
       signal,
     },
     () => {
-      const logs = readLocalAudit();
-      return filters.action ? logs.filter(log => log.action === filters.action) : logs;
+      let logs = readLocalAudit();
+      if (filters.action) {
+        logs = logs.filter(log => log.action === filters.action);
+      }
+      if (filters.actor) {
+        logs = logs.filter(log => log.actor === filters.actor);
+      }
+      if (filters.correlationId) {
+        logs = logs.filter(log => log.correlation_id === filters.correlationId);
+      }
+      const limit = Math.max(1, Math.min(filters.limit ?? 100, 200));
+      return logs.slice(0, limit);
     },
   );
 }

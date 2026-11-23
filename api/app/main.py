@@ -7,17 +7,27 @@ correlation id y auditoria en memoria (solo DEMO; sin autenticacion real).
 from __future__ import annotations
 
 import os
-import threading
 import uuid
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.auth import (
+    Actor,
+    Permission,
+    RBAC_ENFORCE,
+    TENANT_ID,
+    current_actor,
+    require,
+    require_signature,
+)
 from app.schemas import (
     AnalyticsProgress,
+    AppSettings,
+    AppSettingsUpdate,
     AnalyticsSkillMastery,
     ApiMeta,
     ApiResponse,
@@ -48,6 +58,7 @@ from app.schemas import (
     RecommendationFeedback,
     RecommendationItem,
     SandboxAttempt,
+    SettingsPreferences,
     Submission,
     SubmissionFeedback,
     TutorConversation,
@@ -64,11 +75,12 @@ from app.services import (
     notifications,
     recommendations,
     sandbox,
+    settings as settings_service,
     tutor,
 )
+from app.services.audit import add_audit
 from app.services.demo_data import dashboard_summary
 from app.services.inference import infer, model_metrics_summary, neural_status
-from app.services.storage import insert as storage_insert
 from app.services.storage import select as storage_select
 from app.services.storage import source as storage_source
 
@@ -87,16 +99,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-_audit_lock = threading.Lock()
-
-
 def correlation_id(request: Request) -> str:
     return getattr(request.state, "correlation_id", "unknown")
 
 
 def actor(request: Request) -> str:
-    """Actor DEMO del header; sin autenticación real (Fase 4)."""
-    return request.headers.get("X-Actor", "demo-user")
+    """Identificador usado por servicios Fase 3; ahora validado por auth.py."""
+    return current_actor(request).id
 
 
 def envelope(data: Any, request: Request) -> dict[str, Any]:
@@ -110,23 +119,10 @@ def envelope(data: Any, request: Request) -> dict[str, Any]:
     }
 
 
-def add_audit(request: Request, action: str, detail: dict[str, Any]) -> AuditLog:
-    entry = AuditLog(
-        id=f"AUD-{uuid.uuid4().hex[:10]}",
-        correlation_id=correlation_id(request),
-        action=action,
-        actor=request.headers.get("X-Actor", "demo-user"),
-        detail=detail,
-        timestamp=utc_now(),
-    )
-    with _audit_lock:
-        stored = storage_insert("audit_logs", [entry.model_dump()])
-    return AuditLog(**(stored[0] if stored else entry.model_dump()))
-
-
 @app.middleware("http")
 async def correlation_middleware(request: Request, call_next):
     request.state.correlation_id = request.headers.get("X-Correlation-ID") or str(uuid.uuid4())
+    request.state.actor = current_actor(request)
     response = await call_next(request)
     response.headers["X-Correlation-ID"] = correlation_id(request)
     return response
@@ -167,6 +163,9 @@ def health(request: Request):
             "service": "edumaster-api",
             "version": app.version,
             "storage": storage_source(),
+            "auth": "demo-header-rbac",
+            "rbacEnforced": RBAC_ENFORCE,
+            "tenantId": TENANT_ID,
         },
         request,
     )
@@ -217,18 +216,20 @@ def post_recommendation_feedback(payload: RecommendationFeedback, request: Reque
 
 
 @app.post("/api/v1/audit/logs", response_model=ApiResponse[AuditLog])
-def create_audit_log(payload: AuditLogCreate, request: Request):
-    entry = AuditLog(
-        id=f"AUD-{uuid.uuid4().hex[:10]}",
-        correlation_id=payload.correlation_id or correlation_id(request),
-        action=payload.action,
-        actor=payload.actor,
-        detail=payload.detail,
-        timestamp=utc_now(),
+def create_audit_log(
+    payload: AuditLogCreate,
+    request: Request,
+    current: Actor = Depends(require(Permission.AUDIT_WRITE)),
+):
+    # payload.actor se conserva por compatibilidad, pero no se confía en él.
+    entry = add_audit(
+        request,
+        payload.action,
+        payload.detail,
+        actor=current,
+        correlation_id=payload.correlation_id,
     )
-    with _audit_lock:
-        stored = storage_insert("audit_logs", [entry.model_dump()])
-    return envelope(AuditLog(**(stored[0] if stored else entry.model_dump())), request)
+    return envelope(entry, request)
 
 
 @app.get("/api/v1/audit/logs", response_model=ApiResponse[list[AuditLog]])
@@ -238,13 +239,19 @@ def get_audit_logs(
     action: str | None = None,
     correlation_id: str | None = None,
     limit: int = 100,
+    current: Actor = Depends(require(Permission.AUDIT_READ)),
 ):
     filters = {
         "actor": actor,
         "action": action,
         "correlation_id": correlation_id,
     }
-    rows = storage_select("audit_logs", filters=filters, order="timestamp.desc", limit=limit)
+    rows = storage_select(
+        "audit_logs",
+        filters=filters,
+        order="timestamp.desc",
+        limit=max(1, min(limit, 200)),
+    )
     return envelope([AuditLog(**row) for row in rows], request)
 
 
@@ -299,7 +306,12 @@ def post_community_message(thread_id: str, payload: NewCommunityMessage, request
 
 
 @app.post("/api/v1/community/messages/{message_id}/moderate", response_model=ApiResponse[CommunityMessage])
-def moderate_community_message(message_id: str, payload: ModerationRequest, request: Request):
+def moderate_community_message(
+    message_id: str,
+    payload: ModerationRequest,
+    request: Request,
+    current: Actor = Depends(require(Permission.MODERATION_EXECUTE)),
+):
     result = community.moderate_message(message_id, payload)
     if not result:
         raise HTTPException(status_code=404, detail="Mensaje no encontrado")
@@ -356,41 +368,99 @@ def mark_notification_read(notification_id: str, payload: NotificationRead, requ
 
 @app.get("/api/v1/notification-preferences", response_model=ApiResponse[NotificationPreferences])
 def get_notification_preferences(request: Request):
-    return envelope(notifications.get_preferences(), request)
+    # Preferencias propias del actor; no requiere permiso de configuración global.
+    return envelope(notifications.get_preferences(actor(request)), request)
 
 
 @app.put("/api/v1/notification-preferences", response_model=ApiResponse[NotificationPreferences])
 def put_notification_preferences(payload: NotificationPreferences, request: Request):
-    result = notifications.update_preferences(payload)
+    result = notifications.update_preferences(payload, actor(request))
     add_audit(request, "notification.preferences_updated", result.model_dump())
+    return envelope(result, request)
+
+
+# --- Fase 4: configuración institucional y preferencias -----------------------
+
+@app.get("/api/v1/settings", response_model=ApiResponse[AppSettings])
+def get_settings(
+    request: Request,
+    current: Actor = Depends(require(Permission.SETTINGS_VIEW)),
+):
+    return envelope(settings_service.get_settings(current.tenantId), request)
+
+
+@app.put("/api/v1/settings", response_model=ApiResponse[AppSettings])
+def put_settings(
+    payload: AppSettingsUpdate,
+    request: Request,
+    current: Actor = Depends(require(Permission.SETTINGS_EDIT)),
+):
+    result = settings_service.update_settings(payload, current.name, current.tenantId)
+    add_audit(
+        request,
+        "settings.updated",
+        {"tenantId": result.tenantId, "theme": result.theme, "rlsEnabled": result.rlsEnabled},
+    )
+    return envelope(result, request)
+
+
+@app.get("/api/v1/settings/preferences", response_model=ApiResponse[SettingsPreferences])
+def get_settings_preferences(
+    request: Request,
+    current: Actor = Depends(require(Permission.SETTINGS_VIEW)),
+):
+    return envelope(notifications.get_preferences(current.id), request)
+
+
+@app.put("/api/v1/settings/preferences", response_model=ApiResponse[SettingsPreferences])
+def put_settings_preferences(
+    payload: SettingsPreferences,
+    request: Request,
+    current: Actor = Depends(require(Permission.SETTINGS_EDIT)),
+):
+    result = notifications.update_preferences(payload, current.id)
+    add_audit(request, "settings.preferences_updated", result.model_dump())
     return envelope(result, request)
 
 
 # --- Fase 3: cursos ----------------------------------------------------------
 
 @app.get("/api/v1/courses", response_model=ApiResponse[list[Course]])
-def get_courses(request: Request):
-    return envelope(courses.list_courses(actor(request)), request)
+def get_courses(request: Request, current: Actor = Depends(require(Permission.COURSES_VIEW))):
+    return envelope(courses.list_courses(current.id), request)
 
 
 @app.post("/api/v1/courses", response_model=ApiResponse[Course])
-def create_course(payload: NewCourse, request: Request):
+def create_course(
+    payload: NewCourse,
+    request: Request,
+    current: Actor = Depends(require(Permission.COURSES_EDIT)),
+):
     result = courses.create_course(payload)
     add_audit(request, "courses.created", {"id": result.id, "code": result.code, "title": result.title})
     return envelope(result, request)
 
 
 @app.get("/api/v1/courses/{course_id}", response_model=ApiResponse[Course])
-def get_course(course_id: str, request: Request):
-    result = courses.get_course(course_id, actor(request))
+def get_course(
+    course_id: str,
+    request: Request,
+    current: Actor = Depends(require(Permission.COURSES_VIEW)),
+):
+    result = courses.get_course(course_id, current.id)
     if not result:
         raise HTTPException(status_code=404, detail="Curso no encontrado")
     return envelope(result, request)
 
 
 @app.put("/api/v1/courses/{course_id}", response_model=ApiResponse[Course])
-def update_course(course_id: str, payload: NewCourse, request: Request):
-    result = courses.update_course(course_id, payload, actor(request))
+def update_course(
+    course_id: str,
+    payload: NewCourse,
+    request: Request,
+    current: Actor = Depends(require(Permission.COURSES_EDIT)),
+):
+    result = courses.update_course(course_id, payload, current.id)
     if not result:
         raise HTTPException(status_code=404, detail="Curso no encontrado")
     add_audit(request, "courses.updated", {"id": course_id, "code": result.code})
@@ -398,26 +468,36 @@ def update_course(course_id: str, payload: NewCourse, request: Request):
 
 
 @app.post("/api/v1/courses/{course_id}/enroll", response_model=ApiResponse[Course])
-def enroll_course(course_id: str, request: Request):
-    result = courses.enroll_course(course_id, actor(request))
+def enroll_course(
+    course_id: str,
+    request: Request,
+    current: Actor = Depends(require(Permission.COURSES_ENROLL)),
+):
+    result = courses.enroll_course(course_id, current.id)
     if not result:
-        if courses.get_course(course_id, actor(request)) is None:
+        if courses.get_course(course_id, current.id) is None:
             raise HTTPException(status_code=404, detail="Curso no encontrado")
         raise HTTPException(status_code=409, detail="Cupo completo o inscripción inválida")
-    add_audit(request, "courses.enrolled", {"id": course_id, "actor": actor(request)})
+    add_audit(request, "courses.enrolled", {"id": course_id, "actor": current.id})
     return envelope(result, request)
 
 
 # --- Fase 3: rutas de aprendizaje --------------------------------------------
 
 @app.get("/api/v1/learning-paths", response_model=ApiResponse[list[LearningPath]])
-def get_learning_paths(request: Request):
-    return envelope(learning_paths.list_paths(actor(request)), request)
+def get_learning_paths(request: Request, current: Actor = Depends(require(Permission.LEARNING_PATHS_VIEW))):
+    return envelope(learning_paths.list_paths(current.id), request)
 
 
 @app.post("/api/v1/learning-paths/{path_id}/progress", response_model=ApiResponse[LearningPath])
-def update_path_progress(path_id: str, payload: PathProgressRequest, request: Request):
-    result = learning_paths.update_progress(path_id, payload, actor(request))
+def update_path_progress(
+    path_id: str,
+    payload: PathProgressRequest,
+    request: Request,
+    current: Actor = Depends(require(Permission.LEARNING_PATHS_PROGRESS)),
+):
+    # ABAC: el progreso siempre se escribe para el actor autenticado.
+    result = learning_paths.update_progress(path_id, payload, current.id)
     if not result:
         raise HTTPException(status_code=404, detail="Ruta o paso no encontrado")
     add_audit(
@@ -431,17 +511,21 @@ def update_path_progress(path_id: str, payload: PathProgressRequest, request: Re
 # --- Fase 3: evaluaciones y SpeedGrader --------------------------------------
 
 @app.get("/api/v1/assessments", response_model=ApiResponse[list[Assessment]])
-def get_assessments(request: Request):
+def get_assessments(request: Request, current: Actor = Depends(require(Permission.ASSESSMENTS_VIEW))):
     return envelope(assessments.list_assessments(), request)
 
 
 @app.get("/api/v1/submissions", response_model=ApiResponse[list[Submission]])
-def get_submissions(request: Request):
+def get_submissions(request: Request, current: Actor = Depends(require(Permission.SUBMISSIONS_VIEW))):
     return envelope(assessments.list_submissions(), request)
 
 
 @app.get("/api/v1/submissions/{submission_id}", response_model=ApiResponse[Submission])
-def get_submission(submission_id: str, request: Request):
+def get_submission(
+    submission_id: str,
+    request: Request,
+    current: Actor = Depends(require(Permission.SUBMISSIONS_VIEW)),
+):
     result = assessments.get_submission(submission_id)
     if not result:
         raise HTTPException(status_code=404, detail="Entrega no encontrada")
@@ -449,7 +533,15 @@ def get_submission(submission_id: str, request: Request):
 
 
 @app.post("/api/v1/submissions/{submission_id}/grade", response_model=ApiResponse[Submission])
-def grade_submission(submission_id: str, payload: GradeSubmission, request: Request):
+def grade_submission(
+    submission_id: str,
+    payload: GradeSubmission,
+    request: Request,
+    current: Actor = Depends(require(Permission.GRADES_CONFIRM)),
+):
+    # ABAC: la firma oficial no puede atribuirse a otro docente.
+    signed_by = require_signature(request, current, payload.signedBy)
+    payload = payload.model_copy(update={"signedBy": signed_by})
     try:
         result = assessments.grade_submission(submission_id, payload)
     except ValueError as exc:
@@ -470,7 +562,14 @@ def grade_submission(submission_id: str, payload: GradeSubmission, request: Requ
 
 
 @app.post("/api/v1/submissions/{submission_id}/feedback", response_model=ApiResponse[Submission])
-def add_submission_feedback(submission_id: str, payload: SubmissionFeedback, request: Request):
+def add_submission_feedback(
+    submission_id: str,
+    payload: SubmissionFeedback,
+    request: Request,
+    current: Actor = Depends(require(Permission.GRADES_CONFIRM)),
+):
+    signed_by = require_signature(request, current, payload.signedBy)
+    payload = payload.model_copy(update={"signedBy": signed_by})
     result = assessments.add_feedback(submission_id, payload)
     if not result:
         raise HTTPException(status_code=404, detail="Entrega no encontrada")
@@ -485,7 +584,10 @@ def add_submission_feedback(submission_id: str, payload: SubmissionFeedback, req
 # --- Fase 3: sandbox sin ejecución remota ------------------------------------
 
 @app.get("/api/v1/sandbox/attempts", response_model=ApiResponse[list[SandboxAttempt]])
-def list_sandbox_attempts(request: Request):
+def list_sandbox_attempts(
+    request: Request,
+    current: Actor = Depends(require(Permission.SANDBOX_USE)),
+):
     student_id = request.query_params.get("studentId")
     raw_limit = request.query_params.get("limit", "10")
     try:
@@ -496,7 +598,11 @@ def list_sandbox_attempts(request: Request):
 
 
 @app.post("/api/v1/sandbox/attempts", response_model=ApiResponse[SandboxAttempt])
-def create_sandbox_attempt(payload: NewSandboxAttempt, request: Request):
+def create_sandbox_attempt(
+    payload: NewSandboxAttempt,
+    request: Request,
+    current: Actor = Depends(require(Permission.SANDBOX_USE)),
+):
     result = sandbox.create_attempt(payload)
     add_audit(
         request,
@@ -507,7 +613,11 @@ def create_sandbox_attempt(payload: NewSandboxAttempt, request: Request):
 
 
 @app.get("/api/v1/sandbox/attempts/{attempt_id}", response_model=ApiResponse[SandboxAttempt])
-def get_sandbox_attempt(attempt_id: str, request: Request):
+def get_sandbox_attempt(
+    attempt_id: str,
+    request: Request,
+    current: Actor = Depends(require(Permission.SANDBOX_USE)),
+):
     result = sandbox.get_attempt(attempt_id)
     if not result:
         raise HTTPException(status_code=404, detail="Intento no encontrado")

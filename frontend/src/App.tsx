@@ -28,9 +28,47 @@ import { canViewTab } from './auth/permissions';
 import { ApiMeta, DashboardSummary, NavTab, UserProfile, UserRole, ThemeMode } from './types';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
+/** Perfil DEMO asociado al rol activo (mismo mapa para inicio y cambio de rol). */
+function profileForRole(newRole: UserRole, base: UserProfile, persistedName?: string): UserProfile {
+  let name = 'Dra. López';
+  let title = 'Administrador Principal';
+  let avatar = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80';
+
+  if (newRole === 'estudiante') {
+    name = 'Sofia Ramírez Vargas';
+    title = 'Estudiante • Especialidad en Deep Learning';
+    avatar = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80';
+  } else if (newRole === 'docente' || newRole === 'coordinador') {
+    name = 'Dr. Alejandro Morales';
+    title = 'Docente Titular • Redes Neuronales & Transformers';
+    avatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
+  } else if (newRole === 'mle') {
+    name = 'Ing. Carlos Mendoza';
+    title = 'Staff ML Engineer • MLOps & DVC';
+    avatar = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80';
+  } else if (newRole === 'auditor') {
+    name = 'Abg. Roberto Castillo';
+    title = 'Auditor Legal • Privacidad & Ley 29733';
+    avatar = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80';
+  }
+
+  return { ...base, role: newRole, name: persistedName || name, title, avatar };
+}
+
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
-  const [user, setUser] = useState<UserProfile>(currentUser);
+  // Fase 4: rehidratamos el rol DEMO guardado para que X-Role sobreviva a recargas.
+  const [user, setUser] = useState<UserProfile>(() => {
+    try {
+      const raw = localStorage.getItem('edumaster_demo_user');
+      if (!raw) return currentUser;
+      const parsed = JSON.parse(raw) as { name?: string; role?: UserRole };
+      if (!parsed.role) return currentUser;
+      return profileForRole(parsed.role, currentUser, parsed.name);
+    } catch {
+      return currentUser;
+    }
+  });
   const [globalScore] = useState<number>(92.6);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [apiMeta, setApiMeta] = useState<ApiMeta | null>(null);
@@ -79,35 +117,7 @@ export const App: React.FC = () => {
   }, [dashboardReloadKey]);
 
   const handleRoleChange = (newRole: UserRole) => {
-    let name = 'Dra. López';
-    let title = 'Administrador Principal';
-    let avatar = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80';
-
-    if (newRole === 'estudiante') {
-      name = 'Sofia Ramírez Vargas';
-      title = 'Estudiante • Especialidad en Deep Learning';
-      avatar = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80';
-    } else if (newRole === 'docente' || newRole === 'coordinador') {
-      name = 'Dr. Alejandro Morales';
-      title = 'Docente Titular • Redes Neuronales & Transformers';
-      avatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80';
-    } else if (newRole === 'mle') {
-      name = 'Ing. Carlos Mendoza';
-      title = 'Staff ML Engineer • MLOps & DVC';
-      avatar = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80';
-    } else if (newRole === 'auditor') {
-      name = 'Abg. Roberto Castillo';
-      title = 'Auditor Legal • Privacidad & Ley 29733';
-      avatar = 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80';
-    }
-
-    setUser(prev => ({
-      ...prev,
-      role: newRole,
-      name,
-      title,
-      avatar
-    }));
+    setUser(prev => profileForRole(newRole, prev));
 
     if (!canViewTab(newRole, activeTab)) {
       setActiveTab('dashboard');
@@ -261,7 +271,14 @@ export const App: React.FC = () => {
           {canViewTab(user.role, activeTab) && activeTab === 'certificates' && <CertificatesView theme={theme} />}
           {canViewTab(user.role, activeTab) && activeTab === 'neural-inspector' && <NeuralInspectorView theme={theme} />}
           {canViewTab(user.role, activeTab) && activeTab === 'governance' && <AdminGovernanceView theme={theme} role={user.role} />}
-          {canViewTab(user.role, activeTab) && activeTab === 'settings' && <SettingsView currentTheme={theme} onThemeChange={handleThemeChange} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'settings' && (
+            <SettingsView
+              currentTheme={theme}
+              onThemeChange={handleThemeChange}
+              role={user.role}
+              actor={user.name}
+            />
+          )}
 
           {/* Community Tab: vista funcional con hilos, mensajes y moderación */}
           {canViewTab(user.role, activeTab) && activeTab === 'community' && (

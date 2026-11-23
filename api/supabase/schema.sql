@@ -28,6 +28,17 @@ create index if not exists audit_logs_correlation_idx on audit_logs (correlation
 create index if not exists audit_logs_action_idx on audit_logs (action);
 create index if not exists audit_logs_timestamp_idx on audit_logs (timestamp desc);
 
+-- Fase 4: enriquecimiento de auditoría (seguro si la tabla ya existía).
+alter table audit_logs add column if not exists role text not null default 'desconocido';
+alter table audit_logs add column if not exists actor_id text not null default '';
+alter table audit_logs add column if not exists tenant_id text not null default 'demo-tenant';
+alter table audit_logs add column if not exists method text;
+alter table audit_logs add column if not exists path text;
+alter table audit_logs add column if not exists ip_address text;
+alter table audit_logs add column if not exists status text not null default 'success';
+create index if not exists audit_logs_actor_timestamp_idx on audit_logs (actor, timestamp desc);
+create index if not exists audit_logs_status_idx on audit_logs (status);
+
 create table if not exists learning_events (
   id text primary key,
   event_type text not null,
@@ -178,6 +189,35 @@ create table if not exists sandbox_attempts (
 
 create index if not exists sandbox_attempts_student_idx on sandbox_attempts ("studentId", "createdAt");
 
+-- Fase 4: configuración institucional (una fila por tenant).
+create table if not exists settings (
+  id text primary key,
+  "tenantId" text not null unique,
+  theme text not null default 'monochrome' check (theme in ('monochrome', 'cyber', 'light')),
+  organization text not null,
+  -- Informativo en DEMO: no habilita RLS real sin OIDC/PostgREST policies.
+  "rlsEnabled" boolean not null default false,
+  "retentionDays" integer not null default 730 check ("retentionDays" between 1 and 3650),
+  "minorsProtection" boolean not null default true,
+  "consentOnFirstLogin" boolean not null default true,
+  "arcoPortal" boolean not null default true,
+  "updatedAt" timestamptz not null,
+  "updatedBy" text not null
+);
+
+-- Fase 4: preferencias de notificaciones por actor (self-service y settings).
+create table if not exists notification_preferences (
+  id text primary key,
+  actor text not null unique,
+  email boolean not null default false,
+  "inApp" boolean not null default true,
+  digest text not null default 'diario',
+  categories jsonb not null default '[]'::jsonb
+);
+
 -- Nota: cuando se active OIDC/OAuth2, habilitar RLS y crear policies por rol/institución.
+-- Hasta entonces "rlsEnabled" es solo informativo y NINGUNA tabla tiene RLS activo.
 -- alter table certificates enable row level security;
 -- alter table audit_logs enable row level security;
+-- alter table settings enable row level security;
+-- alter table notification_preferences enable row level security;

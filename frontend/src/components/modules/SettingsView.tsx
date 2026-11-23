@@ -1,22 +1,149 @@
-import React, { useState } from 'react';
-import { Settings, Shield, Building2, Save, CheckCircle2, Palette, Moon, Sun, Check } from 'lucide-react';
-import { ThemeMode } from '../../types';
+import React, { useEffect, useState } from 'react';
+import {
+  Settings, Shield, Building2, Save, CheckCircle2, Palette, Moon, Sun, Check,
+  AlertCircle, Loader2, BellRing,
+} from 'lucide-react';
+import { can } from '../../auth/permissions';
+import { isDemoMode } from '../../services/apiClient';
+import { writeAudit } from '../../services/auditSink';
+import {
+  getSettings,
+  getSettingsPreferences,
+  updateSettings,
+  updateSettingsPreferences,
+} from '../../services/settingsApi';
+import {
+  ApiMeta, AppSettings, SettingsPreferences, SettingsUpdate, ThemeMode, UserRole,
+} from '../../types';
 
 interface SettingsViewProps {
   currentTheme: ThemeMode;
   onThemeChange: (theme: ThemeMode) => void;
+  role: UserRole;
+  actor: string;
 }
 
-export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThemeChange }) => {
-  const [retentionDays, setRetentionDays] = useState('730');
-  const [rlsEnabled, setRlsEnabled] = useState(true);
+interface SettingsForm {
+  organization: string;
+  rlsEnabled: boolean;
+  retentionDays: string;
+  minorsProtection: boolean;
+  consentOnFirstLogin: boolean;
+  arcoPortal: boolean;
+}
+
+function formFromSettings(settings: AppSettings): SettingsForm {
+  return {
+    organization: settings.organization,
+    rlsEnabled: settings.rlsEnabled,
+    retentionDays: String(settings.retentionDays),
+    minorsProtection: settings.minorsProtection,
+    consentOnFirstLogin: settings.consentOnFirstLogin,
+    arcoPortal: settings.arcoPortal,
+  };
+}
+
+export const SettingsView: React.FC<SettingsViewProps> = ({
+  currentTheme, onThemeChange, role, actor,
+}) => {
+  const [settings, setSettings] = useState<AppSettings | null>(null);
+  const [form, setForm] = useState<SettingsForm | null>(null);
+  const [prefs, setPrefs] = useState<SettingsPreferences | null>(null);
+  const [meta, setMeta] = useState<ApiMeta | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const [savedNotice, setSavedNotice] = useState(false);
+  const [prefsNotice, setPrefsNotice] = useState(false);
 
   const isMono = currentTheme === 'monochrome';
+  const canEdit = can(role, 'settings:edit');
+  const demoMode = isDemoMode();
 
-  const handleSave = () => {
-    setSavedNotice(true);
-    setTimeout(() => setSavedNotice(false), 3000);
+  useEffect(() => {
+    const controller = new AbortController();
+    Promise.all([
+      getSettings(controller.signal),
+      getSettingsPreferences(controller.signal),
+    ])
+      .then(([settingsResponse, prefsResponse]) => {
+        setSettings(settingsResponse.data);
+        setForm(formFromSettings(settingsResponse.data));
+        setPrefs(prefsResponse.data);
+        setMeta(settingsResponse.meta);
+        setError(null);
+      })
+      .catch(err => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setError(err instanceof Error ? err.message : 'No se pudo cargar la configuración');
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, []);
+
+  const flash = (setter: (value: boolean) => void) => {
+    setter(true);
+    setTimeout(() => setter(false), 3000);
+  };
+
+  const handleSave = async () => {
+    if (!form || saving) return;
+    const retentionDays = Number(form.retentionDays);
+    if (!Number.isInteger(retentionDays) || retentionDays < 1 || retentionDays > 3650) {
+      setError('La retención debe estar entre 1 y 3650 días.');
+      return;
+    }
+
+    const payload: SettingsUpdate = {
+      theme: currentTheme,
+      organization: form.organization.trim(),
+      rlsEnabled: form.rlsEnabled,
+      retentionDays,
+      minorsProtection: form.minorsProtection,
+      consentOnFirstLogin: form.consentOnFirstLogin,
+      arcoPortal: form.arcoPortal,
+    };
+
+    setSaving(true);
+    setError(null);
+    try {
+      const response = await updateSettings(payload);
+      setSettings(response.data);
+      setForm(formFromSettings(response.data));
+      setMeta(response.meta);
+      onThemeChange(response.data.theme);
+      // El backend Fase 4 ya audita PUT /settings; en API no duplicamos.
+      await writeAudit({
+        action: 'settings.view_updated',
+        detail: { theme: response.data.theme, retentionDays },
+        onlyDemo: true,
+      });
+      flash(setSavedNotice);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo guardar la configuración');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePrefsSave = async () => {
+    if (!prefs || saving) return;
+    setSaving(true);
+    setError(null);
+    try {
+      const response = await updateSettingsPreferences(prefs);
+      setPrefs(response.data);
+      await writeAudit({
+        action: 'settings.preferences_updated',
+        detail: { digest: response.data.digest },
+        onlyDemo: true,
+      });
+      flash(setPrefsNotice);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudieron guardar las preferencias');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const themeOptions: {
@@ -33,7 +160,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThem
       description: 'Estética charcoal y grises profundos con alto contraste, paneles delimitados y máxima legibilidad sin negro plano.',
       previewBg: 'bg-[#151821] border-[#3B4254]',
       previewAccent: 'bg-white text-zinc-950 font-bold',
-      icon: <Moon className="w-4 h-4 text-zinc-300" />
+      icon: <Moon className="w-4 h-4 text-zinc-300" />,
     },
     {
       id: 'cyber',
@@ -41,7 +168,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThem
       description: 'Paleta corporativa de alta tecnología con tonos azul marino, cian eléctrico y violeta.',
       previewBg: 'bg-[#06152B] border-blue-500/40',
       previewAccent: 'bg-[#087FE5] text-white font-bold',
-      icon: <Palette className="w-4 h-4 text-cyan-400" />
+      icon: <Palette className="w-4 h-4 text-cyan-400" />,
     },
     {
       id: 'light',
@@ -49,29 +176,71 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThem
       description: 'Entorno blanco papel con bordes nítidos de alta definición, tarjetas elevadas y detalles de contraste optimizados.',
       previewBg: 'bg-white border-slate-300 shadow-sm',
       previewAccent: 'bg-slate-900 text-white font-bold',
-      icon: <Sun className="w-4 h-4 text-amber-500" />
-    }
+      icon: <Sun className="w-4 h-4 text-amber-500" />,
+    },
   ];
+
+  if (loading) {
+    return (
+      <div className="glass-panel p-6 border rounded-2xl flex items-center gap-2 text-xs">
+        <Loader2 className="w-4 h-4 animate-spin" /> Cargando configuración institucional…
+      </div>
+    );
+  }
+
+  if (error && !settings) {
+    return (
+      <div className="p-4 rounded-xl border border-red-500/40 bg-red-500/10 text-xs flex items-start gap-2">
+        <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+        <div>
+          <p className="font-bold m-0">No se pudo cargar la configuración</p>
+          <p className="opacity-80 mt-1 m-0">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-black flex items-center gap-2 m-0">
-          <Settings className="w-5 h-5 opacity-80" />
-          Configuración Institucional & Gobierno de Datos
-        </h1>
-        <p className="text-xs opacity-60 mt-1 m-0">
-          Personalización visual de la plataforma, parámetros multi-tenant y cumplimiento regulatorio Ley N.° 29733 (Perú).
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-xl font-black flex items-center gap-2 m-0">
+            <Settings className="w-5 h-5 opacity-80" />
+            Configuración Institucional & Gobierno de Datos
+          </h1>
+          <p className="text-xs opacity-60 mt-1 m-0">
+            Personalización visual, parámetros multi-tenant y cumplimiento Ley N.° 29733 (Perú).
+          </p>
+        </div>
+        <span className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-full border ${
+          demoMode
+            ? 'border-amber-500/40 bg-amber-500/10 text-amber-400'
+            : 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
+        }`}>
+          {demoMode ? 'DEMO · sin conexión' : 'API · /api/v1'}
+          {meta ? ` · ${meta.correlationId.slice(0, 12)}` : ''}
+        </span>
       </div>
+
+      {!canEdit && (
+        <div className="p-3 rounded-xl border border-amber-500/40 bg-amber-500/10 text-[11px]">
+          Tu rol ({role}) tiene acceso de solo lectura a esta sección.
+        </div>
+      )}
+
+      {error && (
+        <div className="p-3 rounded-xl border border-red-500/40 bg-red-500/10 text-[11px] flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+        </div>
+      )}
 
       {savedNotice && (
         <div className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 ${
           isMono ? 'bg-[#1E222C] border-[#3B4254] text-white' : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
         }`}>
           <CheckCircle2 className="w-4 h-4" />
-          <span>Configuración y preferencias de tema persistidas en el sistema.</span>
+          <span>Configuración persistida en {demoMode ? 'el store DEMO local' : 'la API /api/v1'}.</span>
         </div>
       )}
 
@@ -84,7 +253,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThem
             <Palette className="w-5 h-5 opacity-90" />
             <div>
               <h2 className="text-sm font-bold m-0">Personalización & Tema Visual</h2>
-              <p className="text-xs opacity-60 m-0">Selecciona el esquema de color y estilo visual de la interfaz</p>
+              <p className="text-xs opacity-60 m-0">Selecciona el esquema de color de la interfaz</p>
             </div>
           </div>
           <span className={`text-[11px] font-mono font-bold px-2.5 py-1 rounded-full border ${
@@ -103,20 +272,19 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThem
                 onClick={() => onThemeChange(opt.id)}
                 className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between ${
                   isSelected
-                    ? (isMono 
-                        ? 'bg-[#1E222C] border-white ring-2 ring-white/30 shadow-md' 
-                        : currentTheme === 'light'
-                        ? 'bg-slate-50 border-slate-900 ring-2 ring-slate-900/20 shadow-md'
-                        : 'bg-white/5 border-edumaster-cyan ring-2 ring-edumaster-cyan/30 shadow-glowCyan')
+                    ? (isMono
+                      ? 'bg-[#1E222C] border-white ring-2 ring-white/30 shadow-md'
+                      : currentTheme === 'light'
+                      ? 'bg-slate-50 border-slate-900 ring-2 ring-slate-900/20 shadow-md'
+                      : 'bg-white/5 border-edumaster-cyan ring-2 ring-edumaster-cyan/30 shadow-glowCyan')
                     : (isMono
-                        ? 'bg-[#151821] border-[#2A2F3D] hover:border-[#4D566D] hover:bg-[#1E222C]'
-                        : currentTheme === 'light'
-                        ? 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                        : 'bg-black/30 border-white/10 hover:border-white/30 hover:bg-white/5')
+                      ? 'bg-[#151821] border-[#2A2F3D] hover:border-[#4D566D] hover:bg-[#1E222C]'
+                      : currentTheme === 'light'
+                      ? 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                      : 'bg-black/30 border-white/10 hover:border-white/30 hover:bg-white/5')
                 }`}
               >
                 <div>
-                  {/* Swatch Mini Preview */}
                   <div className={`h-20 w-full rounded-lg border mb-3 p-2.5 flex flex-col justify-between ${opt.previewBg}`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
@@ -126,7 +294,6 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThem
                       </div>
                       <span className="text-[9px] font-mono opacity-60">Preview</span>
                     </div>
-
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
                         <div className="w-16 h-2 rounded bg-current opacity-20" />
@@ -150,14 +317,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThem
                     )}
                   </div>
 
-                  <p className="text-[11px] opacity-70 leading-relaxed mb-3">
-                    {opt.description}
-                  </p>
+                  <p className="text-[11px] opacity-70 leading-relaxed mb-3">{opt.description}</p>
                 </div>
 
                 <button
                   type="button"
-                  className={`w-full py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  onClick={() => onThemeChange(opt.id)}
+                  disabled={!canEdit}
+                  className={`w-full py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-50 ${
                     isSelected
                       ? (isMono ? 'bg-white text-black' : 'bg-edumaster-blue text-white')
                       : 'bg-white/10 opacity-70 hover:opacity-100'
@@ -179,38 +346,54 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThem
             Parámetros del Tenant Institucional
           </h3>
 
-          <div className="space-y-3 text-xs">
-            <div>
-              <label className="opacity-70 block mb-1">Nombre de la Organización</label>
-              <input
-                type="text"
-                defaultValue="Universidad Tecnológica Enterprise"
-                className="w-full bg-black/40 border border-white/10 rounded-xl p-2.5 focus:outline-none focus:border-white/30"
-              />
-            </div>
-
-            <div>
-              <label className="opacity-70 block mb-1">Código Único Institucional (Tenant ID)</label>
-              <input
-                type="text"
-                disabled
-                defaultValue="org-ute-peru-2026"
-                className="w-full bg-black/20 border border-white/10 rounded-xl p-2.5 opacity-60 font-mono"
-              />
-            </div>
-
-            <div className="pt-2">
-              <label className="flex items-center gap-2 cursor-pointer">
+          {form && (
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="opacity-70 block mb-1">Nombre de la Organización</label>
                 <input
-                  type="checkbox"
-                  checked={rlsEnabled}
-                  onChange={e => setRlsEnabled(e.target.checked)}
-                  className="rounded border-zinc-700 text-white focus:ring-0"
+                  type="text"
+                  value={form.organization}
+                  disabled={!canEdit}
+                  onChange={e => setForm({ ...form, organization: e.target.value })}
+                  className="w-full bg-black/40 border border-white/10 rounded-xl p-2.5 focus:outline-none focus:border-white/30 disabled:opacity-60"
                 />
-                <span>Forzar Row Level Security (RLS) en PostgreSQL a nivel de conexión</span>
-              </label>
+              </div>
+
+              <div>
+                <label className="opacity-70 block mb-1">Código Único Institucional (Tenant ID)</label>
+                <input
+                  type="text"
+                  disabled
+                  value={settings?.tenantId ?? ''}
+                  className="w-full bg-black/20 border border-white/10 rounded-xl p-2.5 opacity-60 font-mono"
+                />
+              </div>
+
+              <div className="pt-2">
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.rlsEnabled}
+                    disabled={!canEdit}
+                    onChange={e => setForm({ ...form, rlsEnabled: e.target.checked })}
+                    className="mt-0.5 rounded border-zinc-700"
+                  />
+                  <span>
+                    Marcar RLS como habilitado (informativo)
+                    <span className="block opacity-50 text-[10px] mt-0.5">
+                      DEMO: no activa Row Level Security real sin OIDC y policies en Supabase.
+                    </span>
+                  </span>
+                </label>
+              </div>
+
+              <div className="pt-2 border-t border-white/10">
+                <p className="opacity-60 text-[10px] m-0">
+                  Última actualización: {settings?.updatedAt} · por {settings?.updatedBy}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Legal & Privacy Compliance Ley 29733 */}
@@ -220,44 +403,131 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ currentTheme, onThem
             Privacidad & Ley N.° 29733 (Perú)
           </h3>
 
-          <div className="space-y-3 text-xs">
-            <div>
-              <label className="opacity-70 block mb-1">Periodo de Retención de Eventos Académicos (Días)</label>
-              <input
-                type="number"
-                value={retentionDays}
-                onChange={e => setRetentionDays(e.target.value)}
-                className="w-full bg-black/40 border border-white/10 rounded-xl p-2.5 font-mono focus:outline-none"
-              />
-              <span className="text-[10px] opacity-50">Tras este plazo, los eventos se archivan o anonimizan de forma irreversible.</span>
-            </div>
+          {form && (
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="opacity-70 block mb-1">Retención de eventos académicos (días)</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={3650}
+                  value={form.retentionDays}
+                  disabled={!canEdit}
+                  onChange={e => setForm({ ...form, retentionDays: e.target.value })}
+                  className="w-full bg-black/40 border border-white/10 rounded-xl p-2.5 font-mono focus:outline-none disabled:opacity-60"
+                />
+              </div>
 
-            <div className="p-3 bg-black/40 rounded-xl border border-white/10 space-y-2">
-              <div className="flex items-center justify-between">
-                <span>Protección reforzada para menores de edad:</span>
-                <span className="font-bold opacity-90">Habilitado</span>
+              <div className="p-3 bg-black/40 rounded-xl border border-white/10 space-y-2">
+                {([
+                  ['minorsProtection', 'Protección reforzada para menores de edad'],
+                  ['consentOnFirstLogin', 'Consentimiento informado en primer inicio'],
+                  ['arcoPortal', 'Portal de Derechos ARCO para estudiantes'],
+                ] as const).map(([key, label]) => (
+                  <label key={key} className="flex items-center justify-between gap-2 cursor-pointer">
+                    <span>{label}</span>
+                    <input
+                      type="checkbox"
+                      checked={form[key]}
+                      disabled={!canEdit}
+                      onChange={e => setForm({ ...form, [key]: e.target.checked })}
+                      className="rounded border-zinc-700"
+                    />
+                  </label>
+                ))}
               </div>
-              <div className="flex items-center justify-between">
-                <span>Consentimiento informado en primer inicio:</span>
-                <span className="font-bold opacity-90">Habilitado</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Portal de Derechos ARCO para estudiantes:</span>
-                <span className="font-bold opacity-90">Habilitado</span>
-              </div>
-            </div>
 
-            <button
-              onClick={handleSave}
-              className={`w-full py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors ${
-                isMono ? 'bg-white text-black hover:bg-zinc-200' : 'bg-edumaster-blue hover:bg-edumaster-blue/80 text-white'
-              }`}
-            >
-              <Save className="w-3.5 h-3.5" />
-              Guardar Configuración
-            </button>
-          </div>
+              <button
+                onClick={handleSave}
+                disabled={!canEdit || saving}
+                className={`w-full py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50 ${
+                  isMono ? 'bg-white text-black hover:bg-zinc-200' : 'bg-edumaster-blue hover:bg-edumaster-blue/80 text-white'
+                }`}
+              >
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                Guardar Configuración
+              </button>
+            </div>
+          )}
         </div>
+      </div>
+
+      {/* Preferencias de notificaciones del actor */}
+      <div className="glass-panel p-5 border rounded-2xl space-y-4">
+        <h3 className="text-sm font-bold flex items-center gap-2 m-0">
+          <BellRing className="w-4 h-4 opacity-80" />
+          Preferencias de Notificaciones de {actor}
+        </h3>
+
+        {prefs && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div className="space-y-3">
+              <label className="flex items-center justify-between gap-2">
+                <span>Correo electrónico</span>
+                <input
+                  type="checkbox"
+                  checked={prefs.email}
+                  disabled={!canEdit}
+                  onChange={e => setPrefs({ ...prefs, email: e.target.checked })}
+                  className="rounded border-zinc-700"
+                />
+              </label>
+              <label className="flex items-center justify-between gap-2">
+                <span>Notificaciones en la aplicación</span>
+                <input
+                  type="checkbox"
+                  checked={prefs.inApp}
+                  disabled={!canEdit}
+                  onChange={e => setPrefs({ ...prefs, inApp: e.target.checked })}
+                  className="rounded border-zinc-700"
+                />
+              </label>
+              <div>
+                <label className="opacity-70 block mb-1">Frecuencia del resumen</label>
+                <select
+                  value={prefs.digest}
+                  disabled={!canEdit}
+                  onChange={e => setPrefs({ ...prefs, digest: e.target.value })}
+                  className="w-full bg-black/40 border border-white/10 rounded-xl p-2.5 focus:outline-none disabled:opacity-60"
+                >
+                  <option value="diario">Diario</option>
+                  <option value="semanal">Semanal</option>
+                  <option value="mensual">Mensual</option>
+                </select>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="opacity-70 block mb-1">Categorías (separadas por coma)</label>
+                <input
+                  type="text"
+                  value={prefs.categories.join(', ')}
+                  disabled={!canEdit}
+                  onChange={e => setPrefs({
+                    ...prefs,
+                    categories: e.target.value.split(',').map(v => v.trim()).filter(Boolean),
+                  })}
+                  className="w-full bg-black/40 border border-white/10 rounded-xl p-2.5 focus:outline-none disabled:opacity-60"
+                />
+              </div>
+              <button
+                onClick={handlePrefsSave}
+                disabled={!canEdit || saving}
+                className={`w-full py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50 ${
+                  isMono ? 'bg-white text-black hover:bg-zinc-200' : 'bg-edumaster-blue hover:bg-edumaster-blue/80 text-white'
+                }`}
+              >
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                Guardar Preferencias
+              </button>
+              {prefsNotice && (
+                <p className="text-[11px] text-emerald-400 flex items-center gap-1 m-0">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Preferencias guardadas.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { getBaseUrl, newCorrelationId, request } from './apiClient';
+import { getBaseUrl, getDemoActor, newCorrelationId, request } from './apiClient';
 import { appendLocalAudit } from './demoStore';
 
 export interface AuditEventInput {
@@ -12,9 +12,12 @@ export interface AuditEventInput {
 /**
  * Escribe auditoría desde cualquier módulo.
  * Con API configurada usa POST /api/v1/audit/logs; si falla, deja constancia local.
+ * El actor y el rol se derivan del usuario DEMO activo (X-Actor/X-Role).
  */
 export async function writeAudit(input: AuditEventInput): Promise<string> {
   const correlationId = input.correlationId || newCorrelationId();
+  const demoActor = getDemoActor();
+  const detail = { ...(input.detail ?? {}), role: demoActor.role };
 
   if (input.onlyDemo && getBaseUrl()) {
     return correlationId;
@@ -26,8 +29,8 @@ export async function writeAudit(input: AuditEventInput): Promise<string> {
         method: 'POST',
         body: JSON.stringify({
           action: input.action,
-          actor: 'demo-user',
-          detail: input.detail ?? {},
+          actor: demoActor.name,
+          detail,
           correlation_id: correlationId,
         }),
       });
@@ -39,8 +42,9 @@ export async function writeAudit(input: AuditEventInput): Promise<string> {
 
   appendLocalAudit({
     action: input.action,
-    actor: 'demo-user',
-    detail: input.detail ?? {},
+    actor: demoActor.name,
+    role: demoActor.role,
+    detail,
     correlation_id: correlationId,
   });
   return correlationId;

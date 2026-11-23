@@ -382,6 +382,14 @@ export interface ApiAuditLog {
   actor: string;
   detail: Record<string, unknown>;
   timestamp: string;
+  // Fase 4: campos opcionales para no romper registros DEMO antiguos.
+  role?: string;
+  actor_id?: string;
+  tenant_id?: string;
+  method?: string | null;
+  path?: string | null;
+  ip_address?: string | null;
+  status?: 'success' | 'denied';
 }
 
 export interface NeuralStatusPayload {
@@ -494,4 +502,35 @@ export interface NotificationPreferences {
   digest: string;
   categories: string[];
 }
+
+// --- Fase 4: configuración institucional y preferencias ---
+
+export type SettingsTheme = ThemeMode;
+
+export interface AppSettings {
+  theme: SettingsTheme;
+  organization: string;
+  tenantId: string;
+  /** Informativo en DEMO: no activa RLS real sin OIDC/Postgres policies. */
+  rlsEnabled: boolean;
+  retentionDays: number;
+  minorsProtection: boolean;
+  consentOnFirstLogin: boolean;
+  arcoPortal: boolean;
+  updatedAt: string;
+  updatedBy: string;
+}
+
+export type SettingsUpdate = Pick<
+  AppSettings,
+  | 'theme'
+  | 'organization'
+  | 'rlsEnabled'
+  | 'retentionDays'
+  | 'minorsProtection'
+  | 'consentOnFirstLogin'
+  | 'arcoPortal'
+>;
+
+export type SettingsPreferences = NotificationPreferences;
 

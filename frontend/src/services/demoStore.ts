@@ -50,7 +50,7 @@ export function readLocalAudit(): ApiAuditLog[] {
 }
 
 export function appendLocalAudit(
-  input: Pick<ApiAuditLog, 'action' | 'actor' | 'detail' | 'correlation_id'>,
+  input: Pick<ApiAuditLog, 'action' | 'actor' | 'detail' | 'correlation_id' | 'role' | 'status'>,
 ): ApiAuditLog {
   const entry: ApiAuditLog = {
     id: `AUD-LOCAL-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
@@ -59,6 +59,9 @@ export function appendLocalAudit(
     actor: input.actor,
     detail: input.detail,
     timestamp: new Date().toISOString(),
+    role: input.role,
+    status: input.status ?? 'success',
+    tenant_id: 'demo-tenant',
   };
   writeSlice('auditLogs', [entry, ...readLocalAudit()].slice(0, 200));
   return entry;

@@ -197,6 +197,36 @@ class NotificationPreferences(BaseModel):
     categories: list[str] = Field(default_factory=list)
 
 
+class SettingsPreferences(NotificationPreferences):
+    """Alias versionado para /api/v1/settings/preferences."""
+
+
+class AppSettings(BaseModel):
+    theme: Literal["monochrome", "cyber", "light"] = "monochrome"
+    organization: str = Field(min_length=3, max_length=120)
+    tenantId: str = Field(min_length=3, max_length=80)
+    # Informativo en DEMO: no activa RLS real sin OIDC/Postgres.
+    rlsEnabled: bool = False
+    retentionDays: int = Field(default=730, ge=1, le=3650)
+    minorsProtection: bool = True
+    consentOnFirstLogin: bool = True
+    arcoPortal: bool = True
+    updatedAt: str
+    updatedBy: str
+
+
+class AppSettingsUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    theme: Literal["monochrome", "cyber", "light"]
+    organization: str = Field(min_length=3, max_length=120)
+    rlsEnabled: bool = False
+    retentionDays: int = Field(default=730, ge=1, le=3650)
+    minorsProtection: bool = True
+    consentOnFirstLogin: bool = True
+    arcoPortal: bool = True
+
+
 class FeedbackResult(BaseModel):
     feedback_id: str
     prediction_id: str
@@ -213,13 +243,23 @@ class AuditLog(BaseModel):
     actor: str
     detail: dict[str, Any]
     timestamp: str
+    # Fase 4: enriquecimiento opcional para no romper clientes Fase 1-3.
+    role: str = "desconocido"
+    actor_id: str = ""
+    tenant_id: str = "demo-tenant"
+    method: str | None = None
+    path: str | None = None
+    ip_address: str | None = None
+    status: Literal["success", "denied"] = "success"
 
 
 class AuditLogCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     action: str = Field(min_length=3, max_length=120)
-    actor: str = Field(default="demo-user", min_length=2, max_length=80)
+    # Se conserva por compatibilidad, pero la API Fase 4 ignora el valor del cliente:
+    # el actor real se deriva de las headers DEMO validadas en app/auth.py.
+    actor: str | None = Field(default=None, max_length=80)
     detail: dict[str, Any] = Field(default_factory=dict)
     correlation_id: str | None = None
 

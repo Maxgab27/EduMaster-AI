@@ -249,8 +249,10 @@ Al terminar cada módulo:
 
 - **Fase 1 completada y validada**: Dashboard, Analytics, Certificados, Gobernanza y Neural Inspector leen el contrato `/api/v1` con fallback DEMO; sin métricas falsas ni etiquetas de producción.
 - **Fase 2 completada y validada**: Comunidad, Tutor IA, Recomendaciones y Notificaciones funcionan con API y con store DEMO versionado; las acciones quedan en auditoría sin duplicados.
-- **Próximo paso**: **Fase 3** — Courses, Learning Paths, Assessments/SpeedGrader y Sandbox con estados reales y firma docente.
+- **Fase 3 completada y validada** (`e0da0d5`): Courses, Learning Paths, Assessments/SpeedGrader y Sandbox con estados reales y firma docente obligatoria.
+- **Fase 4 completada y validada** (`d49b9ba`): autoridad RBAC/ABAC DEMO en backend (`X-Actor`/`X-Role`), settings institucionales y preferencias por actor, auditoría enriquecida con `role`/`status`/`tenantId`, y DDL de Supabase preparado sin RLS real. El backend sigue siendo DEMO: `auth=demo-header-rbac`, `storage=memory-demo` hasta configurar Supabase; sin OIDC/JWT.
+- **Próximo paso**: **Fase 5** — alcance pendiente de definir. No activar RLS real ni etiquetas de producción sin OIDC y credenciales de Supabase.
 
 ---
 
-**Estado del plan**: aprobado; Fase 1 y Fase 2 implementadas y verificadas en navegador (`DEMO` y `API`), pendiente de Fase 3.
+**Estado del plan**: aprobado; Fases 1–4 implementadas y verificadas en navegador (`DEMO` y `API`). Autoridad backend es DEMO; sin persistencia Postgres real hasta configurar Supabase.
