@@ -345,5 +345,134 @@ class TutorConversation(BaseModel):
     messages: list[TutorMessage]
 
 
+# --- Fase 3: cursos, rutas, evaluaciones y sandbox ----------------------------
+
+class Course(BaseModel):
+    id: str
+    code: str
+    title: str
+    instructor: str
+    level: Literal["Básico", "Intermedio", "Avanzado"]
+    description: str
+    students: int
+    capacity: int = 0
+    completionRate: int = 0
+    status: Literal["Publicado", "Borrador"] = "Publicado"
+    tags: list[str] = Field(default_factory=list)
+    createdAt: str
+    enrolled: bool = False
+
+
+class NewCourse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    code: str = Field(min_length=3, max_length=20, pattern=r"^[A-Za-z0-9-]+$")
+    title: str = Field(min_length=4, max_length=120)
+    instructor: str = Field(min_length=3, max_length=80)
+    level: Literal["Básico", "Intermedio", "Avanzado"]
+    description: str = Field(min_length=10, max_length=500)
+    capacity: int = Field(default=100, ge=1, le=100000)
+    status: Literal["Publicado", "Borrador"] = "Publicado"
+    tags: list[str] = Field(default_factory=list)
+
+
+class PathStep(BaseModel):
+    id: str
+    name: str
+    status: Literal["completed", "current", "locked"]
+    score: str
+    courseId: str | None = None
+
+
+class LearningPath(BaseModel):
+    id: str
+    title: str
+    description: str
+    duration: str
+    coursesCount: int
+    progress: int
+    steps: list[PathStep]
+
+
+class PathProgressRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    stepId: str = Field(min_length=2, max_length=80)
+    completed: bool = True
+    source: Literal["manual", "recommendation"] = "manual"
+
+
+class Assessment(BaseModel):
+    id: str
+    title: str
+    course: str
+    dueDate: str
+    maxScore: float = 20
+    weight: str
+    attempts: int
+    officialAvg: float | None = None
+    predictiveEst: float | None = None
+    status: Literal["Disponible", "En Calificación", "Cerrado"]
+    note: str = "DEMO · promedios sintéticos de muestra, no evidencia oficial."
+
+
+class RubricScore(BaseModel):
+    criteria: str
+    maxPts: float
+    score: float
+
+
+class Submission(BaseModel):
+    id: str
+    studentId: str
+    studentName: str
+    avatar: str | None = None
+    course: str
+    assignmentTitle: str
+    submittedAt: str
+    estimatedAiScore: float
+    officialScore: float | None = None
+    status: Literal["pending", "in_review", "graded"] = "pending"
+    codeSnippet: str = ""
+    rubricScores: list[RubricScore] = Field(default_factory=list)
+    feedback: str = ""
+    signedBy: str | None = None
+    gradedAt: str | None = None
+    predictionId: str | None = None
+
+
+class GradeSubmission(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    officialScore: float = Field(ge=0)
+    feedback: str = Field(min_length=3, max_length=2000)
+    signedBy: str = Field(min_length=2, max_length=80)
+
+
+class SubmissionFeedback(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    feedback: str = Field(min_length=3, max_length=2000)
+    signedBy: str = Field(min_length=2, max_length=80)
+
+
+class NewSandboxAttempt(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    code: str = Field(min_length=1, max_length=4000)
+    studentId: str = Field(default="EST-DEMO-0001", min_length=2, max_length=60)
+
+
+class SandboxAttempt(BaseModel):
+    id: str
+    studentId: str
+    code: str
+    output: str
+    status: Literal["simulado", "bloqueado"]
+    findings: list[str]
+    guardrail: str
+    createdAt: str
+
+
 def utc_now() -> str:
     return datetime.utcnow().replace(microsecond=0).isoformat() + "Z"

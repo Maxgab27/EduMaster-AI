@@ -1,66 +1,135 @@
-import React, { useState } from 'react';
-import { 
-  Users, 
-  CheckSquare, 
-  AlertTriangle, 
-  Award, 
-  Sparkles, 
-  ArrowRight, 
-  Mail, 
-  CheckCircle2, 
-  ShieldAlert
+import React, { useEffect, useState } from 'react';
+import {
+  Users,
+  CheckSquare,
+  AlertTriangle,
+  Award,
+  Sparkles,
+  ArrowRight,
+  Mail,
+  CheckCircle2,
+  ShieldAlert,
+  RefreshCw,
+  AlertCircle,
 } from 'lucide-react';
-import { ThemeMode, PendingSubmission, AtRiskStudent } from '../../types';
-import { pendingSubmissions as initialSubmissions, atRiskStudents as initialRisks } from '../../data/mockData';
+import type { ApiMeta, ApiSubmission, AtRiskStudent, ThemeMode } from '../../types';
+import { atRiskStudents as initialRisks } from '../../data/mockData';
+import {
+  addSubmissionFeedback,
+  gradeSubmission,
+  listSubmissions,
+} from '../../services/assessmentsApi';
+import { writeAudit } from '../../services/auditSink';
 import { TeacherSpeedGraderModal } from './TeacherSpeedGraderModal';
 
 interface TeacherDashboardProps {
   theme?: ThemeMode;
 }
 
+function initials(name: string): string {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0]?.toUpperCase() ?? '')
+    .join('');
+}
+
 export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'monochrome' }) => {
-  const [submissions, setSubmissions] = useState<PendingSubmission[]>(initialSubmissions);
+  const [submissions, setSubmissions] = useState<ApiSubmission[]>([]);
   const [risks, setRisks] = useState<AtRiskStudent[]>(initialRisks);
-  const [activeSubmission, setActiveSubmission] = useState<PendingSubmission | null>(null);
+  const [meta, setMeta] = useState<ApiMeta | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeSubmission, setActiveSubmission] = useState<ApiSubmission | null>(null);
   const [isSpeedGraderOpen, setIsSpeedGraderOpen] = useState(false);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
 
-  const handleOpenGrader = (sub: PendingSubmission) => {
-    setActiveSubmission(sub);
+  useEffect(() => {
+    const controller = new AbortController();
+    listSubmissions(controller.signal)
+      .then(response => {
+        setSubmissions(response.data);
+        setMeta(response.meta);
+        setError(null);
+      })
+      .catch(err => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setError(err instanceof Error ? err.message : 'No se pudieron cargar las entregas');
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [reloadKey]);
+
+  const pendingCount = submissions.filter(submission => submission.status !== 'graded').length;
+  const graded = submissions.filter(submission => submission.officialScore !== null);
+  const average = graded.length
+    ? (graded.reduce((sum, submission) => sum + (submission.officialScore ?? 0), 0) / graded.length).toFixed(1)
+    : '—';
+
+  const handleOpenGrader = (submission: ApiSubmission) => {
+    setError(null);
+    setActiveSubmission(submission);
     setIsSpeedGraderOpen(true);
   };
 
-  const handleGradeConfirmed = (submissionId: string, officialScore: number, feedback: string) => {
-    setSubmissions(prev => prev.map(s => {
-      if (s.id === submissionId) {
-        return {
-          ...s,
-          status: 'graded',
-          officialScore,
-          feedback
-        };
-      }
-      return s;
-    }));
+  const handleGradeConfirmed = async (
+    submissionId: string,
+    officialScore: number,
+    feedback: string,
+    signedBy: string,
+  ) => {
+    const response = await gradeSubmission(submissionId, { officialScore, feedback, signedBy });
+    setSubmissions(prev => prev.map(item => (item.id === submissionId ? response.data : item)));
+    setActiveSubmission(response.data);
+    await writeAudit({
+      action: 'submissions.graded',
+      correlationId: response.meta.correlationId,
+      onlyDemo: true,
+      detail: {
+        id: submissionId,
+        officialScore,
+        estimatedAiScore: response.data.estimatedAiScore,
+        signedBy,
+      },
+    });
+    setActionNotice(
+      `✓ Nota ${officialScore}/${response.data.rubricScores.reduce((sum, row) => sum + row.maxPts, 0)} firmada por ${signedBy} y registrada en ${response.meta.source.toUpperCase()}. Sin publicación en actas reales.`,
+    );
+  };
 
-    setActionNotice(`✓ Nota oficial de ${officialScore}/20 registrada solo en memoria (demo). Sin auditoría ni publicación real.`);
-    setTimeout(() => setActionNotice(null), 4000);
+  const handleFeedbackSaved = async (
+    submissionId: string,
+    feedback: string,
+    signedBy: string,
+  ) => {
+    const response = await addSubmissionFeedback(submissionId, { feedback, signedBy });
+    setSubmissions(prev => prev.map(item => (item.id === submissionId ? response.data : item)));
+    setActiveSubmission(response.data);
+    await writeAudit({
+      action: 'submissions.feedback',
+      correlationId: response.meta.correlationId,
+      onlyDemo: true,
+      detail: { id: submissionId, signedBy, status: response.data.status },
+    });
+    setActionNotice(`✓ Feedback de ${signedBy} guardado. Estado: ${response.data.status}. La nota oficial permanece sin publicar.`);
   };
 
   const handleSendIntervention = (student: AtRiskStudent) => {
-    setRisks(prev => prev.map(r => r.id === student.id ? { ...r, interventionSent: true } : r));
+    setRisks(prev => prev.map(risk => (risk.id === student.id ? { ...risk, interventionSent: true } : risk)));
+    void writeAudit({
+      action: 'teacher.intervention_recorded',
+      detail: { studentId: student.id, source: 'demo', realMessageSent: false },
+    });
     setActionNotice(`✓ Mentoría registrada localmente para ${student.name} (demo: no se envió ningún mensaje real).`);
-    setTimeout(() => setActionNotice(null), 3500);
   };
-
-  const pendingCount = submissions.filter(s => s.status === 'pending').length;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Teacher Top Welcome & Action Banner */}
       <div className={`p-6 rounded-3xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all shadow-md ${
         isLight
           ? 'bg-gradient-to-r from-emerald-50 to-teal-50/50 border-emerald-200 text-slate-900'
@@ -69,27 +138,39 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
           : 'bg-gradient-to-r from-[#06152B] via-[#0A2540] to-[#0A1F3D] border-emerald-500/30 text-white'
       }`}>
         <div className="space-y-1.5 max-w-2xl">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
               isLight ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : isMono ? 'bg-[#262B37] border-[#3B4254] text-white' : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
             }`}>
-              ESPACIO DOCENTE • PERIODO 2026-II
+              ESPACIO DOCENTE • DEMO
             </span>
-            <span className="text-xs opacity-60">Dr. Alejandro Morales</span>
+            <span className="text-xs opacity-60">
+              {meta ? `${meta.source.toUpperCase()} · ${meta.correlationId.slice(0, 12)}` : 'cargando fuente...'}
+            </span>
           </div>
 
           <h1 className="text-xl md:text-2xl font-black tracking-tight m-0">
             Panel de Gestión Pedagógica & Calificación Rápida
           </h1>
           <p className="text-xs opacity-80 leading-relaxed m-0">
-            Supervisión directa de <strong>142 estudiantes</strong>. Tienes <strong>{pendingCount} entregas pendientes</strong> con propuesta algorítmica lista para tu aprobación humana.
+            Bandeja DEMO con <strong>{submissions.length} entregas</strong> y <strong>{pendingCount} pendientes de firma</strong>. La IA solo propone; la nota oficial la emite el docente.
           </p>
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
+          <button
+            onClick={() => { setLoading(true); setReloadKey(key => key + 1); }}
+            title="Recargar entregas"
+            className={`p-2.5 rounded-xl border ${isLight ? 'bg-white border-slate-200' : 'bg-white/5 border-white/10'}`}
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+          </button>
           {pendingCount > 0 && (
             <button
-              onClick={() => handleOpenGrader(submissions.find(s => s.status === 'pending') || submissions[0])}
+              onClick={() => {
+                const next = submissions.find(item => item.status !== 'graded');
+                if (next) handleOpenGrader(next);
+              }}
               className={`px-5 py-3 rounded-2xl text-xs font-black flex items-center justify-center gap-2 transition-all shadow-lg hover:scale-105 active:scale-95 ${
                 isLight
                   ? 'bg-emerald-700 text-white hover:bg-emerald-800'
@@ -105,70 +186,77 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
         </div>
       </div>
 
+      {error && (
+        <p className={`text-xs p-3 rounded-xl border flex items-center gap-2 ${
+          isLight ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+        }`}>
+          <AlertCircle className="w-3.5 h-3.5" /> {error}
+        </p>
+      )}
+
       {actionNotice && (
         <div className="p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs flex items-center justify-between animate-in fade-in">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{actionNotice}</span>
           </div>
-          <span className="font-mono text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded">
-            Regla Human-in-the-Loop Cumplida
+          <span className="font-mono text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded shrink-0">
+            Human-in-the-loop
           </span>
         </div>
       )}
 
-      {/* KPI Cards Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className={`p-4 rounded-2xl border transition-all ${
           isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
         }`}>
           <div className="flex items-center justify-between opacity-70 text-xs mb-2">
-            <span>Alumnos a Cargo</span>
+            <span>Entregas registradas</span>
             <Users className="w-4 h-4 text-blue-500" />
           </div>
-          <div className="text-2xl font-black font-mono tracking-tight">142</div>
-          <p className="text-[11px] text-emerald-400 font-medium mt-1 m-0">En 3 cohortes activas</p>
+          <div className="text-2xl font-black font-mono tracking-tight">{submissions.length}</div>
+          <p className="text-[11px] opacity-70 mt-1 m-0">Dataset DEMO · {meta ? meta.source : '...'}</p>
         </div>
 
         <div className={`p-4 rounded-2xl border transition-all ${
           isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
         }`}>
           <div className="flex items-center justify-between opacity-70 text-xs mb-2">
-            <span>Por Calificar (SpeedGrader)</span>
+            <span>Por calificar</span>
             <CheckSquare className="w-4 h-4 text-amber-500" />
           </div>
           <div className="text-2xl font-black font-mono tracking-tight">{pendingCount}</div>
-          <p className="text-[11px] opacity-70 mt-1 m-0">Con borrador IA preparado</p>
+          <p className="text-[11px] opacity-70 mt-1 m-0">Requieren firma docente</p>
         </div>
 
         <div className={`p-4 rounded-2xl border transition-all ${
           isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
         }`}>
           <div className="flex items-center justify-between opacity-70 text-xs mb-2">
-            <span>En Riesgo de Deserción</span>
+            <span>En riesgo (DEMO)</span>
             <AlertTriangle className="w-4 h-4 text-rose-400" />
           </div>
           <div className="text-2xl font-black font-mono tracking-tight text-rose-400">
-            {risks.filter(r => r.riskScore > 65).length}
+            {risks.filter(risk => risk.riskScore > 65).length}
           </div>
-          <p className="text-[11px] text-rose-400 font-medium mt-1 m-0">Cabeza C (Riesgo &gt; 65%)</p>
+          <p className="text-[11px] text-rose-400 font-medium mt-1 m-0">Cabeza C · riesgo &gt; 65%</p>
         </div>
 
         <div className={`p-4 rounded-2xl border transition-all ${
           isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
         }`}>
           <div className="flex items-center justify-between opacity-70 text-xs mb-2">
-            <span>Promedio de Cohorte</span>
+            <span>Promedio oficial (DEMO)</span>
             <Award className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="text-2xl font-black font-mono tracking-tight">17.4 <span className="text-xs opacity-60 font-normal">/ 20</span></div>
-          <p className="text-[11px] text-emerald-400 font-medium mt-1 m-0">+0.6 pts vs periodo anterior</p>
+          <div className="text-2xl font-black font-mono tracking-tight">
+            {average} <span className="text-xs opacity-60 font-normal">/ 20</span>
+          </div>
+          <p className="text-[11px] opacity-70 mt-1 m-0">{graded.length} nota(s) firmada(s)</p>
         </div>
       </div>
 
-      {/* Main Grid: SpeedGrader Tray (7 Cols) & Early Risk Warning (5 Cols) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left: SpeedGrader Pending Submissions */}
         <div className="lg:col-span-7 space-y-4">
           <div className={`p-6 rounded-3xl border transition-all ${
             isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
@@ -177,87 +265,109 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
               <div>
                 <h2 className="text-sm font-bold flex items-center gap-2 m-0">
                   <CheckSquare className="w-4 h-4 text-emerald-400" />
-                  Bandeja de Calificación Rápida (SpeedGrader)
+                  Bandeja de Calificación Rápida
                 </h2>
                 <p className="text-xs opacity-60 m-0">
-                  Evidencias entregadas por los alumnos con sugerencia de rúbrica asistida
+                  Evidencias con propuesta asistida; sin nota oficial hasta la firma.
                 </p>
               </div>
-
               <span className={`text-[11px] font-mono font-bold px-2.5 py-1 rounded-full border ${
                 isLight ? 'bg-slate-100 border-slate-200 text-slate-800' : isMono ? 'bg-[#222734] border-[#3B4254] text-zinc-300' : 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300'
               }`}>
-                {pendingCount} Pendientes
+                {pendingCount} pendientes
               </span>
             </div>
 
             <div className="space-y-3">
-              {submissions.map((sub) => (
+              {loading && (
+                <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Cargando entregas...</p>
+              )}
+              {submissions.map(submission => (
                 <div
-                  key={sub.id}
+                  key={submission.id}
                   className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
-                    sub.status === 'graded'
-                      ? (isLight ? 'bg-slate-50 border-slate-200 opacity-75' : isMono ? 'bg-[#181C26] border-[#2A2F3D]' : 'bg-[#06152B]/60 border-white/10')
+                    submission.status === 'graded'
+                      ? (isLight ? 'bg-slate-50 border-slate-200 opacity-80' : isMono ? 'bg-[#181C26] border-[#2A2F3D]' : 'bg-[#06152B]/60 border-white/10')
                       : (isLight ? 'bg-white border-slate-200 hover:border-slate-300' : isMono ? 'bg-[#1C202B] border-[#2A2F3D] hover:border-[#3B4254]' : 'bg-[#0A1F3D] border-edumaster-cardBorder hover:border-edumaster-cyan/50')
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <img
-                      src={sub.avatar}
-                      alt={sub.studentName}
-                      className="w-10 h-10 rounded-full object-cover border border-inherit shrink-0"
-                    />
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-xs font-bold m-0">{sub.studentName}</h3>
-                        <span className="text-[10px] opacity-60 font-mono">• {sub.submittedAt}</span>
+                    {submission.avatar ? (
+                      <img
+                        src={submission.avatar}
+                        alt={submission.studentName}
+                        className="w-10 h-10 rounded-full object-cover border border-inherit shrink-0"
+                      />
+                    ) : (
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold border border-inherit shrink-0 ${
+                        isLight ? 'bg-slate-200 text-slate-700' : 'bg-white/10 text-white'
+                      }`}>
+                        {initials(submission.studentName)}
                       </div>
-                      <p className="text-[11px] opacity-80 m-0 font-medium">{sub.assignmentTitle}</p>
-                      <p className="text-[10px] opacity-60 m-0">{sub.course}</p>
+                    )}
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-xs font-bold m-0">{submission.studentName}</h3>
+                        <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
+                          submission.status === 'graded'
+                            ? 'border-emerald-500/40 text-emerald-400'
+                            : submission.status === 'in_review'
+                            ? 'border-amber-500/40 text-amber-400'
+                            : 'border-white/20 opacity-70'
+                        }`}>
+                          {submission.status}
+                        </span>
+                        <span className="text-[10px] opacity-60 font-mono">• {submission.submittedAt.slice(0, 10)}</span>
+                      </div>
+                      <p className="text-[11px] opacity-80 m-0 font-medium">{submission.assignmentTitle}</p>
+                      <p className="text-[10px] opacity-60 m-0">{submission.course}</p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto justify-between sm:justify-end">
                     <div className="text-right">
-                      {sub.status === 'graded' ? (
+                      {submission.status === 'graded' && submission.officialScore !== null ? (
                         <div>
-                          <span className="text-[10px] opacity-60 block">Nota Oficial</span>
+                          <span className="text-[10px] opacity-60 block">Nota oficial</span>
                           <span className="text-sm font-black font-mono text-emerald-400">
-                            {sub.officialScore} / 20
+                            {submission.officialScore} / 20
                           </span>
+                          <span className="text-[10px] block opacity-60">{submission.signedBy}</span>
                         </div>
                       ) : (
                         <div>
                           <span className="text-[10px] opacity-60 block flex items-center gap-1 justify-end">
                             <Sparkles className="w-2.5 h-2.5 text-amber-400" />
-                            Propuesta IA
+                            Propuesta IA (DEMO)
                           </span>
                           <span className="text-xs font-bold font-mono text-amber-400">
-                            {sub.estimatedAiScore} / 20 pts
+                            {submission.estimatedAiScore} / 20 pts
                           </span>
                         </div>
                       )}
                     </div>
 
                     <button
-                      onClick={() => handleOpenGrader(sub)}
+                      onClick={() => handleOpenGrader(submission)}
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm ${
-                        sub.status === 'graded'
+                        submission.status === 'graded'
                           ? (isLight ? 'bg-slate-200 text-slate-800 hover:bg-slate-300' : isMono ? 'bg-[#262B37] text-zinc-300 hover:text-white' : 'bg-white/10 text-slate-200 hover:bg-white/20')
                           : (isLight ? 'bg-slate-900 text-white hover:bg-slate-800' : isMono ? 'bg-white text-zinc-950 font-black hover:bg-zinc-200' : 'bg-edumaster-blue hover:bg-edumaster-blue/80 text-white')
                       }`}
                     >
-                      {sub.status === 'graded' ? 'Ver / Editar' : 'Calificar con Rúbrica'}
+                      {submission.status === 'graded' ? 'Ver / Editar' : 'Calificar con rúbrica'}
                       <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
                 </div>
               ))}
+              {!loading && submissions.length === 0 && (
+                <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>No hay entregas registradas.</p>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Right: Early Warning Triage (Cabeza C) */}
         <div className="lg:col-span-5 space-y-4">
           <div className={`p-6 rounded-3xl border transition-all ${
             isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
@@ -268,18 +378,15 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
                   <AlertTriangle className="w-4 h-4 text-rose-400" />
                   Triaje de Riesgo de Abandono
                 </h2>
-                <p className="text-xs opacity-60 m-0">
-                  Inferencia predictiva Cabeza C (Brier Score Calibrado)
-                </p>
+                <p className="text-xs opacity-60 m-0">Inferencia DEMO Cabeza C · no califica al estudiante.</p>
               </div>
-
               <span className="text-[10px] font-mono text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/30">
-                Alerta Temprana
+                Alerta temprana
               </span>
             </div>
 
             <div className="space-y-3">
-              {risks.map((student) => (
+              {risks.map(student => (
                 <div
                   key={student.id}
                   className={`p-4 rounded-2xl border transition-all space-y-2.5 ${
@@ -300,7 +407,6 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
                         <p className="text-[10px] opacity-60 m-0">{student.course}</p>
                       </div>
                     </div>
-
                     <div className="text-right">
                       <span className="text-[10px] font-mono font-bold block text-rose-400">
                         Riesgo: {student.riskScore}%
@@ -315,14 +421,14 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
                   <div className={`p-2.5 rounded-xl text-[11px] leading-relaxed border ${
                     isLight ? 'bg-white/80 border-slate-200 text-slate-800' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-300' : 'bg-[#06152B] border-white/10 text-slate-300'
                   }`}>
-                    <strong>Sugerencia Pedagógica:</strong> {student.suggestedAction}
+                    <strong>Sugerencia pedagógica:</strong> {student.suggestedAction}
                   </div>
 
                   <div className="flex justify-end pt-1">
                     <button
                       onClick={() => handleSendIntervention(student)}
                       disabled={student.interventionSent}
-                      className={`px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-colors ${
+                      className={`px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-colors disabled:opacity-50 ${
                         isLight
                           ? 'bg-slate-900 text-white hover:bg-slate-800'
                           : isMono
@@ -331,7 +437,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
                       }`}
                     >
                       <Mail className="w-3 h-3" />
-                      {student.interventionSent ? 'Mentoría Registrada' : 'Registrar Mentoría (Demo)'}
+                      {student.interventionSent ? 'Mentoría registrada' : 'Registrar mentoría (demo)'}
                     </button>
                   </div>
                 </div>
@@ -343,19 +449,20 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
             }`}>
               <ShieldAlert className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
               <span>
-                <strong>Gobernanza Ética:</strong> Esta alerta no califica negativamente al estudiante; sirve como indicador de apoyo para prevenir deserción prematura.
+                <strong>Gobernanza ética:</strong> esta alerta no califica negativamente al estudiante; sirve como indicador de apoyo.
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* SpeedGrader Modal Component */}
       <TeacherSpeedGraderModal
+        key={activeSubmission?.id ?? 'none'}
         submission={activeSubmission}
         isOpen={isSpeedGraderOpen}
         onClose={() => setIsSpeedGraderOpen(false)}
         onGradeConfirmed={handleGradeConfirmed}
+        onFeedbackSaved={handleFeedbackSaved}
         theme={theme}
       />
     </div>

@@ -21,30 +21,51 @@ from app.schemas import (
     AnalyticsSkillMastery,
     ApiMeta,
     ApiResponse,
+    Assessment,
     AuditLog,
     AuditLogCreate,
     Certificate,
     CertificateVerification,
     CommunityMessage,
     CommunityThread,
+    Course,
     DashboardSummary,
     FeedbackResult,
+    GradeSubmission,
     InferenceRequest,
     InferenceResult,
+    LearningPath,
     ModerationRequest,
     NewCommunityMessage,
     NewCommunityThread,
+    NewCourse,
+    NewSandboxAttempt,
     NeuralStatus,
     Notification,
     NotificationPreferences,
     NotificationRead,
+    PathProgressRequest,
     RecommendationFeedback,
     RecommendationItem,
+    SandboxAttempt,
+    Submission,
+    SubmissionFeedback,
     TutorConversation,
     TutorRequest,
     utc_now,
 )
-from app.services import analytics, certificates, community, notifications, recommendations, tutor
+from app.services import (
+    analytics,
+    assessments,
+    certificates,
+    community,
+    courses,
+    learning_paths,
+    notifications,
+    recommendations,
+    sandbox,
+    tutor,
+)
 from app.services.demo_data import dashboard_summary
 from app.services.inference import infer, model_metrics_summary, neural_status
 from app.services.storage import insert as storage_insert
@@ -71,6 +92,11 @@ _audit_lock = threading.Lock()
 
 def correlation_id(request: Request) -> str:
     return getattr(request.state, "correlation_id", "unknown")
+
+
+def actor(request: Request) -> str:
+    """Actor DEMO del header; sin autenticación real (Fase 4)."""
+    return request.headers.get("X-Actor", "demo-user")
 
 
 def envelope(data: Any, request: Request) -> dict[str, Any]:
@@ -337,4 +363,152 @@ def get_notification_preferences(request: Request):
 def put_notification_preferences(payload: NotificationPreferences, request: Request):
     result = notifications.update_preferences(payload)
     add_audit(request, "notification.preferences_updated", result.model_dump())
+    return envelope(result, request)
+
+
+# --- Fase 3: cursos ----------------------------------------------------------
+
+@app.get("/api/v1/courses", response_model=ApiResponse[list[Course]])
+def get_courses(request: Request):
+    return envelope(courses.list_courses(actor(request)), request)
+
+
+@app.post("/api/v1/courses", response_model=ApiResponse[Course])
+def create_course(payload: NewCourse, request: Request):
+    result = courses.create_course(payload)
+    add_audit(request, "courses.created", {"id": result.id, "code": result.code, "title": result.title})
+    return envelope(result, request)
+
+
+@app.get("/api/v1/courses/{course_id}", response_model=ApiResponse[Course])
+def get_course(course_id: str, request: Request):
+    result = courses.get_course(course_id, actor(request))
+    if not result:
+        raise HTTPException(status_code=404, detail="Curso no encontrado")
+    return envelope(result, request)
+
+
+@app.put("/api/v1/courses/{course_id}", response_model=ApiResponse[Course])
+def update_course(course_id: str, payload: NewCourse, request: Request):
+    result = courses.update_course(course_id, payload, actor(request))
+    if not result:
+        raise HTTPException(status_code=404, detail="Curso no encontrado")
+    add_audit(request, "courses.updated", {"id": course_id, "code": result.code})
+    return envelope(result, request)
+
+
+@app.post("/api/v1/courses/{course_id}/enroll", response_model=ApiResponse[Course])
+def enroll_course(course_id: str, request: Request):
+    result = courses.enroll_course(course_id, actor(request))
+    if not result:
+        if courses.get_course(course_id, actor(request)) is None:
+            raise HTTPException(status_code=404, detail="Curso no encontrado")
+        raise HTTPException(status_code=409, detail="Cupo completo o inscripción inválida")
+    add_audit(request, "courses.enrolled", {"id": course_id, "actor": actor(request)})
+    return envelope(result, request)
+
+
+# --- Fase 3: rutas de aprendizaje --------------------------------------------
+
+@app.get("/api/v1/learning-paths", response_model=ApiResponse[list[LearningPath]])
+def get_learning_paths(request: Request):
+    return envelope(learning_paths.list_paths(actor(request)), request)
+
+
+@app.post("/api/v1/learning-paths/{path_id}/progress", response_model=ApiResponse[LearningPath])
+def update_path_progress(path_id: str, payload: PathProgressRequest, request: Request):
+    result = learning_paths.update_progress(path_id, payload, actor(request))
+    if not result:
+        raise HTTPException(status_code=404, detail="Ruta o paso no encontrado")
+    add_audit(
+        request,
+        "learning_path.progress_changed",
+        {"pathId": path_id, "stepId": payload.stepId, "completed": payload.completed, "source": payload.source},
+    )
+    return envelope(result, request)
+
+
+# --- Fase 3: evaluaciones y SpeedGrader --------------------------------------
+
+@app.get("/api/v1/assessments", response_model=ApiResponse[list[Assessment]])
+def get_assessments(request: Request):
+    return envelope(assessments.list_assessments(), request)
+
+
+@app.get("/api/v1/submissions", response_model=ApiResponse[list[Submission]])
+def get_submissions(request: Request):
+    return envelope(assessments.list_submissions(), request)
+
+
+@app.get("/api/v1/submissions/{submission_id}", response_model=ApiResponse[Submission])
+def get_submission(submission_id: str, request: Request):
+    result = assessments.get_submission(submission_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Entrega no encontrada")
+    return envelope(result, request)
+
+
+@app.post("/api/v1/submissions/{submission_id}/grade", response_model=ApiResponse[Submission])
+def grade_submission(submission_id: str, payload: GradeSubmission, request: Request):
+    try:
+        result = assessments.grade_submission(submission_id, payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    if not result:
+        raise HTTPException(status_code=404, detail="Entrega no encontrada")
+    add_audit(
+        request,
+        "submissions.graded",
+        {
+            "id": submission_id,
+            "estimatedAiScore": result.estimatedAiScore,
+            "officialScore": result.officialScore,
+            "signedBy": result.signedBy,
+        },
+    )
+    return envelope(result, request)
+
+
+@app.post("/api/v1/submissions/{submission_id}/feedback", response_model=ApiResponse[Submission])
+def add_submission_feedback(submission_id: str, payload: SubmissionFeedback, request: Request):
+    result = assessments.add_feedback(submission_id, payload)
+    if not result:
+        raise HTTPException(status_code=404, detail="Entrega no encontrada")
+    add_audit(
+        request,
+        "submissions.feedback",
+        {"id": submission_id, "signedBy": payload.signedBy, "status": result.status},
+    )
+    return envelope(result, request)
+
+
+# --- Fase 3: sandbox sin ejecución remota ------------------------------------
+
+@app.get("/api/v1/sandbox/attempts", response_model=ApiResponse[list[SandboxAttempt]])
+def list_sandbox_attempts(request: Request):
+    student_id = request.query_params.get("studentId")
+    raw_limit = request.query_params.get("limit", "10")
+    try:
+        limit = max(1, min(int(raw_limit), 50))
+    except ValueError:
+        raise HTTPException(status_code=422, detail="limit debe ser entero")
+    return envelope(sandbox.list_attempts(student_id=student_id, limit=limit), request)
+
+
+@app.post("/api/v1/sandbox/attempts", response_model=ApiResponse[SandboxAttempt])
+def create_sandbox_attempt(payload: NewSandboxAttempt, request: Request):
+    result = sandbox.create_attempt(payload)
+    add_audit(
+        request,
+        "sandbox.attempt.created",
+        {"id": result.id, "studentId": result.studentId, "status": result.status},
+    )
+    return envelope(result, request)
+
+
+@app.get("/api/v1/sandbox/attempts/{attempt_id}", response_model=ApiResponse[SandboxAttempt])
+def get_sandbox_attempt(attempt_id: str, request: Request):
+    result = sandbox.get_attempt(attempt_id)
+    if not result:
+        raise HTTPException(status_code=404, detail="Intento no encontrado")
     return envelope(result, request)

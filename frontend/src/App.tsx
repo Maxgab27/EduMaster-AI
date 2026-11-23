@@ -54,6 +54,15 @@ export const App: React.FC = () => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+  // El actor DEMO viaja como X-Actor en las peticiones /api/v1.
+  useEffect(() => {
+    try {
+      localStorage.setItem('edumaster_demo_user', JSON.stringify({ name: user.name, role: user.role }));
+    } catch {
+      // Sin localStorage el backend usa demo-user.
+    }
+  }, [user.name, user.role]);
+
   useEffect(() => {
     const controller = new AbortController();
     getDashboardSummary(controller.signal)
@@ -245,10 +254,10 @@ export const App: React.FC = () => {
           )}
 
           {canViewTab(user.role, activeTab) && activeTab === 'learning-paths' && <LearningPathsView theme={theme} />}
-          {canViewTab(user.role, activeTab) && activeTab === 'courses' && <CoursesView theme={theme} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'courses' && <CoursesView theme={theme} role={user.role} />}
           {canViewTab(user.role, activeTab) && activeTab === 'analytics' && <AnalyticsView theme={theme} />}
           {canViewTab(user.role, activeTab) && activeTab === 'ai-tutor' && <AITutorView theme={theme} />}
-          {canViewTab(user.role, activeTab) && activeTab === 'assessments' && <AssessmentsView theme={theme} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'assessments' && <AssessmentsView theme={theme} role={user.role} />}
           {canViewTab(user.role, activeTab) && activeTab === 'certificates' && <CertificatesView theme={theme} />}
           {canViewTab(user.role, activeTab) && activeTab === 'neural-inspector' && <NeuralInspectorView theme={theme} />}
           {canViewTab(user.role, activeTab) && activeTab === 'governance' && <AdminGovernanceView theme={theme} role={user.role} />}

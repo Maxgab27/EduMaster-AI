@@ -35,13 +35,20 @@ def _key() -> str:
     return os.getenv("SUPABASE_KEY", "")
 
 
+def _eq_value(value: Any) -> str:
+    """PostgREST usa true/false en minúsculas para booleanos."""
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    return str(value)
+
+
 def _request(method: str, table: str, params: dict[str, Any] | None = None,
              payload: Any | None = None) -> list[dict[str, Any]]:
     query: dict[str, str] = {}
     for key, value in (params or {}).items():
         if value is None:
             continue
-        query[key] = str(value)
+        query[key] = _eq_value(value)
 
     url = f"{_base_url()}/rest/v1/{table}"
     if query:
@@ -68,7 +75,9 @@ def select(table: str, filters: dict[str, Any] | None = None,
     """SELECT con filtros `column=value` (PostgREST eq implícito)."""
     params: dict[str, Any] = {"select": "*"}
     for key, value in (filters or {}).items():
-        params[key] = f"eq.{value}"
+        if value is None:
+            continue
+        params[key] = f"eq.{_eq_value(value)}"
     if order:
         params["order"] = order
     if limit:
@@ -111,6 +120,24 @@ def insert(table: str, rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             destination.append(record)
             stored.append(record)
         return stored
+
+
+def update(table: str, row_id: str, changes: dict[str, Any]) -> dict[str, Any] | None:
+    """UPDATE por id con fallback al store en memoria."""
+    payload = {key: value for key, value in changes.items() if key != "id"}
+    if configured():
+        try:
+            rows = _request("PATCH", table, params={"id": row_id}, payload=payload)
+            if rows:
+                return rows[0]
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
+            pass
+    with _lock:
+        for row in _memory.get(table, []):
+            if row.get("id") == row_id:
+                row.update(payload)
+                return dict(row)
+    return None
 
 
 def seed_memory(table: str, rows: list[dict[str, Any]]) -> None:

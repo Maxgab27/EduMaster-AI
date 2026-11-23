@@ -150,6 +150,127 @@ export interface AtRiskStudent {
   interventionSent?: boolean;
 }
 
+// --- Fase 3: contratos de cursos, rutas, evaluaciones y sandbox -------------
+
+export type CourseLevel = 'Básico' | 'Intermedio' | 'Avanzado';
+
+export interface ApiCourse {
+  id: string;
+  code: string;
+  title: string;
+  instructor: string;
+  level: CourseLevel;
+  description: string;
+  students: number;
+  capacity: number;
+  completionRate: number;
+  status: 'Publicado' | 'Borrador';
+  tags: string[];
+  createdAt: string;
+  enrolled: boolean;
+}
+
+export interface NewCourseInput {
+  code: string;
+  title: string;
+  instructor: string;
+  level: CourseLevel;
+  description: string;
+  capacity: number;
+  status: 'Publicado' | 'Borrador';
+  tags: string[];
+}
+
+export interface ApiPathStep {
+  id: string;
+  name: string;
+  status: 'completed' | 'current' | 'locked';
+  score: string;
+  courseId: string | null;
+}
+
+export interface ApiLearningPath {
+  id: string;
+  title: string;
+  description: string;
+  duration: string;
+  coursesCount: number;
+  progress: number;
+  steps: ApiPathStep[];
+}
+
+export interface PathProgressInput {
+  stepId: string;
+  completed: boolean;
+  source: 'manual' | 'recommendation';
+}
+
+export interface ApiAssessment {
+  id: string;
+  title: string;
+  course: string;
+  dueDate: string;
+  maxScore: number;
+  weight: string;
+  attempts: number;
+  officialAvg: number | null;
+  predictiveEst: number | null;
+  status: 'Disponible' | 'En Calificación' | 'Cerrado';
+  note: string;
+}
+
+export interface ApiRubricScore {
+  criteria: string;
+  maxPts: number;
+  score: number;
+}
+
+export interface ApiSubmission {
+  id: string;
+  studentId: string;
+  studentName: string;
+  avatar: string | null;
+  course: string;
+  assignmentTitle: string;
+  submittedAt: string;
+  estimatedAiScore: number;
+  officialScore: number | null;
+  status: 'pending' | 'in_review' | 'graded';
+  codeSnippet: string;
+  rubricScores: ApiRubricScore[];
+  feedback: string;
+  signedBy: string | null;
+  gradedAt: string | null;
+  predictionId: string | null;
+}
+
+export interface GradeSubmissionInput {
+  officialScore: number;
+  feedback: string;
+  signedBy: string;
+}
+
+export interface SubmissionFeedbackInput {
+  feedback: string;
+  signedBy: string;
+}
+
+export interface SandboxAttempt {
+  id: string;
+  studentId: string;
+  code: string;
+  output: string;
+  status: 'simulado' | 'bloqueado';
+  findings: string[];
+  guardrail: string;
+  createdAt: string;
+}
+
+export interface NewSandboxAttemptInput {
+  code: string;
+  studentId: string;
+}
+
 export interface AuditLogEntry {
   id: string;
   timestamp: string;

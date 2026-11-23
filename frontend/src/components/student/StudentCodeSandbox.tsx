@@ -1,92 +1,104 @@
-import React, { useState } from 'react';
-import { Play, RotateCcw, CheckCircle2, Terminal, Code2 } from 'lucide-react';
-import { ThemeMode } from '../../types';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Play, RotateCcw, Terminal, Code2, ShieldAlert, AlertCircle, History } from 'lucide-react';
+import type { SandboxAttempt, ThemeMode } from '../../types';
+import { createAttempt, listAttemptsAsync } from '../../services/sandboxApi';
+import { writeAudit } from '../../services/auditSink';
 
 interface StudentCodeSandboxProps {
   theme?: ThemeMode;
   initialCode?: string;
-  onCodeSuccess?: () => void;
+  onCodeSuccess?: (attempt: SandboxAttempt) => void;
 }
 
 export const StudentCodeSandbox: React.FC<StudentCodeSandboxProps> = ({
   theme = 'monochrome',
   initialCode,
-  onCodeSuccess
+  onCodeSuccess,
 }) => {
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
 
-  const defaultSnippet = initialCode || `# Laboratorio Interactivo: EduMaster PyTorch MTL
+  const defaultSnippet = initialCode || `# Laboratorio DEMO: modelo secuencial GRU
+# El servidor NO ejecuta este codigo: solo analiza el texto.
 import torch
 import torch.nn as nn
 
-# 1. Definir tensor de entrada (Batch=4, Secuencia=14)
 x_seq = torch.randn(4, 14, 32)
 gru = nn.GRU(input_size=32, hidden_size=64, batch_first=True)
-
-# 2. Paso hacia adelante (Forward pass)
 out, h_n = gru(x_seq)
 print(f"Shape salida GRU: {out.shape}")
-print(f"Estado oculto final: {h_n.shape}")
 
-# 3. Cabeza de predicción (Finalización 30d)
-head_completion = nn.Sequential(
-    nn.Linear(64, 1),
-    nn.Sigmoid()
-)
-prob = head_completion(h_n.squeeze(0))
-print(f"Probabilidad de completitud estimada: {prob.mean().item():.3f}")
+# Para probar el guardrail, escribe eval("2 + 2") en una línea activa.
+# Las líneas comentadas se ignoran: solo se analiza el código activo.
 `;
 
   const [code, setCode] = useState(defaultSnippet);
-  const [output, setOutput] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState<SandboxAttempt | null>(null);
+  const [history, setHistory] = useState<SandboxAttempt[]>([]);
   const [isRunning, setIsRunning] = useState(false);
-  const [hasRun, setHasRun] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleRun = () => {
+  const refreshHistory = useCallback(() => {
+    listAttemptsAsync()
+      .then(response => setHistory(response.data))
+      .catch(() => setHistory([]));
+  }, []);
+
+  useEffect(() => {
+    refreshHistory();
+  }, [refreshHistory]);
+
+  const handleRun = async () => {
+    if (isRunning) return;
     setIsRunning(true);
-    setOutput(null);
-
-    setTimeout(() => {
+    setError(null);
+    setAttempt(null);
+    try {
+      const response = await createAttempt({ code, studentId: 'EST-DEMO-0001' });
+      setAttempt(response.data);
+      refreshHistory();
+      await writeAudit({
+        action: 'sandbox.attempt.created',
+        correlationId: response.meta.correlationId,
+        onlyDemo: true,
+        detail: { id: response.data.id, status: response.data.status, findings: response.data.findings.length },
+      });
+      if (response.data.status === 'simulado' && onCodeSuccess) {
+        onCodeSuccess(response.data);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No se pudo registrar el análisis');
+    } finally {
       setIsRunning(false);
-      setHasRun(true);
-      setOutput(`[Python 3.12.3 • PyTorch 2.4.1+cu121]
-Shape salida GRU: torch.Size([4, 14, 64])
-Estado oculto final: torch.Size([1, 4, 64])
-Probabilidad de completitud estimada: 0.914
---------------------------------------------------
-✓ Todos los asserts pasaron exitosamente (0.042s).
-✓ Loss ponderada L_total: 0.089 (Convergencia óptima).`);
-      if (onCodeSuccess) onCodeSuccess();
-    }, 850);
+    }
   };
 
   const handleReset = () => {
     setCode(defaultSnippet);
-    setOutput(null);
-    setHasRun(false);
+    setAttempt(null);
+    setError(null);
   };
+
+  const statusClass = attempt?.status === 'bloqueado'
+    ? 'border-rose-500/40 text-rose-400'
+    : 'border-emerald-500/40 text-emerald-400';
 
   return (
     <div className={`p-5 rounded-2xl border transition-all ${
-      isLight 
-        ? 'bg-white border-slate-200 shadow-sm' 
-        : isMono 
-        ? 'bg-[#151821] border-[#2A2F3D]' 
+      isLight
+        ? 'bg-white border-slate-200 shadow-sm'
+        : isMono
+        ? 'bg-[#151821] border-[#2A2F3D]'
         : 'glass-panel border-edumaster-cardBorder'
     }`}>
-      {/* Header */}
       <div className="flex items-center justify-between pb-3 mb-3 border-b border-inherit">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Code2 className={`w-4 h-4 ${isLight ? 'text-blue-600' : isMono ? 'text-zinc-200' : 'text-edumaster-cyan'}`} />
-          <span className="text-xs font-bold tracking-tight">Terminal de Práctica & Playground Python</span>
-          <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
-            isLight ? 'bg-slate-100 border-slate-300 text-slate-700' : isMono ? 'bg-[#222734] border-[#3B4254] text-zinc-300' : 'bg-edumaster-blue/20 border-edumaster-cyan/30 text-edumaster-cyan'
-          }`}>
-            Sandbox Seguro
+          <span className="text-xs font-bold tracking-tight">Laboratorio de Análisis Estático</span>
+          <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${statusClass}`}>
+            SIN EJECUCIÓN REMOTA
           </span>
         </div>
-
         <div className="flex items-center gap-2">
           <button
             onClick={handleReset}
@@ -98,34 +110,49 @@ Probabilidad de completitud estimada: 0.914
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
           <button
-            onClick={handleRun}
+            onClick={() => void handleRun()}
             disabled={isRunning}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm ${
-              isLight 
-                ? 'bg-slate-900 hover:bg-slate-800 text-white' 
-                : isMono 
-                ? 'bg-white text-zinc-950 font-black hover:bg-zinc-200' 
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm disabled:opacity-50 ${
+              isLight
+                ? 'bg-slate-900 hover:bg-slate-800 text-white'
+                : isMono
+                ? 'bg-white text-zinc-950 font-black hover:bg-zinc-200'
                 : 'bg-gradient-to-r from-edumaster-blue to-edumaster-cyan text-white hover:opacity-90'
             }`}
           >
             <Play className={`w-3.5 h-3.5 ${isRunning ? 'animate-spin' : ''}`} />
-            {isRunning ? 'Ejecutando...' : 'Ejecutar Código'}
+            {isRunning ? 'Analizando...' : 'Analizar código'}
           </button>
         </div>
       </div>
 
-      {/* Code Editor Area */}
+      <div className={`p-2.5 rounded-xl border text-[11px] flex items-start gap-2 mb-3 ${
+        isLight ? 'bg-amber-50 border-amber-200 text-amber-900' : isMono ? 'bg-[#1C1A16] border-[#3D3425] text-amber-200' : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+      }`}>
+        <ShieldAlert className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+        <span>
+          Guardrail activo: el código no se ejecuta en el navegador ni en el servidor. Los intentos se persisten y se auditan; ningún análisis modifica calificaciones.
+        </span>
+      </div>
+
+      {error && (
+        <p className={`text-xs p-2.5 rounded-xl border flex items-center gap-2 mb-3 ${
+          isLight ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+        }`}>
+          <AlertCircle className="w-3.5 h-3.5" /> {error}
+        </p>
+      )}
+
       <div className="relative font-mono text-xs rounded-xl overflow-hidden border border-inherit">
         <div className={`px-3 py-1.5 flex items-center justify-between text-[11px] select-none ${
           isLight ? 'bg-slate-100 text-slate-600 border-b border-slate-200' : isMono ? 'bg-[#1C202B] text-zinc-400 border-b border-[#2A2F3D]' : 'bg-[#06152B] text-slate-400 border-b border-edumaster-cardBorder'
         }`}>
-          <span>pytorch_student_lab.py</span>
-          <span>UTF-8 • Python 3.12</span>
+          <span>laboratorio_gru.py</span>
+          <span>UTF-8 • análisis estático</span>
         </div>
-
         <textarea
           value={code}
-          onChange={(e) => setCode(e.target.value)}
+          onChange={event => setCode(event.target.value)}
           spellCheck={false}
           rows={11}
           className={`w-full p-3 font-mono text-xs leading-relaxed focus:outline-none resize-none transition-colors ${
@@ -138,8 +165,7 @@ Probabilidad de completitud estimada: 0.914
         />
       </div>
 
-      {/* Output Terminal */}
-      {output && (
+      {attempt && (
         <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
           <div className={`rounded-xl p-3 border font-mono text-xs leading-relaxed overflow-x-auto ${
             isLight
@@ -148,32 +174,56 @@ Probabilidad de completitud estimada: 0.914
               ? 'bg-[#0A0C10] text-emerald-400 border-[#2A2F3D]'
               : 'bg-[#040D1A] text-emerald-300 border-emerald-500/30'
           }`}>
-            <div className="flex items-center gap-1.5 pb-2 border-b border-white/10 mb-2 text-[10px] text-slate-400 uppercase tracking-wider">
-              <Terminal className="w-3 h-3 text-emerald-400" />
-              <span>Consola de Salida de Ejecución</span>
+            <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-2 text-[10px] uppercase tracking-wider">
+              <span className="flex items-center gap-1.5 text-slate-400">
+                <Terminal className="w-3 h-3 text-emerald-400" />
+                Resultado del análisis estático
+              </span>
+              <span className={`font-bold ${attempt.status === 'bloqueado' ? 'text-rose-400' : 'text-emerald-400'}`}>
+                {attempt.status}
+              </span>
             </div>
-            <pre className="m-0 whitespace-pre-wrap">{output}</pre>
+            <pre className="m-0 whitespace-pre-wrap">{attempt.output}</pre>
+            <ul className="mt-2 pl-4 space-y-0.5 m-0 list-disc">
+              {attempt.findings.map((finding, index) => (
+                <li key={index}>{finding}</li>
+              ))}
+            </ul>
+            <p className="mt-2 pt-2 border-t border-white/10 text-[10px] text-slate-400 m-0">
+              {attempt.guardrail} · intento {attempt.id}
+            </p>
           </div>
         </div>
       )}
 
-      {hasRun && (
-        <div className={`mt-3 p-2.5 rounded-xl border flex items-center justify-between text-xs ${
-          isLight 
-            ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
-            : isMono 
-            ? 'bg-[#18231C] border-[#2A4733] text-emerald-200' 
-            : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+      <div className="mt-3">
+        <div className={`flex items-center gap-2 text-[11px] font-bold mb-2 ${
+          isLight ? 'text-slate-600' : 'text-slate-300'
         }`}>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span><strong>¡Ejercicio Validado!</strong> Tu tensor cumple con las dimensiones esperadas para el pase hacia adelante.</span>
-          </div>
-          <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">
-            +50 XP
-          </span>
+          <History className="w-3.5 h-3.5" /> Historial de intentos
         </div>
-      )}
+        {history.length === 0 ? (
+          <p className={`text-[11px] m-0 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+            Aún no hay intentos registrados.
+          </p>
+        ) : (
+          <div className="space-y-1.5">
+            {history.slice(-3).reverse().map(item => (
+              <div
+                key={item.id}
+                className={`flex items-center justify-between text-[10px] font-mono p-2 rounded-lg border ${
+                  isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : isMono ? 'bg-[#181C26] border-[#2A2F3D] text-zinc-400' : 'bg-[#06152B] border-edumaster-cardBorder text-slate-400'
+                }`}
+              >
+                <span>{item.id}</span>
+                <span className={item.status === 'bloqueado' ? 'text-rose-400' : 'text-emerald-400'}>
+                  {item.status} · {item.findings.length} hallazgo(s)
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

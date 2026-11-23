@@ -85,6 +85,99 @@ create table if not exists recommendation_feedback (
   recorded_at timestamptz not null
 );
 
+-- Fase 3: cursos, rutas, evaluaciones y sandbox.
+-- Las columnas en camelCase coinciden con el contrato /api/v1 y se escriben con comillas.
+
+create table if not exists courses (
+  "id" text primary key,
+  "code" text not null unique,
+  "title" text not null,
+  "instructor" text not null,
+  "level" text not null check ("level" in ('Básico', 'Intermedio', 'Avanzado')),
+  "description" text not null,
+  "students" integer not null default 0,
+  "capacity" integer not null default 100,
+  "completionRate" integer not null default 0,
+  "status" text not null default 'Publicado',
+  "tags" jsonb not null default '[]'::jsonb,
+  "createdAt" timestamptz not null
+);
+
+create table if not exists course_enrollments (
+  "id" text primary key,
+  "courseId" text not null references courses("id") on delete cascade,
+  "actor" text not null,
+  "createdAt" timestamptz not null,
+  unique ("courseId", "actor")
+);
+
+create table if not exists learning_paths (
+  "id" text primary key,
+  "title" text not null,
+  "description" text not null,
+  "duration" text not null,
+  "coursesCount" integer not null default 0,
+  "steps" jsonb not null default '[]'::jsonb
+);
+
+create table if not exists path_progress (
+  "id" text primary key,
+  "pathId" text not null references learning_paths("id") on delete cascade,
+  "stepId" text not null,
+  "actor" text not null,
+  "completed" boolean not null default false,
+  "source" text not null default 'manual',
+  "updatedAt" timestamptz not null,
+  unique ("pathId", "stepId", "actor")
+);
+
+create table if not exists assessments (
+  "id" text primary key,
+  "title" text not null,
+  "course" text not null,
+  "dueDate" text not null,
+  "maxScore" numeric not null default 20,
+  "weight" text not null,
+  "attempts" integer not null default 0,
+  "officialAvg" numeric,
+  "predictiveEst" numeric,
+  "status" text not null
+);
+
+create table if not exists submissions (
+  "id" text primary key,
+  "studentId" text not null,
+  "studentName" text not null,
+  "avatar" text,
+  "course" text not null,
+  "assignmentTitle" text not null,
+  "submittedAt" timestamptz not null,
+  "estimatedAiScore" numeric not null,
+  "officialScore" numeric,
+  "status" text not null default 'pending',
+  "codeSnippet" text not null default '',
+  "rubricScores" jsonb not null default '[]'::jsonb,
+  "feedback" text not null default '',
+  "signedBy" text,
+  "gradedAt" timestamptz,
+  "predictionId" text
+);
+
+create index if not exists submissions_status_idx on submissions ("status");
+
+create table if not exists sandbox_attempts (
+  "id" text primary key,
+  "studentId" text not null,
+  "code" text not null,
+  "output" text not null,
+  "status" text not null check ("status" in ('simulado', 'bloqueado')),
+  "findings" jsonb not null default '[]'::jsonb,
+  "guardrail" text not null,
+  "createdAt" timestamptz not null
+);
+
+create index if not exists sandbox_attempts_student_idx on sandbox_attempts ("studentId", "createdAt");
+
 -- Nota: cuando se active OIDC/OAuth2, habilitar RLS y crear policies por rol/institución.
 -- alter table certificates enable row level security;
 -- alter table audit_logs enable row level security;

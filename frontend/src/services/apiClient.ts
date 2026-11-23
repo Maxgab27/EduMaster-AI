@@ -82,8 +82,16 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   if (!response.ok) {
     let detail = '';
     try {
-      const body = (await response.json()) as { message?: string };
-      detail = body.message ? `: ${body.message}` : '';
+      const body = (await response.json()) as {
+        message?: string;
+        detail?: string | Array<{ msg?: string }>;
+      };
+      const rawDetail = body.message ?? body.detail;
+      if (typeof rawDetail === 'string' && rawDetail) {
+        detail = `: ${rawDetail}`;
+      } else if (Array.isArray(rawDetail)) {
+        detail = `: ${rawDetail.map(item => item.msg).filter(Boolean).join('; ')}`;
+      }
     } catch {
       detail = '';
     }

@@ -8,7 +8,8 @@ import {
   Clock, 
   Sparkles
 } from 'lucide-react';
-import { ThemeMode } from '../../types';
+import { SandboxAttempt, ThemeMode } from '../../types';
+import { writeAudit } from '../../services/auditSink';
 import { StudentCodeSandbox } from './StudentCodeSandbox';
 
 interface StudentStudyModalProps {
@@ -32,24 +33,38 @@ export const StudentStudyModal: React.FC<StudentStudyModalProps> = ({
   });
   const [notesSaved, setNotesSaved] = useState(false);
   const [currentLessonIndex, setCurrentLessonIndex] = useState(2);
+  const [studyNotice, setStudyNotice] = useState<string | null>(null);
+  const [lessons, setLessons] = useState([
+    { id: 1, title: '1. Fundamentos Matemáticos del Backpropagation', duration: '18 min', completed: true },
+    { id: 2, title: '2. Inicialización de Pesos Xavier & He Normal', duration: '22 min', completed: true },
+    { id: 3, title: '3. Redes Recurrentes GRU y Modelado Secuencial', duration: '28 min', completed: false },
+    { id: 4, title: '4. Mecanismo de Atención de Producto Escalar', duration: '35 min', completed: false },
+    { id: 5, title: '5. Calibración de Probabilidades con Brier Score', duration: '25 min', completed: false },
+  ]);
 
   if (!isOpen) return null;
 
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
 
-  const lessons = [
-    { id: 1, title: '1. Fundamentos Matemáticos del Backpropagation', duration: '18 min', completed: true },
-    { id: 2, title: '2. Inicialización de Pesos Xavier & He Normal', duration: '22 min', completed: true },
-    { id: 3, title: '3. Redes Recurrentes GRU y Modelado Secuencial', duration: '28 min', completed: false, current: true },
-    { id: 4, title: '4. Mecanismo de Atención de Producto Escalar', duration: '35 min', completed: false },
-    { id: 5, title: '5. Calibración de Probabilidades con Brier Score', duration: '25 min', completed: false },
-  ];
-
   const handleSaveNotes = () => {
     localStorage.setItem('edumaster_student_notes', notes);
     setNotesSaved(true);
     setTimeout(() => setNotesSaved(false), 2500);
+  };
+
+  const handleCodeSuccess = async (attempt: SandboxAttempt) => {
+    const lesson = lessons[currentLessonIndex];
+    setLessons(prev => prev.map((item, index) => (
+      index === currentLessonIndex ? { ...item, completed: true } : item
+    )));
+    setStudyNotice(
+      `Análisis ${attempt.id} registrado. Lección "${lesson?.title ?? 'actual'}" marcada como completada en este dispositivo; no equivale a nota oficial.`,
+    );
+    await writeAudit({
+      action: 'student.lesson_completed',
+      detail: { lessonId: lesson?.id ?? null, attemptId: attempt.id, source: 'sandbox-static-analysis' },
+    });
   };
 
   return (
@@ -132,6 +147,14 @@ export const StudentStudyModal: React.FC<StudentStudyModalProps> = ({
         <div className="flex-1 flex overflow-hidden">
           {/* Main Content Area */}
           <div className="flex-1 overflow-y-auto p-6 space-y-5">
+            {studyNotice && (
+              <div className={`p-3 rounded-xl border text-xs flex items-start gap-2 ${
+                isLight ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+              }`}>
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                <span>{studyNotice}</span>
+              </div>
+            )}
             {activeTab === 'content' && (
               <div className="space-y-6 max-w-4xl mx-auto">
                 {/* Simulated Video Player / Interactive Presentation */}
@@ -214,7 +237,7 @@ export const StudentStudyModal: React.FC<StudentStudyModalProps> = ({
 
             {activeTab === 'sandbox' && (
               <div className="max-w-4xl mx-auto">
-                <StudentCodeSandbox theme={theme} />
+                <StudentCodeSandbox theme={theme} onCodeSuccess={attempt => void handleCodeSuccess(attempt)} />
               </div>
             )}
 
