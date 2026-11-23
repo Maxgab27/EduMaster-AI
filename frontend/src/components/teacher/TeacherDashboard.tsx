@@ -5,15 +5,10 @@ import {
   AlertTriangle, 
   Award, 
   Sparkles, 
-  FileText, 
   ArrowRight, 
-  Clock, 
   Mail, 
   CheckCircle2, 
-  ShieldAlert, 
-  BarChart3,
-  ExternalLink,
-  BrainCircuit
+  ShieldAlert
 } from 'lucide-react';
 import { ThemeMode, PendingSubmission, AtRiskStudent } from '../../types';
 import { pendingSubmissions as initialSubmissions, atRiskStudents as initialRisks } from '../../data/mockData';
@@ -51,12 +46,13 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
       return s;
     }));
 
-    setActionNotice(`✓ Nota oficial de ${officialScore}/20 publicada y firmada para el estudiante. Registrado en audit_logs.`);
+    setActionNotice(`✓ Nota oficial de ${officialScore}/20 registrada solo en memoria (demo). Sin auditoría ni publicación real.`);
     setTimeout(() => setActionNotice(null), 4000);
   };
 
-  const handleSendIntervention = (studentName: string) => {
-    setActionNotice(`✓ Mensaje personalizado de mentoría y enlace de apoyo enviado a ${studentName}.`);
+  const handleSendIntervention = (student: AtRiskStudent) => {
+    setRisks(prev => prev.map(r => r.id === student.id ? { ...r, interventionSent: true } : r));
+    setActionNotice(`✓ Mentoría registrada localmente para ${student.name} (demo: no se envió ningún mensaje real).`);
     setTimeout(() => setActionNotice(null), 3500);
   };
 
@@ -310,6 +306,9 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
                         Riesgo: {student.riskScore}%
                       </span>
                       <span className="text-[10px] opacity-60">{student.daysInactive} días inactivo</span>
+                      {student.interventionSent && (
+                        <span className="text-[10px] font-bold block text-emerald-400">Mentoría registrada (demo)</span>
+                      )}
                     </div>
                   </div>
 
@@ -321,7 +320,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
 
                   <div className="flex justify-end pt-1">
                     <button
-                      onClick={() => handleSendIntervention(student.name)}
+                      onClick={() => handleSendIntervention(student)}
+                      disabled={student.interventionSent}
                       className={`px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-colors ${
                         isLight
                           ? 'bg-slate-900 text-white hover:bg-slate-800'
@@ -331,7 +331,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
                       }`}
                     >
                       <Mail className="w-3 h-3" />
-                      Enviar Mensaje de Mentoría
+                      {student.interventionSent ? 'Mentoría Registrada' : 'Registrar Mentoría (Demo)'}
                     </button>
                   </div>
                 </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, RotateCcw, CheckCircle2, Sparkles, Terminal, Code2, AlertCircle } from 'lucide-react';
+import { Play, RotateCcw, CheckCircle2, Terminal, Code2 } from 'lucide-react';
 import { ThemeMode } from '../../types';
 
 interface StudentCodeSandboxProps {

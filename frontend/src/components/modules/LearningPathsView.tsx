@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Map, CheckCircle2, ArrowRight, BookOpen, Clock, Award, Star, Lock } from 'lucide-react';
+import { Map, CheckCircle2, ArrowRight, Clock, Lock } from 'lucide-react';
 import { ThemeMode } from '../../types';
 
 interface LearningPathsViewProps {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckSquare, ShieldAlert, Award, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CheckSquare, ShieldAlert } from 'lucide-react';
 import { ThemeMode } from '../../types';
 
 interface AssessmentsViewProps {

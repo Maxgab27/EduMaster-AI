@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { 
   Search, 
   Bell, 
@@ -13,14 +13,20 @@ import {
   Palette,
   Bot
 } from 'lucide-react';
-import { UserProfile, UserRole, ThemeMode } from '../../types';
+import { ApiMeta, AppNotification, NotificationPreferences, ThemeMode, UserProfile, UserRole } from '../../types';
 import { LiveConnectionBadge } from '../common/LiveConnectionBadge';
+import { isDemoMode } from '../../services/apiClient';
+import {
+  getNotificationPreferences,
+  listNotifications,
+  markNotificationRead,
+  updateNotificationPreferences,
+} from '../../services/notificationsApi';
+import { writeAudit } from '../../services/auditSink';
 
 interface TopbarProps {
   user: UserProfile;
   onRoleChange: (role: UserRole) => void;
-  isDemoMode: boolean;
-  onToggleDemoMode: () => void;
   globalScore: number;
   theme: ThemeMode;
   onThemeChange: (theme: ThemeMode) => void;
@@ -31,8 +37,6 @@ interface TopbarProps {
 export const Topbar: React.FC<TopbarProps> = ({
   user,
   onRoleChange,
-  isDemoMode,
-  onToggleDemoMode,
   globalScore,
   theme,
   onThemeChange,
@@ -42,6 +46,71 @@ export const Topbar: React.FC<TopbarProps> = ({
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Notificaciones conectadas al contrato /api/v1 (o al store DEMO local).
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [notificationMeta, setNotificationMeta] = useState<ApiMeta | null>(null);
+  const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
+  const [notificationsError, setNotificationsError] = useState<string | null>(null);
+
+  const unreadCount = useMemo(
+    () => notifications.filter(item => !item.read).length,
+    [notifications],
+  );
+
+  useEffect(() => {
+    const controller = new AbortController();
+    listNotifications(controller.signal)
+      .then(response => {
+        setNotifications(response.data);
+        setNotificationMeta(response.meta);
+      })
+      .catch(err => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setNotificationsError(err instanceof Error ? err.message : 'No se pudieron cargar las notificaciones');
+      });
+    getNotificationPreferences(controller.signal)
+      .then(response => setPreferences(response.data))
+      .catch(() => {
+        // Las preferencias son opcionales en el popover.
+      });
+    return () => controller.abort();
+  }, []);
+
+  const handleMarkRead = async (notification: AppNotification) => {
+    try {
+      const response = await markNotificationRead(notification.id, true);
+      setNotifications(prev =>
+        prev.map(item => (item.id === notification.id ? response.data : item)),
+      );
+      setNotificationMeta(response.meta);
+      await writeAudit({
+        action: 'notification.read_changed',
+        correlationId: response.meta.correlationId,
+        onlyDemo: true,
+        detail: { id: notification.id, read: true },
+      });
+    } catch (err) {
+      setNotificationsError(err instanceof Error ? err.message : 'No se pudo marcar como leída');
+    }
+  };
+
+  const handleToggleInApp = async () => {
+    if (!preferences) return;
+    const updated = { ...preferences, inApp: !preferences.inApp };
+    try {
+      const response = await updateNotificationPreferences(updated);
+      setPreferences(response.data);
+      await writeAudit({
+        action: 'notification.preferences_updated',
+        correlationId: response.meta.correlationId,
+        onlyDemo: true,
+        detail: { ...response.data },
+      });
+    } catch (err) {
+      setNotificationsError(err instanceof Error ? err.message : 'No se pudieron guardar las preferencias');
+    }
+  };
 
   // Filters state
   const [period, setPeriod] = useState('2026-II (Semestre Actual)');
@@ -147,30 +216,25 @@ export const Topbar: React.FC<TopbarProps> = ({
           )}
         </div>
 
-        {/* Demo Mode Toggle Badge */}
-        <button
-          onClick={onToggleDemoMode}
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border transition-all ${
-            isDemoMode
-              ? (isLight 
-                  ? 'bg-amber-100 border-amber-300 text-amber-800'
-                  : isMono 
-                  ? 'bg-[#1E222C] border-[#3B4254] text-zinc-200' 
-                  : 'bg-amber-500/15 border-amber-500/40 text-amber-300')
-              : (isLight
-                  ? 'bg-slate-900 text-white border-slate-900'
-                  : isMono 
-                  ? 'bg-white text-zinc-950 border-white font-black' 
-                  : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300')
+        {/* Badge honesto: los datos siguen siendo DEMO, con o sin API configurada */}
+        <div
+          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border ${
+            isLight 
+              ? 'bg-amber-100 border-amber-300 text-amber-800'
+              : isMono 
+              ? 'bg-[#1E222C] border-[#3B4254] text-zinc-200' 
+              : 'bg-amber-500/15 border-amber-500/40 text-amber-300'
           }`}
-          title="Alternar entre Dataset DEMO y Entorno Productivo"
+          title={isDemoMode()
+            ? 'Sin VITE_API_BASE_URL: se usan adaptadores DEMO locales'
+            : 'API /api/v1 conectada; los datos siguen siendo sintéticos y NO son evidencia pedagógica'}
         >
           <Database className="w-3 h-3" />
-          <span>{isDemoMode ? 'MODO DEMO' : 'PRODUCCIÓN VERIFICADA'}</span>
-        </button>
+          <span>{isDemoMode() ? 'DATASET DEMO · SIN API' : 'API /api/v1 · DATOS DEMO'}</span>
+        </div>
 
-        {/* Live Realtime Connection State Badge */}
-        <LiveConnectionBadge isDemoMode={isDemoMode} theme={theme} />
+        {/* Realtime connection state badge (offline in this demo) */}
+        <LiveConnectionBadge theme={theme} />
       </div>
 
       {/* Right Controls: Command Palette, AI Tutor, Theme Switcher, Score, Notifications, Profile */}
@@ -270,12 +334,19 @@ export const Topbar: React.FC<TopbarProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowNotifications(!showNotifications)}
+            aria-label={`Notificaciones${unreadCount ? `, ${unreadCount} sin leer` : ''}`}
             className={`w-9 h-9 rounded-xl border flex items-center justify-center relative transition-all ${
               isMono ? 'bg-[#1E222C] border-[#2A2F3D] text-white' : isLight ? 'bg-slate-100 border-slate-200 text-slate-800' : 'bg-[#0A1F3D] border-edumaster-cardBorder text-slate-300'
             }`}
           >
             <Bell className="w-4 h-4" />
-            <span className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full ${isMono ? 'bg-white' : 'bg-edumaster-cyan'} animate-pulse`} />
+            {unreadCount > 0 && (
+              <span className={`absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full text-[9px] font-black flex items-center justify-center ${
+                isMono ? 'bg-white text-zinc-950' : 'bg-edumaster-cyan text-slate-950'
+              }`}>
+                {unreadCount}
+              </span>
+            )}
           </button>
 
           {showNotifications && (
@@ -286,22 +357,74 @@ export const Topbar: React.FC<TopbarProps> = ({
                 isLight ? 'border-slate-200' : isMono ? 'border-[#2A2F3D]' : 'border-white/10'
               }`}>
                 <span className="text-xs font-bold">Notificaciones de Dominio</span>
-                <span className="text-[10px] font-bold opacity-60">3 no leídas</span>
+                <span className="text-[10px] font-bold font-mono opacity-60">
+                  {notificationMeta ? `${notificationMeta.source} · ${unreadCount} sin leer` : 'cargando...'}
+                </span>
               </div>
-              <div className="space-y-2 text-xs">
-                <div className={`p-2.5 rounded-xl border ${
-                  isLight ? 'bg-slate-50 border-slate-200 text-slate-800' : isMono ? 'bg-[#12141A] border-[#2A2F3D] text-gray-200' : 'bg-black/40 border-white/10'
-                }`}>
-                  <span className="font-bold block">Evaluación completada</span>
-                  <span className="opacity-60 text-[11px]">Cohorte DL-2026 registró 48 entregas validadas por rúbrica.</span>
-                </div>
-                <div className={`p-2.5 rounded-xl border ${
-                  isLight ? 'bg-slate-50 border-slate-200 text-slate-800' : isMono ? 'bg-[#12141A] border-[#2A2F3D] text-gray-200' : 'bg-black/40 border-white/10'
-                }`}>
-                  <span className="font-bold block">Entrenamiento finalizado</span>
-                  <span className="opacity-60 text-[11px]">PyTorch MTL v1.0 alcanzó 0.914 PR-AUC sin data leakage.</span>
-                </div>
+
+              {notificationsError && (
+                <p className={`text-[10px] mb-2 ${isLight ? 'text-rose-700' : 'text-rose-300'}`}>{notificationsError}</p>
+              )}
+
+              <div className="space-y-2 text-xs max-h-72 overflow-y-auto">
+                {notifications.map(notification => (
+                  <div
+                    key={notification.id}
+                    className={`p-2.5 rounded-xl border ${
+                      notification.read
+                        ? 'opacity-60'
+                        : isLight ? 'bg-slate-50 border-slate-200 text-slate-800' : isMono ? 'bg-[#12141A] border-[#2A2F3D] text-gray-200' : 'bg-black/40 border-white/10'
+                    } ${isLight ? 'border-slate-200' : ''}`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-bold block">{notification.title}</span>
+                      <span className={`text-[9px] font-mono px-1 rounded border shrink-0 ${
+                        isLight ? 'bg-white border-slate-200 text-slate-500' : 'bg-white/5 border-white/10 text-slate-400'
+                      }`}>
+                        {notification.category}
+                      </span>
+                    </div>
+                    <span className="opacity-60 text-[11px] block mt-0.5">{notification.message}</span>
+                    <div className="flex items-center justify-between gap-2 mt-1.5">
+                      <span className={`text-[9px] font-mono opacity-50 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                        {notification.createdAt.slice(0, 10)}
+                      </span>
+                      {!notification.read && (
+                        <button
+                          onClick={() => void handleMarkRead(notification)}
+                          className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border ${
+                            isLight ? 'bg-slate-900 text-white border-slate-900' : isMono ? 'bg-white text-zinc-950 border-white' : 'bg-edumaster-blue text-white border-edumaster-blue'
+                          }`}
+                        >
+                          Marcar leída
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {notifications.length === 0 && !notificationsError && (
+                  <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Sin notificaciones.</p>
+                )}
               </div>
+
+              {preferences && (
+                <div className={`mt-3 pt-2 border-t flex items-center justify-between text-[10px] ${
+                  isLight ? 'border-slate-200' : isMono ? 'border-[#2A2F3D]' : 'border-white/10'
+                }`}>
+                  <span className="opacity-70">Notificaciones en la app</span>
+                  <button
+                    onClick={() => void handleToggleInApp()}
+                    aria-pressed={preferences.inApp}
+                    className={`px-2 py-0.5 rounded-lg border font-bold ${
+                      preferences.inApp
+                        ? isLight ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                        : isLight ? 'bg-slate-100 border-slate-300 text-slate-600' : 'bg-white/5 border-white/10 text-slate-400'
+                    }`}
+                  >
+                    {preferences.inApp ? 'Activadas' : 'Desactivadas'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

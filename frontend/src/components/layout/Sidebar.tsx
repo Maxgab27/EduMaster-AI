@@ -14,12 +14,14 @@ import {
   Cpu,
   ShieldCheck
 } from 'lucide-react';
-import { NavTab, ThemeMode } from '../../types';
+import { NavTab, ThemeMode, UserRole } from '../../types';
+import { canViewTab } from '../../auth/permissions';
 
 interface SidebarProps {
   activeTab: NavTab;
   onTabChange: (tab: NavTab) => void;
   onlineCount: number;
+  role: UserRole;
   theme?: ThemeMode;
 }
 
@@ -27,6 +29,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeTab, 
   onTabChange, 
   onlineCount,
+  role,
   theme = 'monochrome'
 }) => {
   const isMono = theme === 'monochrome';
@@ -75,7 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Navigation Menu Links */}
         <nav className="p-3 space-y-1">
-          {navItems.map(item => {
+          {navItems.filter(item => canViewTab(role, item.id)).map(item => {
             const isActive = activeTab === item.id;
             return (
               <button
@@ -131,19 +134,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 fill="none"
                 stroke={isMono ? "#FFFFFF" : isLight ? "#0F172A" : "#20C8F5"}
                 strokeWidth="3.5"
-                strokeDasharray="99.8, 100"
+                strokeDasharray="91.4, 100"
               />
             </svg>
             <Sparkles className="w-4 h-4 opacity-80 absolute" />
           </div>
 
           <div>
-            <span className="text-[10px] opacity-60 font-medium block leading-none">Precisión</span>
+            <span className="text-[10px] opacity-60 font-medium block leading-none">PR-AUC (demo)</span>
             <div className="flex items-baseline gap-1.5 mt-1">
-              <span className="text-base font-black font-mono tabular-numbers">99.8%</span>
-              <span className={`text-[10px] font-bold ${isMono ? 'text-zinc-200' : 'text-emerald-700'}`}>↑ +2.4%</span>
+              <span className="text-base font-black font-mono tabular-numbers">0.914</span>
             </div>
-            <span className="text-[9px] opacity-50 block">este mes</span>
+            <span className="text-[9px] opacity-50 block">métrica simulada</span>
           </div>
         </div>
 

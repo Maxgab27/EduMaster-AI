@@ -14,10 +14,16 @@ import { ActivityEvent, ThemeMode } from '../../types';
 interface RecentActivityFeedProps {
   onViewAll?: () => void;
   theme?: ThemeMode;
+  activity?: ActivityEvent[];
 }
 
-export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({ onViewAll, theme = 'monochrome' }) => {
-  const [events, setEvents] = useState<ActivityEvent[]>(recentActivities);
+export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
+  onViewAll,
+  theme = 'monochrome',
+  activity = recentActivities
+}) => {
+  const [simulatedEvents, setSimulatedEvents] = useState<ActivityEvent[]>([]);
+  const events = [...simulatedEvents, ...activity];
 
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
@@ -54,7 +60,7 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({ onViewAl
         id: `act-${Date.now()}`,
         icon: 'award',
         title: 'Certificado de MLOps emitido',
-        description: 'Folio EDU-2026-10492 validado en blockchain',
+        description: 'Folio EDU-2026-10492 (demo, sin blockchain real)',
         timeAgo: 'Justo ahora',
         user: 'Elena P.',
         status: 'success'
@@ -71,7 +77,7 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({ onViewAl
     ];
 
     const pick = samplePool[Math.floor(Math.random() * samplePool.length)];
-    setEvents(prev => [pick, ...prev.slice(0, 4)]);
+    setSimulatedEvents(prev => [pick, ...prev.slice(0, 4)]);
   };
 
   return (

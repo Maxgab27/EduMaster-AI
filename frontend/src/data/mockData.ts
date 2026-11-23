@@ -507,7 +507,7 @@ export const arcoRequests: ArcoRequest[] = [
 export const mlopsTelemetry = {
   inferenceLatencyP95: '18.4 ms',
   inferenceLatencyP99: '24.1 ms',
-  activeModelVersion: 'edumaster-mtl-v2.4-prod',
+  activeModelVersion: 'edumaster-mtl-v2.4-demo',
   modelAccuracyPR: '0.914 PR-AUC',
   baselineAdvantage: '+4.9% vs LightGBM',
   celeryQueues: {

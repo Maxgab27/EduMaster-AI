@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { Globe2 } from 'lucide-react';
 import { regionsData } from '../../data/mockData';
-import { ThemeMode } from '../../types';
+import { RegionProgress, ThemeMode } from '../../types';
 
 interface GeoProgressMapProps {
   theme?: ThemeMode;
+  regions?: RegionProgress[];
 }
 
-export const GeoProgressMap: React.FC<GeoProgressMapProps> = ({ theme = 'monochrome' }) => {
+export const GeoProgressMap: React.FC<GeoProgressMapProps> = ({
+  theme = 'monochrome',
+  regions = regionsData
+}) => {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
 
   const isMono = theme === 'monochrome';
@@ -23,7 +27,7 @@ export const GeoProgressMap: React.FC<GeoProgressMapProps> = ({ theme = 'monochr
     'Oceanía': { cx: 415, cy: 168 }
   };
 
-  const totalStudents = regionsData.reduce((acc, r) => acc + r.students, 0);
+  const totalStudents = regions.reduce((acc, r) => acc + r.students, 0);
 
   const getPinColor = (origColor: string) => {
     if (isMono) return '#FFFFFF';
@@ -117,7 +121,7 @@ export const GeoProgressMap: React.FC<GeoProgressMapProps> = ({ theme = 'monochr
           </g>
 
           {/* Static Hub Pins (No animate-ping, crisp enterprise styling) */}
-          {regionsData.map(r => {
+          {regions.map(r => {
             const pin = regionPins[r.region];
             if (!pin) return null;
             const isSelected = selectedRegion === r.region;
@@ -167,7 +171,7 @@ export const GeoProgressMap: React.FC<GeoProgressMapProps> = ({ theme = 'monochr
 
       {/* Regional Metrics Grid with High Contrast */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-        {regionsData.map(item => {
+        {regions.map(item => {
           const isSelected = selectedRegion === item.region;
           return (
             <div

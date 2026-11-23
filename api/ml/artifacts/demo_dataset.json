@@ -1,0 +1,6798 @@
+{
+  "label": "DEMO - dataset sintetico, no usar para conclusiones educativas",
+  "rows": 240,
+  "records": [
+    {
+      "student_id": "EST-0000",
+      "category": "MATEMATICA",
+      "active_days_14d": 4,
+      "sessions_14d": 3,
+      "completion_ratio": 0.202,
+      "assessment_mean": 0.0,
+      "assignment_late_rate": 0.537,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "assessment_submit",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0001",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 9,
+      "sessions_14d": 13,
+      "completion_ratio": 0.9442,
+      "assessment_mean": 0.8185,
+      "assignment_late_rate": 0.3872,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0002",
+      "category": "CIENCIAS",
+      "active_days_14d": 10,
+      "sessions_14d": 11,
+      "completion_ratio": 0.339,
+      "assessment_mean": 0.3954,
+      "assignment_late_rate": 0.4404,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "login",
+        "login",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "login",
+        "content_view",
+        "help_request",
+        "activity_start",
+        "help_request"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0003",
+      "category": "MATEMATICA",
+      "active_days_14d": 4,
+      "sessions_14d": 8,
+      "completion_ratio": 0.8793,
+      "assessment_mean": 0.6964,
+      "assignment_late_rate": 0.8361,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "activity_start",
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "help_request",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0004",
+      "category": "CIENCIAS",
+      "active_days_14d": 3,
+      "sessions_14d": 1,
+      "completion_ratio": 0.5496,
+      "assessment_mean": 0.162,
+      "assignment_late_rate": 0.2437,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "assessment_submit",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0005",
+      "category": "CIENCIAS",
+      "active_days_14d": 2,
+      "sessions_14d": 2,
+      "completion_ratio": 0.7491,
+      "assessment_mean": 0.5878,
+      "assignment_late_rate": 0.098,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "help_request"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0006",
+      "category": "CIENCIAS",
+      "active_days_14d": 13,
+      "sessions_14d": 15,
+      "completion_ratio": 0.8974,
+      "assessment_mean": 0.6629,
+      "assignment_late_rate": 0.6095,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0007",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 5,
+      "sessions_14d": 3,
+      "completion_ratio": 0.1788,
+      "assessment_mean": 0.2344,
+      "assignment_late_rate": 0.5514,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "assessment_submit",
+        "activity_complete",
+        "login",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0008",
+      "category": "CIENCIAS",
+      "active_days_14d": 1,
+      "sessions_14d": 0,
+      "completion_ratio": 0.4354,
+      "assessment_mean": 0.267,
+      "assignment_late_rate": 0.9063,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "assessment_submit",
+        "help_request",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0009",
+      "category": "CIENCIAS",
+      "active_days_14d": 13,
+      "sessions_14d": 14,
+      "completion_ratio": 0.6801,
+      "assessment_mean": 0.6494,
+      "assignment_late_rate": 0.0934,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "help_request",
+        "activity_start",
+        "assessment_submit",
+        "login",
+        "help_request",
+        "content_view",
+        "help_request",
+        "content_view",
+        "login",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0010",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 10,
+      "sessions_14d": 14,
+      "completion_ratio": 0.4579,
+      "assessment_mean": 0.2802,
+      "assignment_late_rate": 0.6461,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "login",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0011",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 3,
+      "sessions_14d": 2,
+      "completion_ratio": 0.0783,
+      "assessment_mean": 0.0,
+      "assignment_late_rate": 0.5713,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "login",
+        "activity_complete",
+        "assessment_submit",
+        "assessment_submit",
+        "assessment_submit",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0012",
+      "category": "CIENCIAS",
+      "active_days_14d": 8,
+      "sessions_14d": 9,
+      "completion_ratio": 0.8852,
+      "assessment_mean": 0.5882,
+      "assignment_late_rate": 0.3739,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "assessment_submit",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0013",
+      "category": "CIENCIAS",
+      "active_days_14d": 5,
+      "sessions_14d": 5,
+      "completion_ratio": 0.4696,
+      "assessment_mean": 0.277,
+      "assignment_late_rate": 0.2681,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "assessment_submit",
+        "help_request",
+        "activity_start",
+        "assessment_submit",
+        "activity_start",
+        "activity_complete",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0014",
+      "category": "LENGUA",
+      "active_days_14d": 12,
+      "sessions_14d": 15,
+      "completion_ratio": 0.5146,
+      "assessment_mean": 0.3777,
+      "assignment_late_rate": 0.1765,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0015",
+      "category": "CIENCIAS",
+      "active_days_14d": 1,
+      "sessions_14d": 3,
+      "completion_ratio": 0.4813,
+      "assessment_mean": 0.5069,
+      "assignment_late_rate": 0.5239,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "activity_complete",
+        "activity_start",
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "content_view",
+        "assessment_submit",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0016",
+      "category": "LENGUA",
+      "active_days_14d": 10,
+      "sessions_14d": 13,
+      "completion_ratio": 0.9379,
+      "assessment_mean": 0.7599,
+      "assignment_late_rate": 0.1729,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "login",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0017",
+      "category": "CIENCIAS",
+      "active_days_14d": 0,
+      "sessions_14d": 2,
+      "completion_ratio": 0.3287,
+      "assessment_mean": 0.0695,
+      "assignment_late_rate": 0.1464,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0018",
+      "category": "CIENCIAS",
+      "active_days_14d": 9,
+      "sessions_14d": 10,
+      "completion_ratio": 0.3829,
+      "assessment_mean": 0.2426,
+      "assignment_late_rate": 0.378,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "assessment_submit",
+        "activity_complete",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0019",
+      "category": "MATEMATICA",
+      "active_days_14d": 10,
+      "sessions_14d": 14,
+      "completion_ratio": 0.9479,
+      "assessment_mean": 0.7304,
+      "assignment_late_rate": 0.472,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "activity_start",
+        "login",
+        "content_view",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0020",
+      "category": "CIENCIAS",
+      "active_days_14d": 3,
+      "sessions_14d": 5,
+      "completion_ratio": 0.3488,
+      "assessment_mean": 0.1218,
+      "assignment_late_rate": 0.4663,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "login",
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "login"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0021",
+      "category": "MATEMATICA",
+      "active_days_14d": 12,
+      "sessions_14d": 16,
+      "completion_ratio": 0.6291,
+      "assessment_mean": 0.3219,
+      "assignment_late_rate": 0.4063,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "assessment_submit",
+        "assessment_submit",
+        "help_request",
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0022",
+      "category": "LENGUA",
+      "active_days_14d": 12,
+      "sessions_14d": 12,
+      "completion_ratio": 0.4565,
+      "assessment_mean": 0.3699,
+      "assignment_late_rate": 0.2139,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "login"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0023",
+      "category": "LENGUA",
+      "active_days_14d": 13,
+      "sessions_14d": 14,
+      "completion_ratio": 0.7184,
+      "assessment_mean": 0.339,
+      "assignment_late_rate": 0.0108,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "assessment_submit",
+        "help_request",
+        "content_view",
+        "help_request",
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "help_request",
+        "activity_complete",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0024",
+      "category": "LENGUA",
+      "active_days_14d": 5,
+      "sessions_14d": 4,
+      "completion_ratio": 0.536,
+      "assessment_mean": 0.4518,
+      "assignment_late_rate": 0.378,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "login",
+        "assessment_submit",
+        "content_view",
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "assessment_submit",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0025",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 6,
+      "sessions_14d": 4,
+      "completion_ratio": 0.482,
+      "assessment_mean": 0.178,
+      "assignment_late_rate": 0.379,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "login",
+        "login",
+        "help_request",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0026",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 7,
+      "sessions_14d": 6,
+      "completion_ratio": 0.7094,
+      "assessment_mean": 0.3096,
+      "assignment_late_rate": 0.3979,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "help_request",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "activity_start",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0027",
+      "category": "MATEMATICA",
+      "active_days_14d": 0,
+      "sessions_14d": 0,
+      "completion_ratio": 0.4199,
+      "assessment_mean": 0.3354,
+      "assignment_late_rate": 0.4079,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "activity_complete",
+        "login",
+        "help_request",
+        "activity_complete",
+        "content_view",
+        "login",
+        "activity_complete",
+        "activity_start",
+        "assessment_submit",
+        "content_view",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0028",
+      "category": "CIENCIAS",
+      "active_days_14d": 3,
+      "sessions_14d": 4,
+      "completion_ratio": 0.4664,
+      "assessment_mean": 0.2914,
+      "assignment_late_rate": 0.6526,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "login",
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0029",
+      "category": "LENGUA",
+      "active_days_14d": 5,
+      "sessions_14d": 9,
+      "completion_ratio": 0.7784,
+      "assessment_mean": 0.5819,
+      "assignment_late_rate": 0.3107,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "activity_complete",
+        "assessment_submit",
+        "content_view",
+        "content_view",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0030",
+      "category": "MATEMATICA",
+      "active_days_14d": 4,
+      "sessions_14d": 5,
+      "completion_ratio": 0.6905,
+      "assessment_mean": 0.6065,
+      "assignment_late_rate": 0.1767,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "activity_start",
+        "login",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0031",
+      "category": "CIENCIAS",
+      "active_days_14d": 11,
+      "sessions_14d": 14,
+      "completion_ratio": 0.9812,
+      "assessment_mean": 0.8086,
+      "assignment_late_rate": 0.3122,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "login",
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0032",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 10,
+      "sessions_14d": 10,
+      "completion_ratio": 0.5654,
+      "assessment_mean": 0.3802,
+      "assignment_late_rate": 0.1428,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "login",
+        "assessment_submit",
+        "activity_complete",
+        "activity_start",
+        "activity_start",
+        "activity_start",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0033",
+      "category": "CIENCIAS",
+      "active_days_14d": 8,
+      "sessions_14d": 10,
+      "completion_ratio": 0.5414,
+      "assessment_mean": 0.3062,
+      "assignment_late_rate": 0.5213,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "assessment_submit",
+        "assessment_submit",
+        "content_view",
+        "activity_start",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0034",
+      "category": "CIENCIAS",
+      "active_days_14d": 0,
+      "sessions_14d": 0,
+      "completion_ratio": 0.4055,
+      "assessment_mean": 0.1745,
+      "assignment_late_rate": 0.3014,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "activity_complete",
+        "login",
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0035",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 8,
+      "sessions_14d": 10,
+      "completion_ratio": 0.8274,
+      "assessment_mean": 0.7635,
+      "assignment_late_rate": 0.0686,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "assessment_submit",
+        "login",
+        "content_view",
+        "assessment_submit",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0036",
+      "category": "CIENCIAS",
+      "active_days_14d": 0,
+      "sessions_14d": 0,
+      "completion_ratio": 0.1252,
+      "assessment_mean": 0.1176,
+      "assignment_late_rate": 0.5412,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "activity_complete",
+        "activity_start",
+        "activity_start",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "login",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0037",
+      "category": "MATEMATICA",
+      "active_days_14d": 11,
+      "sessions_14d": 14,
+      "completion_ratio": 0.5353,
+      "assessment_mean": 0.1828,
+      "assignment_late_rate": 0.5592,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "login",
+        "content_view",
+        "login",
+        "assessment_submit",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0038",
+      "category": "LENGUA",
+      "active_days_14d": 7,
+      "sessions_14d": 7,
+      "completion_ratio": 0.941,
+      "assessment_mean": 0.774,
+      "assignment_late_rate": 0.5406,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "assessment_submit",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0039",
+      "category": "LENGUA",
+      "active_days_14d": 5,
+      "sessions_14d": 5,
+      "completion_ratio": 0.813,
+      "assessment_mean": 0.5345,
+      "assignment_late_rate": 0.5081,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "help_request",
+        "content_view",
+        "login",
+        "login",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0040",
+      "category": "LENGUA",
+      "active_days_14d": 3,
+      "sessions_14d": 7,
+      "completion_ratio": 0.5126,
+      "assessment_mean": 0.5853,
+      "assignment_late_rate": 0.3936,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "help_request",
+        "activity_complete",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "assessment_submit",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0041",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 8,
+      "sessions_14d": 8,
+      "completion_ratio": 0.3274,
+      "assessment_mean": 0.0552,
+      "assignment_late_rate": 0.4582,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "login",
+        "assessment_submit",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0042",
+      "category": "CIENCIAS",
+      "active_days_14d": 9,
+      "sessions_14d": 8,
+      "completion_ratio": 0.3361,
+      "assessment_mean": 0.3531,
+      "assignment_late_rate": 0.2031,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "login",
+        "login",
+        "assessment_submit",
+        "assessment_submit",
+        "content_view",
+        "help_request",
+        "assessment_submit"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0043",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 14,
+      "sessions_14d": 18,
+      "completion_ratio": 0.7593,
+      "assessment_mean": 0.5058,
+      "assignment_late_rate": 0.5486,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "activity_start",
+        "activity_start",
+        "login",
+        "login",
+        "content_view",
+        "help_request",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0044",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 8,
+      "sessions_14d": 12,
+      "completion_ratio": 0.6022,
+      "assessment_mean": 0.2644,
+      "assignment_late_rate": 0.3036,
+      "help_requests_14d": 6,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "help_request"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0045",
+      "category": "CIENCIAS",
+      "active_days_14d": 6,
+      "sessions_14d": 8,
+      "completion_ratio": 0.4592,
+      "assessment_mean": 0.1982,
+      "assignment_late_rate": 0.2498,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "assessment_submit",
+        "activity_start",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "assessment_submit",
+        "activity_complete",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0046",
+      "category": "CIENCIAS",
+      "active_days_14d": 6,
+      "sessions_14d": 10,
+      "completion_ratio": 0.5189,
+      "assessment_mean": 0.2938,
+      "assignment_late_rate": 0.7842,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "login",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0047",
+      "category": "LENGUA",
+      "active_days_14d": 13,
+      "sessions_14d": 12,
+      "completion_ratio": 0.9312,
+      "assessment_mean": 0.7711,
+      "assignment_late_rate": 0.1754,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "login",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0048",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 0,
+      "sessions_14d": 0,
+      "completion_ratio": 0.5728,
+      "assessment_mean": 0.5091,
+      "assignment_late_rate": 0.4674,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "activity_start",
+        "assessment_submit",
+        "activity_complete",
+        "content_view",
+        "login",
+        "assessment_submit",
+        "content_view",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0049",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 9,
+      "sessions_14d": 7,
+      "completion_ratio": 0.2692,
+      "assessment_mean": 0.0,
+      "assignment_late_rate": 0.5522,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "assessment_submit",
+        "activity_start",
+        "login",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0050",
+      "category": "CIENCIAS",
+      "active_days_14d": 6,
+      "sessions_14d": 5,
+      "completion_ratio": 0.6974,
+      "assessment_mean": 0.3616,
+      "assignment_late_rate": 0.6726,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "login",
+        "assessment_submit",
+        "login",
+        "help_request",
+        "content_view",
+        "login",
+        "help_request",
+        "activity_complete",
+        "activity_complete",
+        "help_request",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0051",
+      "category": "MATEMATICA",
+      "active_days_14d": 10,
+      "sessions_14d": 13,
+      "completion_ratio": 0.2909,
+      "assessment_mean": 0.2934,
+      "assignment_late_rate": 0.3345,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "content_view",
+        "assessment_submit",
+        "help_request",
+        "activity_start",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0052",
+      "category": "LENGUA",
+      "active_days_14d": 14,
+      "sessions_14d": 12,
+      "completion_ratio": 0.7595,
+      "assessment_mean": 0.4941,
+      "assignment_late_rate": 0.0671,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "activity_start",
+        "login",
+        "login",
+        "activity_complete",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0053",
+      "category": "LENGUA",
+      "active_days_14d": 12,
+      "sessions_14d": 12,
+      "completion_ratio": 0.7537,
+      "assessment_mean": 0.5416,
+      "assignment_late_rate": 0.1963,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "assessment_submit",
+        "activity_complete",
+        "login",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0054",
+      "category": "MATEMATICA",
+      "active_days_14d": 13,
+      "sessions_14d": 17,
+      "completion_ratio": 0.7923,
+      "assessment_mean": 0.4034,
+      "assignment_late_rate": 0.135,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "activity_start",
+        "content_view",
+        "login",
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0055",
+      "category": "MATEMATICA",
+      "active_days_14d": 13,
+      "sessions_14d": 16,
+      "completion_ratio": 0.9006,
+      "assessment_mean": 0.6343,
+      "assignment_late_rate": 0.5,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "assessment_submit",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "login",
+        "content_view",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0056",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 6,
+      "sessions_14d": 5,
+      "completion_ratio": 0.7119,
+      "assessment_mean": 0.2486,
+      "assignment_late_rate": 0.2184,
+      "help_requests_14d": 7,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0057",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 0,
+      "sessions_14d": 0,
+      "completion_ratio": 0.318,
+      "assessment_mean": 0.4654,
+      "assignment_late_rate": 0.2335,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_start",
+        "login",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "login",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0058",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 11,
+      "sessions_14d": 10,
+      "completion_ratio": 0.7525,
+      "assessment_mean": 0.6299,
+      "assignment_late_rate": 0.2903,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "assessment_submit",
+        "content_view",
+        "help_request",
+        "content_view",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "assessment_submit",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0059",
+      "category": "CIENCIAS",
+      "active_days_14d": 12,
+      "sessions_14d": 12,
+      "completion_ratio": 0.7222,
+      "assessment_mean": 0.3728,
+      "assignment_late_rate": 0.3249,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "help_request",
+        "content_view",
+        "activity_complete",
+        "login",
+        "login",
+        "content_view",
+        "activity_complete",
+        "activity_start",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0060",
+      "category": "CIENCIAS",
+      "active_days_14d": 1,
+      "sessions_14d": 2,
+      "completion_ratio": 0.6834,
+      "assessment_mean": 0.5591,
+      "assignment_late_rate": 0.4206,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "assessment_submit",
+        "activity_start",
+        "content_view",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0061",
+      "category": "MATEMATICA",
+      "active_days_14d": 13,
+      "sessions_14d": 14,
+      "completion_ratio": 0.5836,
+      "assessment_mean": 0.4224,
+      "assignment_late_rate": 0.2534,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "login",
+        "content_view",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0062",
+      "category": "CIENCIAS",
+      "active_days_14d": 7,
+      "sessions_14d": 8,
+      "completion_ratio": 0.8631,
+      "assessment_mean": 0.6943,
+      "assignment_late_rate": 0.0936,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "activity_start",
+        "login",
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "activity_start",
+        "help_request"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0063",
+      "category": "CIENCIAS",
+      "active_days_14d": 2,
+      "sessions_14d": 6,
+      "completion_ratio": 0.6458,
+      "assessment_mean": 0.3131,
+      "assignment_late_rate": 0.2957,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "help_request",
+        "activity_complete",
+        "login",
+        "help_request",
+        "activity_complete",
+        "assessment_submit",
+        "help_request",
+        "assessment_submit",
+        "login",
+        "assessment_submit",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0064",
+      "category": "CIENCIAS",
+      "active_days_14d": 0,
+      "sessions_14d": 4,
+      "completion_ratio": 0.4827,
+      "assessment_mean": 0.3659,
+      "assignment_late_rate": 0.3062,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "login",
+        "activity_complete",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0065",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 5,
+      "sessions_14d": 5,
+      "completion_ratio": 0.1441,
+      "assessment_mean": 0.1196,
+      "assignment_late_rate": 0.6469,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "login",
+        "content_view",
+        "login",
+        "assessment_submit",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0066",
+      "category": "LENGUA",
+      "active_days_14d": 11,
+      "sessions_14d": 10,
+      "completion_ratio": 0.7712,
+      "assessment_mean": 0.6587,
+      "assignment_late_rate": 0.5439,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0067",
+      "category": "MATEMATICA",
+      "active_days_14d": 0,
+      "sessions_14d": 0,
+      "completion_ratio": 0.2234,
+      "assessment_mean": 0.2588,
+      "assignment_late_rate": 0.5969,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "activity_start",
+        "login",
+        "login",
+        "login",
+        "assessment_submit",
+        "help_request",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0068",
+      "category": "LENGUA",
+      "active_days_14d": 11,
+      "sessions_14d": 10,
+      "completion_ratio": 0.4909,
+      "assessment_mean": 0.1553,
+      "assignment_late_rate": 0.252,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0069",
+      "category": "MATEMATICA",
+      "active_days_14d": 7,
+      "sessions_14d": 7,
+      "completion_ratio": 0.475,
+      "assessment_mean": 0.3731,
+      "assignment_late_rate": 0.3828,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_start",
+        "login",
+        "activity_complete",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0070",
+      "category": "CIENCIAS",
+      "active_days_14d": 12,
+      "sessions_14d": 11,
+      "completion_ratio": 0.8324,
+      "assessment_mean": 0.7419,
+      "assignment_late_rate": 0.0108,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "login",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "login",
+        "help_request",
+        "activity_complete",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0071",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 14,
+      "sessions_14d": 18,
+      "completion_ratio": 0.8574,
+      "assessment_mean": 0.5674,
+      "assignment_late_rate": 0.1131,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0072",
+      "category": "MATEMATICA",
+      "active_days_14d": 12,
+      "sessions_14d": 16,
+      "completion_ratio": 0.9475,
+      "assessment_mean": 0.6104,
+      "assignment_late_rate": 0.3314,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "help_request",
+        "content_view",
+        "activity_complete",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0073",
+      "category": "CIENCIAS",
+      "active_days_14d": 0,
+      "sessions_14d": 2,
+      "completion_ratio": 0.7025,
+      "assessment_mean": 0.579,
+      "assignment_late_rate": 0.1657,
+      "help_requests_14d": 5,
+      "event_sequence": [
+        "content_view",
+        "help_request",
+        "activity_start",
+        "login",
+        "content_view",
+        "activity_complete",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0074",
+      "category": "MATEMATICA",
+      "active_days_14d": 3,
+      "sessions_14d": 5,
+      "completion_ratio": 0.8457,
+      "assessment_mean": 0.7638,
+      "assignment_late_rate": 0.0752,
+      "help_requests_14d": 5,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "login"
+      ],
+      "finalizado": 0,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0075",
+      "category": "LENGUA",
+      "active_days_14d": 13,
+      "sessions_14d": 17,
+      "completion_ratio": 0.6419,
+      "assessment_mean": 0.6235,
+      "assignment_late_rate": 0.7866,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0076",
+      "category": "MATEMATICA",
+      "active_days_14d": 5,
+      "sessions_14d": 9,
+      "completion_ratio": 0.78,
+      "assessment_mean": 0.3944,
+      "assignment_late_rate": 0.5616,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "content_view",
+        "content_view",
+        "content_view",
+        "content_view",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0077",
+      "category": "LENGUA",
+      "active_days_14d": 8,
+      "sessions_14d": 6,
+      "completion_ratio": 0.6263,
+      "assessment_mean": 0.5188,
+      "assignment_late_rate": 0.3882,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "content_view",
+        "login",
+        "activity_start",
+        "activity_complete",
+        "login",
+        "content_view",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0078",
+      "category": "CIENCIAS",
+      "active_days_14d": 7,
+      "sessions_14d": 5,
+      "completion_ratio": 0.6574,
+      "assessment_mean": 0.2789,
+      "assignment_late_rate": 0.734,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "assessment_submit",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0079",
+      "category": "LENGUA",
+      "active_days_14d": 6,
+      "sessions_14d": 4,
+      "completion_ratio": 0.9098,
+      "assessment_mean": 0.5326,
+      "assignment_late_rate": 0.1964,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "login",
+        "activity_start",
+        "activity_start",
+        "help_request",
+        "login",
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "assessment_submit",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0080",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 0,
+      "sessions_14d": 0,
+      "completion_ratio": 0.3969,
+      "assessment_mean": 0.2369,
+      "assignment_late_rate": 0.1857,
+      "help_requests_14d": 7,
+      "event_sequence": [
+        "activity_start",
+        "login",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0081",
+      "category": "MATEMATICA",
+      "active_days_14d": 3,
+      "sessions_14d": 3,
+      "completion_ratio": 0.5066,
+      "assessment_mean": 0.5088,
+      "assignment_late_rate": 0.5403,
+      "help_requests_14d": 5,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0082",
+      "category": "CIENCIAS",
+      "active_days_14d": 8,
+      "sessions_14d": 12,
+      "completion_ratio": 0.9558,
+      "assessment_mean": 0.8014,
+      "assignment_late_rate": 0.2664,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "assessment_submit",
+        "content_view",
+        "activity_complete",
+        "assessment_submit",
+        "content_view",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0083",
+      "category": "LENGUA",
+      "active_days_14d": 11,
+      "sessions_14d": 10,
+      "completion_ratio": 0.7435,
+      "assessment_mean": 0.4413,
+      "assignment_late_rate": 0.1788,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "login",
+        "content_view",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0084",
+      "category": "MATEMATICA",
+      "active_days_14d": 2,
+      "sessions_14d": 1,
+      "completion_ratio": 0.5963,
+      "assessment_mean": 0.3795,
+      "assignment_late_rate": 0.6971,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "help_request",
+        "content_view",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0085",
+      "category": "MATEMATICA",
+      "active_days_14d": 4,
+      "sessions_14d": 5,
+      "completion_ratio": 0.7281,
+      "assessment_mean": 0.6517,
+      "assignment_late_rate": 0.2946,
+      "help_requests_14d": 7,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "help_request",
+        "content_view",
+        "login",
+        "activity_start",
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0086",
+      "category": "MATEMATICA",
+      "active_days_14d": 10,
+      "sessions_14d": 8,
+      "completion_ratio": 0.6348,
+      "assessment_mean": 0.5276,
+      "assignment_late_rate": 0.2611,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "help_request",
+        "content_view",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0087",
+      "category": "LENGUA",
+      "active_days_14d": 4,
+      "sessions_14d": 4,
+      "completion_ratio": 0.6496,
+      "assessment_mean": 0.3795,
+      "assignment_late_rate": 0.7467,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "assessment_submit",
+        "login",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "help_request",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0088",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 13,
+      "sessions_14d": 16,
+      "completion_ratio": 0.8763,
+      "assessment_mean": 0.6121,
+      "assignment_late_rate": 0.259,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "help_request",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0089",
+      "category": "LENGUA",
+      "active_days_14d": 4,
+      "sessions_14d": 2,
+      "completion_ratio": 0.5962,
+      "assessment_mean": 0.2353,
+      "assignment_late_rate": 0.567,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "content_view",
+        "login",
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "help_request",
+        "activity_start",
+        "assessment_submit",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0090",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 12,
+      "sessions_14d": 12,
+      "completion_ratio": 0.9768,
+      "assessment_mean": 0.7404,
+      "assignment_late_rate": 0.5912,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "assessment_submit",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0091",
+      "category": "CIENCIAS",
+      "active_days_14d": 12,
+      "sessions_14d": 11,
+      "completion_ratio": 0.7278,
+      "assessment_mean": 0.5217,
+      "assignment_late_rate": 0.5092,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_start",
+        "login",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0092",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 9,
+      "sessions_14d": 11,
+      "completion_ratio": 0.7087,
+      "assessment_mean": 0.4793,
+      "assignment_late_rate": 0.5425,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "login",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0093",
+      "category": "MATEMATICA",
+      "active_days_14d": 4,
+      "sessions_14d": 3,
+      "completion_ratio": 0.2511,
+      "assessment_mean": 0.2362,
+      "assignment_late_rate": 0.4243,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0094",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 11,
+      "sessions_14d": 11,
+      "completion_ratio": 0.6167,
+      "assessment_mean": 0.2322,
+      "assignment_late_rate": 0.4448,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "activity_start",
+        "help_request",
+        "activity_complete",
+        "help_request",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0095",
+      "category": "CIENCIAS",
+      "active_days_14d": 4,
+      "sessions_14d": 7,
+      "completion_ratio": 0.2518,
+      "assessment_mean": 0.3053,
+      "assignment_late_rate": 0.385,
+      "help_requests_14d": 14,
+      "event_sequence": [
+        "activity_complete",
+        "assessment_submit",
+        "activity_complete",
+        "login",
+        "activity_start",
+        "content_view",
+        "login",
+        "login",
+        "activity_complete",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0096",
+      "category": "MATEMATICA",
+      "active_days_14d": 10,
+      "sessions_14d": 10,
+      "completion_ratio": 0.8612,
+      "assessment_mean": 0.6539,
+      "assignment_late_rate": 0.6155,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "assessment_submit",
+        "login",
+        "assessment_submit",
+        "login",
+        "login",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0097",
+      "category": "CIENCIAS",
+      "active_days_14d": 1,
+      "sessions_14d": 1,
+      "completion_ratio": 0.7827,
+      "assessment_mean": 0.7365,
+      "assignment_late_rate": 0.3388,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0098",
+      "category": "LENGUA",
+      "active_days_14d": 1,
+      "sessions_14d": 5,
+      "completion_ratio": 0.2323,
+      "assessment_mean": 0.2707,
+      "assignment_late_rate": 0.6301,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "assessment_submit",
+        "activity_start",
+        "activity_start",
+        "help_request",
+        "activity_start",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0099",
+      "category": "LENGUA",
+      "active_days_14d": 9,
+      "sessions_14d": 12,
+      "completion_ratio": 0.9744,
+      "assessment_mean": 0.5975,
+      "assignment_late_rate": 0.1043,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "login",
+        "help_request",
+        "content_view",
+        "activity_complete",
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0100",
+      "category": "LENGUA",
+      "active_days_14d": 3,
+      "sessions_14d": 1,
+      "completion_ratio": 0.7544,
+      "assessment_mean": 0.554,
+      "assignment_late_rate": 0.5945,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "login",
+        "activity_start",
+        "login",
+        "activity_start",
+        "assessment_submit",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0101",
+      "category": "CIENCIAS",
+      "active_days_14d": 12,
+      "sessions_14d": 14,
+      "completion_ratio": 0.6099,
+      "assessment_mean": 0.4283,
+      "assignment_late_rate": 0.4586,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "assessment_submit",
+        "activity_start",
+        "assessment_submit",
+        "activity_start",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0102",
+      "category": "MATEMATICA",
+      "active_days_14d": 4,
+      "sessions_14d": 5,
+      "completion_ratio": 0.9002,
+      "assessment_mean": 0.6325,
+      "assignment_late_rate": 0.3451,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "content_view",
+        "login",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0103",
+      "category": "LENGUA",
+      "active_days_14d": 8,
+      "sessions_14d": 9,
+      "completion_ratio": 0.6386,
+      "assessment_mean": 0.2138,
+      "assignment_late_rate": 0.191,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "assessment_submit",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "help_request"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0104",
+      "category": "MATEMATICA",
+      "active_days_14d": 1,
+      "sessions_14d": 1,
+      "completion_ratio": 0.7872,
+      "assessment_mean": 0.6431,
+      "assignment_late_rate": 0.0495,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "help_request",
+        "activity_start",
+        "content_view",
+        "login",
+        "content_view",
+        "activity_start",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0105",
+      "category": "MATEMATICA",
+      "active_days_14d": 4,
+      "sessions_14d": 2,
+      "completion_ratio": 0.6633,
+      "assessment_mean": 0.5691,
+      "assignment_late_rate": 0.2897,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "assessment_submit",
+        "activity_start",
+        "content_view",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0106",
+      "category": "CIENCIAS",
+      "active_days_14d": 12,
+      "sessions_14d": 16,
+      "completion_ratio": 0.7418,
+      "assessment_mean": 0.537,
+      "assignment_late_rate": 0.191,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "assessment_submit",
+        "login",
+        "content_view",
+        "assessment_submit",
+        "activity_complete",
+        "activity_start",
+        "login",
+        "activity_start",
+        "content_view",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0107",
+      "category": "CIENCIAS",
+      "active_days_14d": 2,
+      "sessions_14d": 4,
+      "completion_ratio": 0.4254,
+      "assessment_mean": 0.2601,
+      "assignment_late_rate": 0.5906,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "help_request",
+        "activity_complete",
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0108",
+      "category": "MATEMATICA",
+      "active_days_14d": 10,
+      "sessions_14d": 12,
+      "completion_ratio": 0.3773,
+      "assessment_mean": 0.3383,
+      "assignment_late_rate": 0.3451,
+      "help_requests_14d": 7,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "assessment_submit",
+        "assessment_submit",
+        "activity_complete",
+        "assessment_submit",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0109",
+      "category": "LENGUA",
+      "active_days_14d": 10,
+      "sessions_14d": 10,
+      "completion_ratio": 0.9312,
+      "assessment_mean": 0.7882,
+      "assignment_late_rate": 0.1068,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "content_view",
+        "activity_complete",
+        "activity_start",
+        "login",
+        "activity_start",
+        "content_view",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0110",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 7,
+      "sessions_14d": 9,
+      "completion_ratio": 0.6471,
+      "assessment_mean": 0.4026,
+      "assignment_late_rate": 0.0223,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "assessment_submit",
+        "assessment_submit",
+        "activity_start",
+        "login",
+        "content_view",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0111",
+      "category": "CIENCIAS",
+      "active_days_14d": 1,
+      "sessions_14d": 0,
+      "completion_ratio": 0.1879,
+      "assessment_mean": 0.1476,
+      "assignment_late_rate": 0.6158,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "login",
+        "content_view",
+        "login",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0112",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 13,
+      "sessions_14d": 11,
+      "completion_ratio": 0.7699,
+      "assessment_mean": 0.5755,
+      "assignment_late_rate": 0.2925,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "assessment_submit",
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "activity_start",
+        "login",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0113",
+      "category": "LENGUA",
+      "active_days_14d": 1,
+      "sessions_14d": 0,
+      "completion_ratio": 0.1677,
+      "assessment_mean": 0.2731,
+      "assignment_late_rate": 0.4481,
+      "help_requests_14d": 6,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "assessment_submit"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0114",
+      "category": "LENGUA",
+      "active_days_14d": 2,
+      "sessions_14d": 3,
+      "completion_ratio": 0.2292,
+      "assessment_mean": 0.0,
+      "assignment_late_rate": 0.0678,
+      "help_requests_14d": 5,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "content_view",
+        "content_view",
+        "content_view",
+        "login",
+        "activity_complete",
+        "login",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0115",
+      "category": "CIENCIAS",
+      "active_days_14d": 13,
+      "sessions_14d": 11,
+      "completion_ratio": 0.8524,
+      "assessment_mean": 0.8143,
+      "assignment_late_rate": 0.7974,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "content_view",
+        "activity_start",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0116",
+      "category": "LENGUA",
+      "active_days_14d": 8,
+      "sessions_14d": 8,
+      "completion_ratio": 0.6421,
+      "assessment_mean": 0.6033,
+      "assignment_late_rate": 0.2359,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "assessment_submit",
+        "content_view",
+        "help_request",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0117",
+      "category": "LENGUA",
+      "active_days_14d": 7,
+      "sessions_14d": 7,
+      "completion_ratio": 0.5148,
+      "assessment_mean": 0.3127,
+      "assignment_late_rate": 0.6653,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "activity_start",
+        "assessment_submit",
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "activity_start",
+        "login",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0118",
+      "category": "LENGUA",
+      "active_days_14d": 10,
+      "sessions_14d": 13,
+      "completion_ratio": 0.8967,
+      "assessment_mean": 0.6684,
+      "assignment_late_rate": 0.1023,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "activity_start",
+        "activity_complete",
+        "login",
+        "login",
+        "activity_start",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0119",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 5,
+      "sessions_14d": 7,
+      "completion_ratio": 0.633,
+      "assessment_mean": 0.5363,
+      "assignment_late_rate": 0.353,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0120",
+      "category": "CIENCIAS",
+      "active_days_14d": 10,
+      "sessions_14d": 12,
+      "completion_ratio": 0.4936,
+      "assessment_mean": 0.4029,
+      "assignment_late_rate": 0.4839,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "assessment_submit",
+        "login",
+        "assessment_submit",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "help_request",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0121",
+      "category": "LENGUA",
+      "active_days_14d": 8,
+      "sessions_14d": 8,
+      "completion_ratio": 0.5376,
+      "assessment_mean": 0.579,
+      "assignment_late_rate": 0.1138,
+      "help_requests_14d": 7,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "help_request",
+        "activity_start",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0122",
+      "category": "LENGUA",
+      "active_days_14d": 9,
+      "sessions_14d": 8,
+      "completion_ratio": 0.7071,
+      "assessment_mean": 0.6048,
+      "assignment_late_rate": 0.5514,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "login",
+        "login",
+        "help_request",
+        "activity_start",
+        "activity_start",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0123",
+      "category": "MATEMATICA",
+      "active_days_14d": 6,
+      "sessions_14d": 5,
+      "completion_ratio": 0.3775,
+      "assessment_mean": 0.473,
+      "assignment_late_rate": 0.4232,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0124",
+      "category": "MATEMATICA",
+      "active_days_14d": 7,
+      "sessions_14d": 8,
+      "completion_ratio": 0.843,
+      "assessment_mean": 0.4603,
+      "assignment_late_rate": 0.3974,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "assessment_submit",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0125",
+      "category": "LENGUA",
+      "active_days_14d": 2,
+      "sessions_14d": 1,
+      "completion_ratio": 0.5485,
+      "assessment_mean": 0.4889,
+      "assignment_late_rate": 0.1339,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0126",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 1,
+      "sessions_14d": 0,
+      "completion_ratio": 0.3549,
+      "assessment_mean": 0.2759,
+      "assignment_late_rate": 0.4955,
+      "help_requests_14d": 5,
+      "event_sequence": [
+        "assessment_submit",
+        "login",
+        "content_view",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0127",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 13,
+      "sessions_14d": 13,
+      "completion_ratio": 0.5078,
+      "assessment_mean": 0.3835,
+      "assignment_late_rate": 0.3833,
+      "help_requests_14d": 6,
+      "event_sequence": [
+        "activity_complete",
+        "help_request",
+        "login",
+        "login",
+        "activity_start",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0128",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 9,
+      "sessions_14d": 11,
+      "completion_ratio": 0.4836,
+      "assessment_mean": 0.1886,
+      "assignment_late_rate": 0.1074,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "assessment_submit",
+        "login",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "activity_start",
+        "login",
+        "activity_start",
+        "content_view",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0129",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 7,
+      "sessions_14d": 6,
+      "completion_ratio": 0.6613,
+      "assessment_mean": 0.3304,
+      "assignment_late_rate": 0.408,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "assessment_submit",
+        "login",
+        "content_view",
+        "activity_start",
+        "assessment_submit",
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "login",
+        "help_request",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0130",
+      "category": "MATEMATICA",
+      "active_days_14d": 4,
+      "sessions_14d": 7,
+      "completion_ratio": 0.471,
+      "assessment_mean": 0.206,
+      "assignment_late_rate": 0.583,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "assessment_submit",
+        "activity_complete",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0131",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 13,
+      "sessions_14d": 12,
+      "completion_ratio": 0.7429,
+      "assessment_mean": 0.5783,
+      "assignment_late_rate": 0.1976,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "activity_start",
+        "assessment_submit",
+        "login",
+        "assessment_submit",
+        "content_view",
+        "content_view",
+        "content_view",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0132",
+      "category": "MATEMATICA",
+      "active_days_14d": 8,
+      "sessions_14d": 9,
+      "completion_ratio": 0.5366,
+      "assessment_mean": 0.5989,
+      "assignment_late_rate": 0.2037,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0133",
+      "category": "MATEMATICA",
+      "active_days_14d": 10,
+      "sessions_14d": 9,
+      "completion_ratio": 0.5992,
+      "assessment_mean": 0.3598,
+      "assignment_late_rate": 0.3169,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "help_request",
+        "activity_start",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "assessment_submit",
+        "help_request"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0134",
+      "category": "CIENCIAS",
+      "active_days_14d": 5,
+      "sessions_14d": 9,
+      "completion_ratio": 0.9982,
+      "assessment_mean": 0.6324,
+      "assignment_late_rate": 0.0336,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "content_view",
+        "login",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0135",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 1,
+      "sessions_14d": 3,
+      "completion_ratio": 0.3695,
+      "assessment_mean": 0.1849,
+      "assignment_late_rate": 0.0892,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "content_view",
+        "help_request",
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0136",
+      "category": "MATEMATICA",
+      "active_days_14d": 14,
+      "sessions_14d": 16,
+      "completion_ratio": 0.8835,
+      "assessment_mean": 0.7388,
+      "assignment_late_rate": 0.1422,
+      "help_requests_14d": 8,
+      "event_sequence": [
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0137",
+      "category": "CIENCIAS",
+      "active_days_14d": 2,
+      "sessions_14d": 4,
+      "completion_ratio": 0.6959,
+      "assessment_mean": 0.3379,
+      "assignment_late_rate": 0.3172,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "activity_start",
+        "activity_complete",
+        "help_request",
+        "content_view",
+        "login",
+        "login",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0138",
+      "category": "MATEMATICA",
+      "active_days_14d": 2,
+      "sessions_14d": 3,
+      "completion_ratio": 0.6045,
+      "assessment_mean": 0.6299,
+      "assignment_late_rate": 0.4922,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0139",
+      "category": "CIENCIAS",
+      "active_days_14d": 1,
+      "sessions_14d": 0,
+      "completion_ratio": 0.2808,
+      "assessment_mean": 0.3781,
+      "assignment_late_rate": 0.3291,
+      "help_requests_14d": 9,
+      "event_sequence": [
+        "activity_start",
+        "assessment_submit",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0140",
+      "category": "MATEMATICA",
+      "active_days_14d": 13,
+      "sessions_14d": 13,
+      "completion_ratio": 0.2359,
+      "assessment_mean": 0.0244,
+      "assignment_late_rate": 0.2362,
+      "help_requests_14d": 9,
+      "event_sequence": [
+        "activity_start",
+        "assessment_submit",
+        "content_view",
+        "content_view",
+        "login",
+        "login",
+        "help_request",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0141",
+      "category": "LENGUA",
+      "active_days_14d": 3,
+      "sessions_14d": 1,
+      "completion_ratio": 0.1332,
+      "assessment_mean": 0.2871,
+      "assignment_late_rate": 0.3146,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "activity_start",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "login",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0142",
+      "category": "MATEMATICA",
+      "active_days_14d": 2,
+      "sessions_14d": 6,
+      "completion_ratio": 0.3568,
+      "assessment_mean": 0.3348,
+      "assignment_late_rate": 0.6317,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0143",
+      "category": "LENGUA",
+      "active_days_14d": 8,
+      "sessions_14d": 6,
+      "completion_ratio": 0.656,
+      "assessment_mean": 0.2987,
+      "assignment_late_rate": 0.163,
+      "help_requests_14d": 6,
+      "event_sequence": [
+        "content_view",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0144",
+      "category": "CIENCIAS",
+      "active_days_14d": 6,
+      "sessions_14d": 5,
+      "completion_ratio": 0.7635,
+      "assessment_mean": 0.4988,
+      "assignment_late_rate": 0.4412,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "help_request",
+        "content_view",
+        "login",
+        "activity_complete",
+        "login",
+        "login",
+        "activity_complete",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0145",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 6,
+      "sessions_14d": 9,
+      "completion_ratio": 0.5344,
+      "assessment_mean": 0.4635,
+      "assignment_late_rate": 0.5465,
+      "help_requests_14d": 5,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0146",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 11,
+      "sessions_14d": 14,
+      "completion_ratio": 0.154,
+      "assessment_mean": 0.1417,
+      "assignment_late_rate": 0.2834,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "assessment_submit",
+        "activity_complete",
+        "login",
+        "assessment_submit",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0147",
+      "category": "LENGUA",
+      "active_days_14d": 12,
+      "sessions_14d": 11,
+      "completion_ratio": 0.6596,
+      "assessment_mean": 0.3469,
+      "assignment_late_rate": 0.2816,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "assessment_submit",
+        "activity_complete",
+        "assessment_submit",
+        "login",
+        "assessment_submit",
+        "activity_start",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0148",
+      "category": "CIENCIAS",
+      "active_days_14d": 0,
+      "sessions_14d": 0,
+      "completion_ratio": 0.6968,
+      "assessment_mean": 0.5589,
+      "assignment_late_rate": 0.4403,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "login",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "help_request",
+        "activity_complete",
+        "login",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0149",
+      "category": "MATEMATICA",
+      "active_days_14d": 5,
+      "sessions_14d": 4,
+      "completion_ratio": 0.7597,
+      "assessment_mean": 0.713,
+      "assignment_late_rate": 0.4349,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "help_request",
+        "activity_start",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0150",
+      "category": "MATEMATICA",
+      "active_days_14d": 13,
+      "sessions_14d": 12,
+      "completion_ratio": 0.9432,
+      "assessment_mean": 0.6726,
+      "assignment_late_rate": 0.1718,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "assessment_submit",
+        "help_request",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "activity_start",
+        "login",
+        "activity_complete",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0151",
+      "category": "CIENCIAS",
+      "active_days_14d": 9,
+      "sessions_14d": 11,
+      "completion_ratio": 0.3372,
+      "assessment_mean": 0.3464,
+      "assignment_late_rate": 0.1836,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "assessment_submit",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0152",
+      "category": "MATEMATICA",
+      "active_days_14d": 5,
+      "sessions_14d": 7,
+      "completion_ratio": 0.7231,
+      "assessment_mean": 0.6947,
+      "assignment_late_rate": 0.347,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "content_view",
+        "assessment_submit",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "assessment_submit",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0153",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 7,
+      "sessions_14d": 8,
+      "completion_ratio": 0.807,
+      "assessment_mean": 0.4416,
+      "assignment_late_rate": 0.1223,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "assessment_submit",
+        "login",
+        "login",
+        "login",
+        "content_view",
+        "activity_complete",
+        "login",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0154",
+      "category": "MATEMATICA",
+      "active_days_14d": 12,
+      "sessions_14d": 13,
+      "completion_ratio": 0.408,
+      "assessment_mean": 0.0724,
+      "assignment_late_rate": 0.2268,
+      "help_requests_14d": 5,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "login",
+        "login",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0155",
+      "category": "MATEMATICA",
+      "active_days_14d": 14,
+      "sessions_14d": 16,
+      "completion_ratio": 0.6577,
+      "assessment_mean": 0.5094,
+      "assignment_late_rate": 0.2576,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "activity_start",
+        "login",
+        "content_view",
+        "login",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "help_request",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0156",
+      "category": "LENGUA",
+      "active_days_14d": 11,
+      "sessions_14d": 13,
+      "completion_ratio": 0.8096,
+      "assessment_mean": 0.5133,
+      "assignment_late_rate": 0.1674,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "assessment_submit",
+        "content_view",
+        "activity_complete",
+        "assessment_submit",
+        "help_request",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0157",
+      "category": "MATEMATICA",
+      "active_days_14d": 10,
+      "sessions_14d": 14,
+      "completion_ratio": 0.7307,
+      "assessment_mean": 0.5576,
+      "assignment_late_rate": 0.2179,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "help_request",
+        "assessment_submit",
+        "login",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0158",
+      "category": "CIENCIAS",
+      "active_days_14d": 13,
+      "sessions_14d": 12,
+      "completion_ratio": 0.7185,
+      "assessment_mean": 0.5407,
+      "assignment_late_rate": 0.3185,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "activity_complete",
+        "login",
+        "assessment_submit",
+        "content_view",
+        "login",
+        "content_view",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0159",
+      "category": "CIENCIAS",
+      "active_days_14d": 5,
+      "sessions_14d": 6,
+      "completion_ratio": 0.8745,
+      "assessment_mean": 0.6967,
+      "assignment_late_rate": 0.0791,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0160",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 4,
+      "sessions_14d": 5,
+      "completion_ratio": 0.6826,
+      "assessment_mean": 0.4842,
+      "assignment_late_rate": 0.2641,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "help_request",
+        "activity_complete",
+        "activity_start",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0161",
+      "category": "MATEMATICA",
+      "active_days_14d": 13,
+      "sessions_14d": 14,
+      "completion_ratio": 0.8797,
+      "assessment_mean": 0.5449,
+      "assignment_late_rate": 0.43,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "login",
+        "login",
+        "login",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0162",
+      "category": "MATEMATICA",
+      "active_days_14d": 8,
+      "sessions_14d": 6,
+      "completion_ratio": 0.7971,
+      "assessment_mean": 0.4764,
+      "assignment_late_rate": 0.1402,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "assessment_submit",
+        "content_view",
+        "login",
+        "content_view",
+        "content_view",
+        "content_view",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0163",
+      "category": "MATEMATICA",
+      "active_days_14d": 10,
+      "sessions_14d": 14,
+      "completion_ratio": 0.8056,
+      "assessment_mean": 0.7905,
+      "assignment_late_rate": 0.4095,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "login",
+        "help_request",
+        "assessment_submit",
+        "assessment_submit",
+        "content_view",
+        "assessment_submit",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0164",
+      "category": "LENGUA",
+      "active_days_14d": 8,
+      "sessions_14d": 6,
+      "completion_ratio": 0.3391,
+      "assessment_mean": 0.2563,
+      "assignment_late_rate": 0.5315,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0165",
+      "category": "LENGUA",
+      "active_days_14d": 0,
+      "sessions_14d": 2,
+      "completion_ratio": 0.1755,
+      "assessment_mean": 0.0,
+      "assignment_late_rate": 0.587,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "assessment_submit",
+        "content_view",
+        "activity_start",
+        "login",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0166",
+      "category": "LENGUA",
+      "active_days_14d": 6,
+      "sessions_14d": 10,
+      "completion_ratio": 0.5141,
+      "assessment_mean": 0.4918,
+      "assignment_late_rate": 0.3317,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "help_request",
+        "content_view",
+        "content_view",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "login",
+        "activity_start",
+        "login"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0167",
+      "category": "MATEMATICA",
+      "active_days_14d": 4,
+      "sessions_14d": 3,
+      "completion_ratio": 0.6695,
+      "assessment_mean": 0.3542,
+      "assignment_late_rate": 0.0789,
+      "help_requests_14d": 6,
+      "event_sequence": [
+        "assessment_submit",
+        "content_view",
+        "activity_complete",
+        "assessment_submit",
+        "activity_start",
+        "content_view",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0168",
+      "category": "CIENCIAS",
+      "active_days_14d": 11,
+      "sessions_14d": 13,
+      "completion_ratio": 0.3471,
+      "assessment_mean": 0.0817,
+      "assignment_late_rate": 0.2993,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "help_request",
+        "login",
+        "activity_complete",
+        "content_view",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0169",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 0,
+      "sessions_14d": 0,
+      "completion_ratio": 0.5414,
+      "assessment_mean": 0.2359,
+      "assignment_late_rate": 0.1497,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0170",
+      "category": "CIENCIAS",
+      "active_days_14d": 1,
+      "sessions_14d": 0,
+      "completion_ratio": 0.3918,
+      "assessment_mean": 0.3747,
+      "assignment_late_rate": 0.4979,
+      "help_requests_14d": 5,
+      "event_sequence": [
+        "login",
+        "login",
+        "assessment_submit",
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "login",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0171",
+      "category": "MATEMATICA",
+      "active_days_14d": 11,
+      "sessions_14d": 11,
+      "completion_ratio": 0.3789,
+      "assessment_mean": 0.361,
+      "assignment_late_rate": 0.5778,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "login",
+        "content_view",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0172",
+      "category": "MATEMATICA",
+      "active_days_14d": 3,
+      "sessions_14d": 7,
+      "completion_ratio": 0.311,
+      "assessment_mean": 0.3761,
+      "assignment_late_rate": 0.8237,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "login",
+        "activity_complete",
+        "help_request",
+        "activity_start",
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0173",
+      "category": "CIENCIAS",
+      "active_days_14d": 0,
+      "sessions_14d": 2,
+      "completion_ratio": 0.0086,
+      "assessment_mean": 0.0111,
+      "assignment_late_rate": 0.5513,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "assessment_submit",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0174",
+      "category": "CIENCIAS",
+      "active_days_14d": 3,
+      "sessions_14d": 2,
+      "completion_ratio": 0.5766,
+      "assessment_mean": 0.2662,
+      "assignment_late_rate": 0.0714,
+      "help_requests_14d": 5,
+      "event_sequence": [
+        "login",
+        "login",
+        "content_view",
+        "activity_start",
+        "login",
+        "content_view",
+        "content_view",
+        "content_view",
+        "content_view",
+        "login",
+        "assessment_submit",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0175",
+      "category": "MATEMATICA",
+      "active_days_14d": 2,
+      "sessions_14d": 5,
+      "completion_ratio": 0.2894,
+      "assessment_mean": 0.2788,
+      "assignment_late_rate": 0.6234,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0176",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 7,
+      "sessions_14d": 6,
+      "completion_ratio": 0.7932,
+      "assessment_mean": 0.5769,
+      "assignment_late_rate": 0.2823,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "assessment_submit",
+        "login",
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0177",
+      "category": "CIENCIAS",
+      "active_days_14d": 14,
+      "sessions_14d": 18,
+      "completion_ratio": 0.966,
+      "assessment_mean": 0.5451,
+      "assignment_late_rate": 0.1195,
+      "help_requests_14d": 8,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "login",
+        "assessment_submit",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0178",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 12,
+      "sessions_14d": 15,
+      "completion_ratio": 0.9121,
+      "assessment_mean": 0.6715,
+      "assignment_late_rate": 0.1186,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "activity_start",
+        "login",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0179",
+      "category": "LENGUA",
+      "active_days_14d": 7,
+      "sessions_14d": 6,
+      "completion_ratio": 0.6453,
+      "assessment_mean": 0.3254,
+      "assignment_late_rate": 0.5875,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_start",
+        "login",
+        "login",
+        "content_view",
+        "help_request",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0180",
+      "category": "CIENCIAS",
+      "active_days_14d": 13,
+      "sessions_14d": 15,
+      "completion_ratio": 0.4671,
+      "assessment_mean": 0.4474,
+      "assignment_late_rate": 0.3979,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "activity_start",
+        "assessment_submit",
+        "assessment_submit",
+        "activity_complete",
+        "activity_complete",
+        "assessment_submit",
+        "activity_complete",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0181",
+      "category": "LENGUA",
+      "active_days_14d": 4,
+      "sessions_14d": 8,
+      "completion_ratio": 0.2317,
+      "assessment_mean": 0.0959,
+      "assignment_late_rate": 0.4184,
+      "help_requests_14d": 10,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "login",
+        "login",
+        "content_view",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0182",
+      "category": "MATEMATICA",
+      "active_days_14d": 3,
+      "sessions_14d": 7,
+      "completion_ratio": 0.5055,
+      "assessment_mean": 0.435,
+      "assignment_late_rate": 0.2498,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "assessment_submit",
+        "login",
+        "activity_start",
+        "activity_start",
+        "login",
+        "activity_complete",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0183",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 2,
+      "sessions_14d": 0,
+      "completion_ratio": 0.2705,
+      "assessment_mean": 0.2817,
+      "assignment_late_rate": 0.3725,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "login",
+        "login",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0184",
+      "category": "MATEMATICA",
+      "active_days_14d": 2,
+      "sessions_14d": 5,
+      "completion_ratio": 0.2467,
+      "assessment_mean": 0.2086,
+      "assignment_late_rate": 0.1588,
+      "help_requests_14d": 8,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "activity_start",
+        "assessment_submit"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0185",
+      "category": "LENGUA",
+      "active_days_14d": 13,
+      "sessions_14d": 16,
+      "completion_ratio": 0.5567,
+      "assessment_mean": 0.3196,
+      "assignment_late_rate": 0.3876,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "assessment_submit",
+        "activity_complete",
+        "assessment_submit",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0186",
+      "category": "CIENCIAS",
+      "active_days_14d": 10,
+      "sessions_14d": 12,
+      "completion_ratio": 0.4134,
+      "assessment_mean": 0.1496,
+      "assignment_late_rate": 0.3104,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "assessment_submit",
+        "activity_complete",
+        "help_request",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0187",
+      "category": "MATEMATICA",
+      "active_days_14d": 8,
+      "sessions_14d": 12,
+      "completion_ratio": 0.463,
+      "assessment_mean": 0.2364,
+      "assignment_late_rate": 0.4156,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "login",
+        "activity_complete",
+        "login",
+        "activity_start",
+        "content_view",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0188",
+      "category": "MATEMATICA",
+      "active_days_14d": 5,
+      "sessions_14d": 7,
+      "completion_ratio": 0.3115,
+      "assessment_mean": 0.314,
+      "assignment_late_rate": 0.2251,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "content_view",
+        "login",
+        "login",
+        "login",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0189",
+      "category": "MATEMATICA",
+      "active_days_14d": 10,
+      "sessions_14d": 11,
+      "completion_ratio": 0.6596,
+      "assessment_mean": 0.4614,
+      "assignment_late_rate": 0.3222,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "assessment_submit",
+        "activity_start",
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0190",
+      "category": "LENGUA",
+      "active_days_14d": 2,
+      "sessions_14d": 1,
+      "completion_ratio": 0.1491,
+      "assessment_mean": 0.0,
+      "assignment_late_rate": 0.6505,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "help_request",
+        "help_request",
+        "assessment_submit",
+        "assessment_submit",
+        "login",
+        "login",
+        "assessment_submit",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0191",
+      "category": "MATEMATICA",
+      "active_days_14d": 12,
+      "sessions_14d": 15,
+      "completion_ratio": 0.8434,
+      "assessment_mean": 0.732,
+      "assignment_late_rate": 0.3594,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "content_view",
+        "assessment_submit",
+        "activity_start",
+        "login",
+        "content_view",
+        "content_view",
+        "assessment_submit",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0192",
+      "category": "CIENCIAS",
+      "active_days_14d": 7,
+      "sessions_14d": 7,
+      "completion_ratio": 0.8605,
+      "assessment_mean": 0.5045,
+      "assignment_late_rate": 0.5377,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "login",
+        "login",
+        "content_view",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0193",
+      "category": "CIENCIAS",
+      "active_days_14d": 12,
+      "sessions_14d": 15,
+      "completion_ratio": 0.5028,
+      "assessment_mean": 0.4288,
+      "assignment_late_rate": 0.4341,
+      "help_requests_14d": 6,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "login",
+        "assessment_submit",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0194",
+      "category": "CIENCIAS",
+      "active_days_14d": 3,
+      "sessions_14d": 4,
+      "completion_ratio": 0.2625,
+      "assessment_mean": 0.4365,
+      "assignment_late_rate": 0.6566,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "assessment_submit",
+        "content_view",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0195",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 8,
+      "sessions_14d": 11,
+      "completion_ratio": 0.9519,
+      "assessment_mean": 0.7928,
+      "assignment_late_rate": 0.2618,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0196",
+      "category": "MATEMATICA",
+      "active_days_14d": 1,
+      "sessions_14d": 5,
+      "completion_ratio": 0.3286,
+      "assessment_mean": 0.2302,
+      "assignment_late_rate": 0.6746,
+      "help_requests_14d": 5,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "activity_start",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0197",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 5,
+      "sessions_14d": 4,
+      "completion_ratio": 0.4795,
+      "assessment_mean": 0.3854,
+      "assignment_late_rate": 0.5485,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_complete",
+        "assessment_submit",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "help_request",
+        "content_view",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0198",
+      "category": "LENGUA",
+      "active_days_14d": 5,
+      "sessions_14d": 4,
+      "completion_ratio": 0.6386,
+      "assessment_mean": 0.2753,
+      "assignment_late_rate": 0.397,
+      "help_requests_14d": 6,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "help_request",
+        "login",
+        "activity_start",
+        "help_request",
+        "activity_complete",
+        "content_view",
+        "assessment_submit",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0199",
+      "category": "LENGUA",
+      "active_days_14d": 11,
+      "sessions_14d": 9,
+      "completion_ratio": 0.3661,
+      "assessment_mean": 0.3,
+      "assignment_late_rate": 0.2003,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "activity_complete",
+        "help_request",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0200",
+      "category": "LENGUA",
+      "active_days_14d": 11,
+      "sessions_14d": 14,
+      "completion_ratio": 0.5771,
+      "assessment_mean": 0.5049,
+      "assignment_late_rate": 0.2202,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "content_view",
+        "login",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0201",
+      "category": "CIENCIAS",
+      "active_days_14d": 6,
+      "sessions_14d": 7,
+      "completion_ratio": 0.8464,
+      "assessment_mean": 0.4187,
+      "assignment_late_rate": 0.3237,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "assessment_submit",
+        "login",
+        "assessment_submit",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0202",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 12,
+      "sessions_14d": 15,
+      "completion_ratio": 0.5742,
+      "assessment_mean": 0.2915,
+      "assignment_late_rate": 0.4149,
+      "help_requests_14d": 7,
+      "event_sequence": [
+        "activity_start",
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0203",
+      "category": "CIENCIAS",
+      "active_days_14d": 11,
+      "sessions_14d": 12,
+      "completion_ratio": 0.7516,
+      "assessment_mean": 0.6548,
+      "assignment_late_rate": 0.14,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "login",
+        "activity_complete",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0204",
+      "category": "CIENCIAS",
+      "active_days_14d": 14,
+      "sessions_14d": 16,
+      "completion_ratio": 0.9454,
+      "assessment_mean": 0.6458,
+      "assignment_late_rate": 0.1129,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_start",
+        "login",
+        "activity_start",
+        "help_request",
+        "activity_complete",
+        "assessment_submit",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0205",
+      "category": "LENGUA",
+      "active_days_14d": 1,
+      "sessions_14d": 5,
+      "completion_ratio": 0.2652,
+      "assessment_mean": 0.083,
+      "assignment_late_rate": 0.5201,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "login",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0206",
+      "category": "LENGUA",
+      "active_days_14d": 1,
+      "sessions_14d": 1,
+      "completion_ratio": 0.4093,
+      "assessment_mean": 0.2797,
+      "assignment_late_rate": 0.5854,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "assessment_submit",
+        "assessment_submit"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0207",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 11,
+      "sessions_14d": 14,
+      "completion_ratio": 0.6689,
+      "assessment_mean": 0.5743,
+      "assignment_late_rate": 0.2861,
+      "help_requests_14d": 7,
+      "event_sequence": [
+        "activity_start",
+        "login",
+        "content_view",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-000",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0208",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 7,
+      "sessions_14d": 10,
+      "completion_ratio": 0.8699,
+      "assessment_mean": 0.7781,
+      "assignment_late_rate": 0.519,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "content_view",
+        "help_request",
+        "login",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "assessment_submit",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0209",
+      "category": "MATEMATICA",
+      "active_days_14d": 4,
+      "sessions_14d": 4,
+      "completion_ratio": 0.8639,
+      "assessment_mean": 0.6387,
+      "assignment_late_rate": 0.4468,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_start",
+        "activity_start",
+        "assessment_submit",
+        "content_view",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0210",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 2,
+      "sessions_14d": 5,
+      "completion_ratio": 0.8672,
+      "assessment_mean": 0.5528,
+      "assignment_late_rate": 0.2634,
+      "help_requests_14d": 9,
+      "event_sequence": [
+        "activity_complete",
+        "assessment_submit",
+        "activity_complete",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0211",
+      "category": "CIENCIAS",
+      "active_days_14d": 2,
+      "sessions_14d": 0,
+      "completion_ratio": 0.4125,
+      "assessment_mean": 0.2142,
+      "assignment_late_rate": 0.5835,
+      "help_requests_14d": 6,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "help_request",
+        "assessment_submit",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0212",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 7,
+      "sessions_14d": 6,
+      "completion_ratio": 0.6512,
+      "assessment_mean": 0.4312,
+      "assignment_late_rate": 0.5941,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "activity_complete",
+        "content_view",
+        "login",
+        "activity_start",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0213",
+      "category": "LENGUA",
+      "active_days_14d": 9,
+      "sessions_14d": 12,
+      "completion_ratio": 0.9155,
+      "assessment_mean": 0.6134,
+      "assignment_late_rate": 0.1184,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "content_view",
+        "assessment_submit",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0214",
+      "category": "MATEMATICA",
+      "active_days_14d": 2,
+      "sessions_14d": 2,
+      "completion_ratio": 0.4023,
+      "assessment_mean": 0.3446,
+      "assignment_late_rate": 0.6078,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "assessment_submit",
+        "activity_start",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0215",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 10,
+      "sessions_14d": 8,
+      "completion_ratio": 0.8153,
+      "assessment_mean": 0.4833,
+      "assignment_late_rate": 0.1939,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "assessment_submit",
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "assessment_submit",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0216",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 5,
+      "sessions_14d": 8,
+      "completion_ratio": 0.6196,
+      "assessment_mean": 0.4149,
+      "assignment_late_rate": 0.634,
+      "help_requests_14d": 7,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "activity_start",
+        "activity_start",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "content_view",
+        "login",
+        "assessment_submit",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0217",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 7,
+      "sessions_14d": 10,
+      "completion_ratio": 0.5695,
+      "assessment_mean": 0.2196,
+      "assignment_late_rate": 0.4493,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "login",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-004",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0218",
+      "category": "CIENCIAS",
+      "active_days_14d": 7,
+      "sessions_14d": 5,
+      "completion_ratio": 0.8665,
+      "assessment_mean": 0.4785,
+      "assignment_late_rate": 0.4079,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "activity_start",
+        "login",
+        "login",
+        "content_view",
+        "content_view",
+        "content_view",
+        "login",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0219",
+      "category": "MATEMATICA",
+      "active_days_14d": 0,
+      "sessions_14d": 0,
+      "completion_ratio": 0.6345,
+      "assessment_mean": 0.4252,
+      "assignment_late_rate": 0.3219,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "activity_complete",
+        "activity_complete",
+        "login",
+        "content_view"
+      ],
+      "finalizado": 0,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0220",
+      "category": "LENGUA",
+      "active_days_14d": 14,
+      "sessions_14d": 12,
+      "completion_ratio": 0.6511,
+      "assessment_mean": 0.6689,
+      "assignment_late_rate": 0.4563,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "assessment_submit",
+        "activity_complete",
+        "activity_complete",
+        "activity_start",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0221",
+      "category": "MATEMATICA",
+      "active_days_14d": 12,
+      "sessions_14d": 14,
+      "completion_ratio": 0.6726,
+      "assessment_mean": 0.2969,
+      "assignment_late_rate": 0.1211,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-008",
+        "REC-000",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0222",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 6,
+      "sessions_14d": 8,
+      "completion_ratio": 0.6015,
+      "assessment_mean": 0.3817,
+      "assignment_late_rate": 0.36,
+      "help_requests_14d": 8,
+      "event_sequence": [
+        "assessment_submit",
+        "activity_start",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "activity_start",
+        "activity_complete"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0223",
+      "category": "LENGUA",
+      "active_days_14d": 13,
+      "sessions_14d": 14,
+      "completion_ratio": 0.9922,
+      "assessment_mean": 0.7477,
+      "assignment_late_rate": 0.2784,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_start",
+        "content_view",
+        "login",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 3,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-009",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0224",
+      "category": "CIENCIAS",
+      "active_days_14d": 14,
+      "sessions_14d": 15,
+      "completion_ratio": 0.883,
+      "assessment_mean": 0.6805,
+      "assignment_late_rate": 0.1541,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "login",
+        "assessment_submit",
+        "login",
+        "content_view",
+        "login",
+        "activity_complete",
+        "content_view",
+        "assessment_submit",
+        "content_view",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0225",
+      "category": "LENGUA",
+      "active_days_14d": 2,
+      "sessions_14d": 5,
+      "completion_ratio": 0.7577,
+      "assessment_mean": 0.4803,
+      "assignment_late_rate": 0.4213,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "assessment_submit",
+        "help_request",
+        "activity_complete",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-009",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0226",
+      "category": "CIENCIAS",
+      "active_days_14d": 10,
+      "sessions_14d": 10,
+      "completion_ratio": 0.4381,
+      "assessment_mean": 0.3223,
+      "assignment_late_rate": 0.6556,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "activity_complete",
+        "content_view",
+        "login",
+        "help_request",
+        "login",
+        "activity_start",
+        "assessment_submit"
+      ],
+      "finalizado": 0,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-001",
+        "REC-005",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0227",
+      "category": "LENGUA",
+      "active_days_14d": 0,
+      "sessions_14d": 3,
+      "completion_ratio": 0.8421,
+      "assessment_mean": 0.7008,
+      "assignment_late_rate": 0.0938,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "activity_complete",
+        "activity_complete",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0228",
+      "category": "CIENCIAS",
+      "active_days_14d": 4,
+      "sessions_14d": 2,
+      "completion_ratio": 0.8692,
+      "assessment_mean": 0.729,
+      "assignment_late_rate": 0.0971,
+      "help_requests_14d": 3,
+      "event_sequence": [
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "activity_complete"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0229",
+      "category": "CIENCIAS",
+      "active_days_14d": 5,
+      "sessions_14d": 3,
+      "completion_ratio": 0.4851,
+      "assessment_mean": 0.3485,
+      "assignment_late_rate": 0.4307,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "login",
+        "activity_complete",
+        "login",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "activity_complete",
+        "content_view",
+        "login",
+        "activity_start",
+        "assessment_submit",
+        "login"
+      ],
+      "finalizado": 0,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-004",
+        "REC-008"
+      ]
+    },
+    {
+      "student_id": "EST-0230",
+      "category": "CIENCIAS",
+      "active_days_14d": 11,
+      "sessions_14d": 15,
+      "completion_ratio": 0.9197,
+      "assessment_mean": 0.4924,
+      "assignment_late_rate": 0.3255,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "activity_start",
+        "content_view",
+        "assessment_submit",
+        "activity_complete",
+        "login"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 1,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0231",
+      "category": "MATEMATICA",
+      "active_days_14d": 10,
+      "sessions_14d": 8,
+      "completion_ratio": 0.9327,
+      "assessment_mean": 0.5209,
+      "assignment_late_rate": 0.404,
+      "help_requests_14d": 2,
+      "event_sequence": [
+        "login",
+        "content_view",
+        "login",
+        "assessment_submit",
+        "content_view",
+        "content_view",
+        "content_view",
+        "login",
+        "content_view",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0232",
+      "category": "LENGUA",
+      "active_days_14d": 12,
+      "sessions_14d": 15,
+      "completion_ratio": 0.9232,
+      "assessment_mean": 0.6311,
+      "assignment_late_rate": 0.0617,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "login",
+        "assessment_submit",
+        "content_view",
+        "help_request",
+        "content_view",
+        "content_view",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0233",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 14,
+      "sessions_14d": 15,
+      "completion_ratio": 0.4504,
+      "assessment_mean": 0.3079,
+      "assignment_late_rate": 0.5725,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "content_view",
+        "content_view",
+        "content_view",
+        "assessment_submit",
+        "help_request"
+      ],
+      "finalizado": 1,
+      "dominio": 0,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0234",
+      "category": "MATEMATICA",
+      "active_days_14d": 7,
+      "sessions_14d": 8,
+      "completion_ratio": 0.8417,
+      "assessment_mean": 0.5885,
+      "assignment_late_rate": 0.3551,
+      "help_requests_14d": 5,
+      "event_sequence": [
+        "help_request",
+        "activity_complete",
+        "login",
+        "activity_complete",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-005",
+        "REC-001"
+      ]
+    },
+    {
+      "student_id": "EST-0235",
+      "category": "MATEMATICA",
+      "active_days_14d": 12,
+      "sessions_14d": 13,
+      "completion_ratio": 0.4832,
+      "assessment_mean": 0.1341,
+      "assignment_late_rate": 0.4143,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "activity_complete",
+        "login",
+        "assessment_submit",
+        "login",
+        "login",
+        "activity_complete",
+        "activity_complete",
+        "activity_start",
+        "activity_complete",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-000",
+        "REC-008",
+        "REC-004"
+      ]
+    },
+    {
+      "student_id": "EST-0236",
+      "category": "LENGUA",
+      "active_days_14d": 1,
+      "sessions_14d": 4,
+      "completion_ratio": 0.6025,
+      "assessment_mean": 0.534,
+      "assignment_late_rate": 0.4139,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "login",
+        "activity_complete",
+        "login",
+        "activity_start"
+      ],
+      "finalizado": 0,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    },
+    {
+      "student_id": "EST-0237",
+      "category": "CIENCIAS",
+      "active_days_14d": 10,
+      "sessions_14d": 8,
+      "completion_ratio": 0.5023,
+      "assessment_mean": 0.4288,
+      "assignment_late_rate": 0.1421,
+      "help_requests_14d": 1,
+      "event_sequence": [
+        "login",
+        "activity_start",
+        "content_view",
+        "activity_complete",
+        "content_view",
+        "activity_start"
+      ],
+      "finalizado": 1,
+      "dominio": 1,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-005",
+        "REC-001",
+        "REC-009"
+      ]
+    },
+    {
+      "student_id": "EST-0238",
+      "category": "TECNOLOGIA",
+      "active_days_14d": 7,
+      "sessions_14d": 9,
+      "completion_ratio": 0.9292,
+      "assessment_mean": 0.7523,
+      "assignment_late_rate": 0.4066,
+      "help_requests_14d": 4,
+      "event_sequence": [
+        "content_view",
+        "content_view",
+        "activity_complete",
+        "assessment_submit"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-009",
+        "REC-001",
+        "REC-005"
+      ]
+    },
+    {
+      "student_id": "EST-0239",
+      "category": "CIENCIAS",
+      "active_days_14d": 12,
+      "sessions_14d": 16,
+      "completion_ratio": 0.8282,
+      "assessment_mean": 0.4843,
+      "assignment_late_rate": 0.3622,
+      "help_requests_14d": 0,
+      "event_sequence": [
+        "content_view",
+        "activity_start",
+        "content_view",
+        "activity_start",
+        "login",
+        "content_view",
+        "login",
+        "activity_start",
+        "activity_start",
+        "content_view"
+      ],
+      "finalizado": 1,
+      "dominio": 2,
+      "riesgo": 0,
+      "recursos_relevantes": [
+        "REC-004",
+        "REC-008",
+        "REC-000"
+      ]
+    }
+  ]
+}

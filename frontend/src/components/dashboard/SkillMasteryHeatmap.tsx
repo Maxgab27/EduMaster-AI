@@ -5,9 +5,13 @@ import { SkillCategory, ThemeMode } from '../../types';
 
 interface SkillMasteryHeatmapProps {
   theme?: ThemeMode;
+  skills?: SkillCategory[];
 }
 
-export const SkillMasteryHeatmap: React.FC<SkillMasteryHeatmapProps> = ({ theme = 'monochrome' }) => {
+export const SkillMasteryHeatmap: React.FC<SkillMasteryHeatmapProps> = ({
+  theme = 'monochrome',
+  skills = skillMasteryData
+}) => {
   const [hoveredCell, setHoveredCell] = useState<{
     category: SkillCategory;
     levelKey: keyof SkillCategory['levels'];
@@ -87,7 +91,7 @@ export const SkillMasteryHeatmap: React.FC<SkillMasteryHeatmapProps> = ({ theme 
       <div className="flex items-stretch gap-4 flex-1">
         {/* Matrix Grid */}
         <div className="flex-1 flex flex-col justify-between">
-          {skillMasteryData.map(cat => (
+          {skills.map(cat => (
             <div key={cat.id} className="flex items-center gap-2 my-1">
               {/* Category Name Label */}
               <div className="w-36 text-xs font-medium flex items-center gap-1.5 truncate">

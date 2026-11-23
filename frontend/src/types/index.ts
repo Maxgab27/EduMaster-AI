@@ -147,6 +147,7 @@ export interface AtRiskStudent {
   lastActive: string;
   suggestedAction: string;
   status: 'critical' | 'warning' | 'normal';
+  interventionSent?: boolean;
 }
 
 export interface AuditLogEntry {
@@ -170,5 +171,206 @@ export interface ArcoRequest {
   submittedDate: string;
   deadline: string;
   legalRepresentative: string;
+}
+
+// --- API contracts (contract-first; demo adapter lives in services/) ---
+
+export interface ApiMeta {
+  source: 'demo' | 'api';
+  generatedAt: string;
+  correlationId: string;
+}
+
+export interface ApiResponse<T> {
+  data: T;
+  meta: ApiMeta;
+}
+
+export interface DashboardSummary {
+  metrics: MetricCardData[];
+  regions: RegionProgress[];
+  skills: SkillCategory[];
+  activity: ActivityEvent[];
+  neural: {
+    status: NeuralStatus;
+    epoch: number;
+    loss: number;
+    valMetric: number;
+    modelVersion: string;
+    publicationDecision?: string;
+  };
+}
+
+// --- Fase 1: contratos de solo lectura ---
+
+export interface ProgressPoint {
+  label: string;
+  completion: number;
+  activeStudents: number;
+  assessments: number;
+}
+
+export interface AnalyticsProgress {
+  label: string;
+  cohort: string;
+  series: ProgressPoint[];
+}
+
+export interface SkillMasteryAggregate {
+  skill: string;
+  level: number;
+  certifiedByDocent: boolean;
+  evidenceCount: number;
+}
+
+export interface AnalyticsSkillMastery {
+  label: string;
+  skills: SkillMasteryAggregate[];
+}
+
+export interface CertificateRecord {
+  id: string;
+  folio: string;
+  student: string;
+  course: string;
+  issuedAt: string;
+  grade: string;
+  hash: string;
+  status: string;
+  verificationUrl: string;
+  qrSvg?: string | null;
+}
+
+export interface CertificateVerification {
+  valid: boolean;
+  folio: string;
+  student: string;
+  course: string;
+  issuedAt: string;
+  grade: string;
+  hash: string;
+  status: string;
+  verifiedAt: string;
+  message: string;
+}
+
+export interface ApiAuditLog {
+  id: string;
+  correlation_id: string;
+  action: string;
+  actor: string;
+  detail: Record<string, unknown>;
+  timestamp: string;
+}
+
+export interface NeuralStatusPayload {
+  model_name: string;
+  model_version: string;
+  feature_schema_version: string;
+  status: string;
+  trained_epochs: number;
+  last_train_loss: number | null;
+  last_val_loss: number | null;
+  temperature: Record<string, number>;
+  decision_thresholds: Record<string, number>;
+  lambdas: Record<string, number>;
+  publication_decision: string;
+  evaluation_source: string;
+}
+
+export interface ModelMetricsSummary {
+  label?: string;
+  model?: {
+    name?: string;
+    version?: string;
+    trained_epochs?: number;
+    lambdas?: Record<string, number>;
+  };
+  mtl_test?: Record<string, unknown>;
+  baselines_test?: Record<string, Record<string, unknown>>;
+  publication_decision?: string;
+}
+
+// --- Fase 2: comunidad, tutor, recomendaciones y notificaciones ---
+
+export interface CommunityThread {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  members: number;
+  pinned: boolean;
+  createdAt: string;
+  lastActivity: string;
+  messageCount: number;
+}
+
+export interface CommunityMessage {
+  id: string;
+  threadId: string;
+  author: string;
+  role: string;
+  text: string;
+  createdAt: string;
+  likes: number;
+  moderated: boolean;
+  hidden: boolean;
+}
+
+export interface TutorMessageData {
+  id: string;
+  conversationId: string;
+  sender: 'user' | 'tutor';
+  text: string;
+  createdAt: string;
+  confidence?: number | null;
+  sources?: string[];
+  guardrail?: string | null;
+}
+
+export interface TutorConversationData {
+  conversationId: string;
+  messages: TutorMessageData[];
+}
+
+export interface RecommendationItemData {
+  id: string;
+  prediction_id: string;
+  resource_id: string;
+  prefix: 'Repasa' | 'Completa' | 'Sigue' | 'Realiza' | 'Explora';
+  title: string;
+  course: string;
+  difficulty: string;
+  rationale: string;
+  confidence: number;
+  score: number;
+  available: boolean;
+  status: string;
+}
+
+export interface FeedbackResultData {
+  feedback_id: string;
+  prediction_id: string;
+  resource_id: string;
+  decision: string;
+  recorded_at: string;
+  note: string;
+}
+
+export interface AppNotification {
+  id: string;
+  title: string;
+  message: string;
+  category: string;
+  createdAt: string;
+  read: boolean;
+  actor: string;
+}
+
+export interface NotificationPreferences {
+  email: boolean;
+  inApp: boolean;
+  digest: string;
+  categories: string[];
 }
 

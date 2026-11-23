@@ -4,35 +4,50 @@ import {
   LayoutDashboard, 
   BookOpen, 
   Map, 
-  BarChart3, 
   Bot, 
   CheckSquare, 
   Award, 
   Cpu, 
   Settings, 
   ShieldCheck, 
-  User, 
+  User,
   Palette, 
-  X,
   ArrowRight
 } from 'lucide-react';
 import { NavTab, UserRole, ThemeMode } from '../../types';
+import { can, type Permission } from '../../auth/permissions';
+
+const COMMAND_PERMISSIONS: Record<string, Permission> = {
+  'nav-dash': 'dashboard:view',
+  'nav-courses': 'courses:view',
+  'nav-paths': 'learning-paths:view',
+  'nav-assessments': 'assessments:view',
+  'nav-tutor': 'ai-tutor:use',
+  'nav-certs': 'certificates:view',
+  'nav-neural': 'neural-inspector:view',
+  'nav-gov': 'governance:view',
+  'nav-settings': 'settings:view'
+};
 
 interface GlobalCommandPaletteProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpen: () => void;
   onNavigate: (tab: NavTab) => void;
   onRoleChange: (role: UserRole) => void;
   onThemeChange: (theme: ThemeMode) => void;
+  role: UserRole;
   theme?: ThemeMode;
 }
 
 export const GlobalCommandPalette: React.FC<GlobalCommandPaletteProps> = ({
   isOpen,
   onClose,
+  onOpen,
   onNavigate,
   onRoleChange,
   onThemeChange,
+  role,
   theme = 'monochrome'
 }) => {
   const [query, setQuery] = useState('');
@@ -42,13 +57,14 @@ export const GlobalCommandPalette: React.FC<GlobalCommandPaletteProps> = ({
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         if (isOpen) onClose();
+        else onOpen();
       } else if (e.key === 'Escape' && isOpen) {
         onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, onOpen]);
 
   if (!isOpen) return null;
 
@@ -79,7 +95,12 @@ export const GlobalCommandPalette: React.FC<GlobalCommandPaletteProps> = ({
     { id: 'theme-light', category: 'Tema Visual', title: 'Tema Claro Minimalista de Alto Contraste', icon: <Palette className="w-4 h-4 text-amber-500" />, action: () => { onThemeChange('light'); onClose(); } },
   ];
 
-  const filtered = commands.filter(c => 
+  const allowed = commands.filter(c => {
+    const permission = COMMAND_PERMISSIONS[c.id];
+    return !permission || can(role, permission);
+  });
+
+  const filtered = allowed.filter(c => 
     c.title.toLowerCase().includes(query.toLowerCase()) || 
     c.category.toLowerCase().includes(query.toLowerCase())
   );

@@ -1,0 +1,20 @@
+{
+  "model_name": "edumaster_mtl_network",
+  "model_version": "0.1.0-demo",
+  "feature_schema_version": "1.0.0-demo",
+  "dataset": "synthetic_demo_v1",
+  "seed": 42,
+  "time_window_days": 14,
+  "max_sequence_length": 12,
+  "hidden_dim": 8,
+  "learning_rate": 0.01,
+  "epochs": 60,
+  "early_stopping_patience": 20,
+  "lambdas": {
+    "completion": 1.0,
+    "mastery": 1.0,
+    "dropout_risk": 1.0,
+    "ranking": 0.5
+  },
+  "notes": "Implementacion DEMO de la logica MTL del documento: baselines interpretables primero, red compacta con pesos compartidos y cabezas A-D, perdida multitarea enmascarada, calibracion y explicaciones prudentes. No es un modelo validado educationalmente."
+}

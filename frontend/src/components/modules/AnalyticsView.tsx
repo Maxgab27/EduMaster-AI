@@ -1,35 +1,85 @@
-import React, { useState } from 'react';
-import { BarChart3, Download, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { ThemeMode } from '../../types';
+import React, { useEffect, useState } from 'react';
+import { BarChart3, Download, AlertTriangle, CheckCircle2, RefreshCw } from 'lucide-react';
+import type {
+  AnalyticsProgress,
+  AnalyticsSkillMastery,
+  ApiMeta,
+  ThemeMode,
+} from '../../types';
+import { COHORT_OPTIONS, getAnalyticsProgress, getAnalyticsSkillMastery } from '../../services/analyticsApi';
+import { writeAudit } from '../../services/auditSink';
 
 interface AnalyticsViewProps {
   theme?: ThemeMode;
 }
 
+function percent(value: number): string {
+  return `${Math.round(value * 100)}%`;
+}
+
 export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ theme = 'monochrome' }) => {
-  const [selectedCohort, setSelectedCohort] = useState('2026-II');
-  const [exportNotice, setExportNotice] = useState<string | null>(null);
+  const [cohort, setCohort] = useState('todos');
+  const [progress, setProgress] = useState<AnalyticsProgress | null>(null);
+  const [skills, setSkills] = useState<AnalyticsSkillMastery | null>(null);
+  const [meta, setMeta] = useState<ApiMeta | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
 
-  const handleExport = (type: string) => {
-    setExportNotice(`Generando archivo ${type} auditado con firma de tiempo UTC y filtros aplicados...`);
-    setTimeout(() => {
-      setExportNotice(`Reporte ${type} exportado exitosamente bajo normativa de gobernanza.`);
-      setTimeout(() => setExportNotice(null), 4000);
-    }, 1200);
+  useEffect(() => {
+    const controller = new AbortController();
+    Promise.all([
+      getAnalyticsProgress(cohort, controller.signal),
+      getAnalyticsSkillMastery(controller.signal),
+    ])
+      .then(([progressResponse, skillsResponse]) => {
+        setProgress(progressResponse.data);
+        setSkills(skillsResponse.data);
+        setMeta(progressResponse.meta);
+      })
+      .catch(err => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setError(err instanceof Error ? err.message : 'No se pudo cargar la analítica');
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [cohort, reloadKey]);
+
+  const handleExport = async () => {
+    if (!progress || !skills) return;
+    const rows = [
+      ['seccion', 'campo', 'valor'],
+      ...progress.series.map(point => ['progreso', point.label, percent(point.completion)]),
+      ...progress.series.map(point => ['progreso_activos', point.label, String(point.activeStudents)]),
+      ...progress.series.map(point => ['evaluaciones', point.label, String(point.assessments)]),
+      ...skills.skills.map(skill => ['dominio', skill.skill, percent(skill.level)]),
+    ];
+    const csv = rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `analitica-${cohort}-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    setNotice(`CSV generado con ${rows.length - 1} filas. Correlation ID ${meta?.correlationId.slice(0, 14) ?? 'local'}.`);
+    await writeAudit({
+      action: 'analytics.export_csv',
+      detail: { cohort, rows: rows.length - 1 },
+    });
   };
 
-  const cohorts = [
-    { name: 'Cohorte 2026-II', students: 12450, retention: '89.4%', dropoutRisk: '4.2%', avgScore: '16.8/20' },
-    { name: 'Cohorte 2026-I', students: 12143, retention: '86.1%', dropoutRisk: '6.8%', avgScore: '16.2/20' },
-    { name: 'Cohorte 2025-II', students: 10890, retention: '83.5%', dropoutRisk: '8.1%', avgScore: '15.9/20' },
-  ];
+  const maxStudents = Math.max(1, ...(progress?.series.map(point => point.activeStudents) ?? [1]));
+  const maxAssessments = Math.max(1, ...(progress?.series.map(point => point.assessments) ?? [1]));
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-xl font-black flex items-center gap-2 m-0">
@@ -37,179 +87,205 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ theme = 'monochrom
             Analítica Educativa & Desempeño Institucional
           </h1>
           <p className={`text-xs mt-1 m-0 ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
-            Métricas agregadas no invasivas, curvas de retención y análisis de riesgo de abandono.
+            Series y dominio calculados desde eventos sintéticos. No son notas oficiales ni evidencia pedagógica.
           </p>
         </div>
-
-        {/* Export Buttons */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <select
+            value={cohort}
+            onChange={event => {
+              setLoading(true);
+              setError(null);
+              setCohort(event.target.value);
+            }}
+            className={`px-3 py-1.5 rounded-xl border text-xs focus:outline-none ${
+              isLight ? 'bg-white border-slate-300 text-slate-800' : isMono ? 'bg-[#202532] border-[#3B4254] text-zinc-200' : 'bg-[#0A1F3D] border-edumaster-cardBorder text-slate-200'
+            }`}
+          >
+            {COHORT_OPTIONS.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+          <span className={`text-[10px] font-mono px-2 py-1.5 rounded border ${
+            isLight ? 'bg-slate-100 border-slate-200 text-slate-600' : 'bg-white/5 border-white/10 text-slate-400'
+          }`}>
+            {meta ? `${meta.source} · ${meta.correlationId.slice(0, 14)}` : 'sin fuente'}
+          </span>
           <button
-            onClick={() => handleExport('CSV')}
-            className={`px-3 py-1.5 border text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors ${
-              isLight 
-                ? 'bg-white border-slate-300 text-slate-800 hover:bg-slate-50' 
-                : isMono 
-                ? 'bg-[#1C202B] border-[#2A2F3D] text-zinc-200 hover:text-white' 
-                : 'bg-[#0A1F3D] hover:bg-[#0D2B52] border-edumaster-cardBorder text-slate-200'
+            onClick={() => {
+              setLoading(true);
+              setError(null);
+              setReloadKey(key => key + 1);
+            }}
+            className={`p-2 rounded-xl border transition-colors ${
+              isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-white/5 border-white/10 text-slate-300'
+            }`}
+            title="Recargar filtro"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => void handleExport()}
+            disabled={!progress || !skills}
+            className={`px-3 py-1.5 border text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors disabled:opacity-40 ${
+              isLight ? 'bg-slate-900 text-white hover:bg-slate-800' : isMono ? 'bg-white text-zinc-950 font-black hover:bg-zinc-200' : 'bg-edumaster-blue text-white hover:bg-edumaster-blue/80'
             }`}
           >
             <Download className="w-3.5 h-3.5" /> Exportar CSV
           </button>
-          <button
-            onClick={() => handleExport('PDF')}
-            className={`px-3 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm transition-colors ${
-              isLight 
-                ? 'bg-slate-900 text-white hover:bg-slate-800' 
-                : isMono 
-                ? 'bg-white text-zinc-950 font-black hover:bg-zinc-200' 
-                : 'bg-edumaster-blue hover:bg-edumaster-blue/80 text-white shadow-glowBlue'
-            }`}
-          >
-            <Download className="w-3.5 h-3.5" /> Reporte Oficial PDF
-          </button>
         </div>
       </div>
 
-      {exportNotice && (
-        <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2 animate-in fade-in">
+      {notice && (
+        <div className={`p-3.5 rounded-xl border text-xs flex items-center gap-2 ${
+          isLight ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+        }`}>
           <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>{exportNotice}</span>
+          <span>{notice}</span>
         </div>
       )}
 
-      {/* Cohort Comparison Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {cohorts.map(c => {
-          const isSelected = selectedCohort === c.name;
-          return (
-            <div
-              key={c.name}
-              onClick={() => setSelectedCohort(c.name)}
-              className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-                isSelected
-                  ? (isLight 
-                      ? 'bg-blue-50/70 border-blue-400 text-slate-900 shadow-sm' 
-                      : isMono 
-                      ? 'bg-[#1C2436] border-[#384A6E] text-white shadow-md' 
-                      : 'bg-[#0A1F3D] border-edumaster-cyan shadow-glowBlue text-white')
-                  : (isLight 
-                      ? 'bg-white border-slate-200 text-slate-800 hover:border-slate-300' 
-                      : isMono 
-                      ? 'bg-[#151821] border-[#2A2F3D] text-zinc-200 hover:border-[#3B4254]' 
-                      : 'glass-panel border-edumaster-cardBorder opacity-80 hover:opacity-100 text-slate-100')
-              }`}
-            >
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-bold text-sm">{c.name}</span>
-                <span className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold border ${
-                  isLight ? 'bg-blue-100 border-blue-200 text-blue-800' : isMono ? 'bg-[#242A38] border-[#3B4254] text-white' : 'bg-edumaster-blue/20 border-edumaster-cyan/30 text-edumaster-cyan'
-                }`}>
-                  Vigente
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                <div>
-                  <span className={`block text-[10px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Alumnos</span>
-                  <span className="font-bold font-mono text-sm">{c.students.toLocaleString()}</span>
-                </div>
-                <div>
-                  <span className={`block text-[10px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Tasa Retención</span>
-                  <span className={`font-mono text-sm font-bold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>{c.retention}</span>
-                </div>
-                <div>
-                  <span className={`block text-[10px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Riesgo Abandono</span>
-                  <span className={`font-mono text-sm font-bold ${isLight ? 'text-amber-700' : 'text-amber-400'}`}>{c.dropoutRisk}</span>
-                </div>
-                <div>
-                  <span className={`block text-[10px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Nota Promedio</span>
-                  <span className={`font-mono text-sm font-bold ${isLight ? 'text-purple-700' : 'text-purple-400'}`}>{c.avgScore}</span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Retention Curve & Dropdown Risk Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className={`p-5 rounded-2xl border transition-all ${
-          isLight ? 'bg-white border-slate-200 text-slate-900 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-100' : 'glass-panel border-edumaster-cardBorder text-slate-100'
+      {error && (
+        <div className={`p-4 rounded-2xl border text-xs ${
+          isLight ? 'bg-rose-50 border-rose-200 text-rose-800' : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
         }`}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold m-0">Curva de Retención Semanal</h3>
-            <span className={`text-[11px] font-mono ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>{selectedCohort}</span>
-          </div>
-
-          <div className={`h-44 flex items-end gap-2 pt-4 border-b px-2 ${isLight ? 'border-slate-200' : isMono ? 'border-[#2A2F3D]' : 'border-edumaster-cardBorder'}`}>
-            {[98, 95, 93, 91, 90, 89, 88, 89, 87, 88, 89, 90].map((val, idx) => (
-              <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 group">
-                <span className={`text-[9px] font-mono opacity-0 group-hover:opacity-100 transition-opacity ${isLight ? 'text-slate-600' : 'text-slate-300'}`}>
-                  {val}%
-                </span>
-                <div
-                  className={`w-full rounded-t-md transition-all ${
-                    isLight ? 'bg-slate-800 group-hover:bg-blue-600' : isMono ? 'bg-white group-hover:bg-zinc-300' : 'bg-gradient-to-t from-edumaster-blue to-edumaster-cyan'
-                  }`}
-                  style={{ height: `${(val - 70) * 3.2}px` }}
-                />
-                <span className={`text-[9px] font-mono ${isLight ? 'text-slate-500' : 'text-slate-500'}`}>S{idx + 1}</span>
-              </div>
-            ))}
-          </div>
-          <span className={`text-[10px] block mt-2 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Semanas lectivas del semestre (S1 a S12)</span>
+          {error}
         </div>
+      )}
 
-        <div className={`p-5 rounded-2xl border transition-all ${
-          isLight ? 'bg-white border-slate-200 text-slate-900 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-100' : 'glass-panel border-edumaster-cardBorder text-slate-100'
+      {loading ? (
+        <div className={`p-10 rounded-2xl border text-center text-xs animate-pulse ${
+          isLight ? 'bg-white border-slate-200 text-slate-500' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-400' : 'glass-panel border-edumaster-cardBorder text-slate-400'
         }`}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold m-0">Segmentación de Riesgo de Deserción (IA Cabeza C)</h3>
-            <span className={`text-[11px] font-mono font-bold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>Brier Score: 0.082</span>
+          Calculando series desde {meta?.source === 'api' ? 'la API' : 'el adaptador DEMO'}...
+        </div>
+      ) : progress && skills ? (
+        <>
+          <div className={`p-4 rounded-2xl border text-xs ${
+            isLight ? 'bg-blue-50 border-blue-200 text-blue-900' : isMono ? 'bg-[#1C2436] border-[#384A6E] text-white' : 'bg-[#0A1F3D] border-edumaster-cyan/40 text-slate-200'
+          }`}>
+            <strong>Fuente:</strong> {progress.label} · <strong>Corte:</strong> {COHORT_OPTIONS.find(option => option.value === cohort)?.label ?? cohort}
           </div>
 
-          <div className="space-y-3 pt-2 text-xs">
-            <div>
-              <div className="flex justify-between text-[11px] mb-1">
-                <span className={`font-bold ${isLight ? 'text-emerald-700' : 'text-emerald-400'}`}>Riesgo Bajo (Prob &lt; 15%)</span>
-                <span className="font-mono font-medium">84.2% (10,480 alumnos)</span>
-              </div>
-              <div className={`h-2 rounded-full overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-slate-800'}`}>
-                <div className="h-full bg-emerald-500 rounded-full" style={{ width: '84.2%' }} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className={`p-5 rounded-2xl border ${
+              isLight ? 'bg-white border-slate-200 text-slate-900 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-100' : 'glass-panel border-edumaster-cardBorder text-slate-100'
+            }`}>
+              <h3 className="text-sm font-bold m-0 mb-1">Progreso semanal de finalización</h3>
+              <p className={`text-[11px] mb-4 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                Promedio de completion_ratio por ventana; no equivale a nota oficial.
+              </p>
+              <div className="space-y-3">
+                {progress.series.map(point => (
+                  <div key={point.label}>
+                    <div className="flex justify-between text-[11px] mb-1">
+                      <span className="font-bold">{point.label}</span>
+                      <span className="font-mono">{percent(point.completion)}</span>
+                    </div>
+                    <div className={`h-2 rounded-full overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-white/10'}`}>
+                      <div className="h-full rounded-full bg-emerald-500" style={{ width: percent(point.completion) }} />
+                    </div>
+                    <div className={`flex justify-between text-[10px] mt-1 font-mono ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                      <span>{point.activeStudents} activos</span>
+                      <span>{point.assessments} evaluaciones</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div>
-              <div className="flex justify-between text-[11px] mb-1">
-                <span className={`font-bold ${isLight ? 'text-amber-700' : 'text-amber-400'}`}>Riesgo Moderado (15% - 40%)</span>
-                <span className="font-mono font-medium">11.6% (1,444 alumnos)</span>
+            <div className={`p-5 rounded-2xl border ${
+              isLight ? 'bg-white border-slate-200 text-slate-900 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-100' : 'glass-panel border-edumaster-cardBorder text-slate-100'
+            }`}>
+              <h3 className="text-sm font-bold m-0 mb-1">Actividad derivada de eventos</h3>
+              <p className={`text-[11px] mb-4 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                Estudiantes activos y evaluaciones por semana, sobre la misma serie DEMO.
+              </p>
+              <div className={`h-44 flex items-end gap-2 pt-4 border-b px-2 ${isLight ? 'border-slate-200' : isMono ? 'border-[#2A2F3D]' : 'border-edumaster-cardBorder'}`}>
+                {progress.series.map(point => (
+                  <div key={point.label} className="flex-1 flex flex-col items-center gap-1.5 group">
+                    <span className={`text-[9px] font-mono opacity-0 group-hover:opacity-100 ${isLight ? 'text-slate-600' : 'text-slate-300'}`}>
+                      {point.activeStudents}
+                    </span>
+                    <div
+                      className={`w-full rounded-t-md ${isLight ? 'bg-blue-600' : isMono ? 'bg-white' : 'bg-gradient-to-t from-edumaster-blue to-edumaster-cyan'}`}
+                      style={{ height: `${Math.max(6, (point.activeStudents / maxStudents) * 120)}px` }}
+                    />
+                    <span className={`text-[9px] font-mono ${isLight ? 'text-slate-500' : 'text-slate-500'}`}>
+                      {point.label.replace('Semana ', 'S')}
+                    </span>
+                  </div>
+                ))}
               </div>
-              <div className={`h-2 rounded-full overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-slate-800'}`}>
-                <div className="h-full bg-amber-500 rounded-full" style={{ width: '11.6%' }} />
+              <div className={`mt-3 h-2 rounded-full overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-white/10'}`}>
+                <div
+                  className="h-full rounded-full bg-purple-500"
+                  style={{ width: `${Math.round((progress.series.at(-1)?.assessments ?? 0) / maxAssessments * 100)}%` }}
+                />
               </div>
-            </div>
-
-            <div>
-              <div className="flex justify-between text-[11px] mb-1">
-                <span className={`font-bold ${isLight ? 'text-rose-700' : 'text-rose-400'}`}>Riesgo Crítico (Prob &gt; 40%)</span>
-                <span className="font-mono font-medium">4.2% (526 alumnos)</span>
-              </div>
-              <div className={`h-2 rounded-full overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-slate-800'}`}>
-                <div className="h-full bg-rose-500 rounded-full" style={{ width: '4.2%' }} />
-              </div>
+              <p className={`text-[10px] mt-1 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                Última semana: {progress.series.at(-1)?.assessments ?? 0} evaluaciones registradas.
+              </p>
             </div>
           </div>
 
-          <div className={`mt-4 p-3 rounded-xl border text-[11px] flex items-start gap-2 ${
+          <div className={`p-5 rounded-2xl border ${
+            isLight ? 'bg-white border-slate-200 text-slate-900 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-100' : 'glass-panel border-edumaster-cardBorder text-slate-100'
+          }`}>
+            <h3 className="text-sm font-bold m-0 mb-1">Dominio por competencia</h3>
+            <p className={`text-[11px] mb-4 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>{skills.label}</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className={`border-b text-[11px] ${isLight ? 'border-slate-200 text-slate-500' : isMono ? 'border-[#2A2F3D] text-zinc-400' : 'border-edumaster-cardBorder text-slate-400'}`}>
+                    <th className="pb-3">Competencia</th>
+                    <th className="pb-3">Nivel agregado</th>
+                    <th className="pb-3">Evidencias</th>
+                    <th className="pb-3">Certificación docente</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {skills.skills.map(skill => (
+                    <tr key={skill.skill} className={`border-b ${isLight ? 'border-slate-100' : isMono ? 'border-[#2A2F3D]/60' : 'border-edumaster-cardBorder/50'}`}>
+                      <td className="py-3 font-bold">{skill.skill}</td>
+                      <td className="py-3">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-24 h-2 rounded-full overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-white/10'}`}>
+                            <div
+                              className={`h-full rounded-full ${skill.level >= 0.75 ? 'bg-emerald-500' : skill.level >= 0.6 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                              style={{ width: percent(skill.level) }}
+                            />
+                          </div>
+                          <span className="font-mono">{percent(skill.level)}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 font-mono">{skill.evidenceCount}</td>
+                      <td className="py-3">
+                        <span className={`text-[10px] px-2 py-0.5 rounded border ${
+                          skill.certifiedByDocent
+                            ? isLight ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                            : isLight ? 'bg-amber-50 border-amber-200 text-amber-800' : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                        }`}>
+                          {skill.certifiedByDocent ? 'Sí' : 'Pendiente'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className={`p-4 rounded-xl border text-[11px] flex items-start gap-2 ${
             isLight ? 'bg-amber-50 border-amber-200 text-amber-900' : isMono ? 'bg-[#1C1812] border-[#3D3320] text-amber-200' : 'bg-[#06152B] border-amber-500/30 text-amber-300'
           }`}>
             <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
             <span>
-              <strong>Guardrail de Seguridad:</strong> Las señales de riesgo se derivan a tutores y consejeros académicos humanos. Queda prohibida la aplicación de medidas punitivas automáticas.
+              <strong>Guardrail:</strong> el riesgo y el dominio son estimaciones DEMO. No deben usarse para sancionar ni para emitir notas oficiales sin revisión docente.
             </span>
           </div>
-        </div>
-      </div>
+        </>
+      ) : null}
     </div>
   );
 };

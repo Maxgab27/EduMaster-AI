@@ -3,16 +3,10 @@ import {
   X, 
   Play, 
   CheckCircle2, 
-  FileText, 
   Code2, 
-  ChevronRight, 
   Bookmark, 
-  MessageSquare, 
   Clock, 
-  Award,
-  Sparkles,
-  Maximize2,
-  ExternalLink
+  Sparkles
 } from 'lucide-react';
 import { ThemeMode } from '../../types';
 import { StudentCodeSandbox } from './StudentCodeSandbox';

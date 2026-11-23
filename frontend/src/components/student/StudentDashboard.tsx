@@ -5,21 +5,18 @@ import {
   Award, 
   CheckSquare, 
   Sparkles, 
-  BookOpen, 
   ArrowRight, 
-  AlertCircle, 
   CheckCircle2, 
   Code2, 
   ShieldCheck, 
-  Calendar,
   Upload,
-  BrainCircuit,
   TrendingUp
 } from 'lucide-react';
-import { ThemeMode, StudentTask, Recommendation } from '../../types';
-import { studentTasks as initialTasks, initialRecommendations } from '../../data/mockData';
+import { ThemeMode, StudentTask } from '../../types';
+import { studentTasks as initialTasks } from '../../data/mockData';
 import { StudentStudyModal } from './StudentStudyModal';
 import { StudentCodeSandbox } from './StudentCodeSandbox';
+import { AIRecommendationsCard } from '../dashboard/AIRecommendationsCard';
 
 interface StudentDashboardProps {
   theme?: ThemeMode;
@@ -31,7 +28,6 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   onOpenAITutor
 }) => {
   const [tasks, setTasks] = useState<StudentTask[]>(initialTasks);
-  const [recommendations, setRecommendations] = useState<Recommendation[]>(initialRecommendations);
   const [isStudyModalOpen, setIsStudyModalOpen] = useState(false);
   const [uploadNotice, setUploadNotice] = useState<string | null>(null);
   const [filterTask, setFilterTask] = useState<'all' | 'urgent' | 'upcoming'>('all');
@@ -42,7 +38,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
   const handleSimulateSubmit = (taskId: string, taskTitle: string) => {
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: 'submitted' } : t));
-    setUploadNotice(`¡Evidencia enviada para "${taskTitle}"! Código SHA-256 generado.`);
+    setUploadNotice(`¡Evidencia enviada para "${taskTitle}"! (simulación local, sin hash real).`);
     setTimeout(() => setUploadNotice(null), 3500);
   };
 
@@ -288,56 +284,8 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             </div>
           </div>
 
-          {/* AI Pedagogical Recommendations */}
-          <div className={`p-6 rounded-3xl border transition-all ${
-            isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
-          }`}>
-            <div className="flex items-center justify-between pb-3 border-b border-inherit mb-4">
-              <div className="flex items-center gap-2">
-                <BrainCircuit className="w-4 h-4 text-edumaster-cyan" />
-                <h2 className="text-sm font-bold m-0">Recomendaciones Adaptativas Personalizadas</h2>
-              </div>
-              <span className="text-[10px] font-mono opacity-60">Cabeza D • PyTorch MTL</span>
-            </div>
-
-            <div className="space-y-3">
-              {recommendations.slice(0, 3).map(rec => (
-                <div
-                  key={rec.id}
-                  className={`p-4 rounded-2xl border transition-all ${
-                    isLight ? 'bg-slate-50 border-slate-200' : isMono ? 'bg-[#181C26] border-[#2A2F3D]' : 'bg-[#06152B]/80 border-edumaster-cardBorder'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono ${
-                      rec.prefix === 'Repasa' ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-300'
-                    }`}>
-                      {rec.prefix} • {rec.difficulty}
-                    </span>
-                    <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                      Confianza: {Math.round(rec.confidence * 100)}%
-                    </span>
-                  </div>
-
-                  <h3 className="text-xs font-bold m-0 mb-1">{rec.title}</h3>
-                  <p className="text-[11px] opacity-70 leading-relaxed mb-3 m-0">
-                    <strong>Motivo Pedagógico:</strong> {rec.rationale}
-                  </p>
-
-                  <div className="flex justify-end">
-                    <button
-                      onClick={() => setIsStudyModalOpen(true)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors ${
-                        isLight ? 'text-blue-700 hover:bg-blue-50' : isMono ? 'text-zinc-200 hover:text-white hover:bg-white/10' : 'text-edumaster-cyan hover:underline'
-                      }`}
-                    >
-                      Estudiar tema <ArrowRight className="w-3 h-3" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* AI Pedagogical Recommendations: conectadas al artefacto MTL + catálogo */}
+          <AIRecommendationsCard theme={theme} />
         </div>
 
         {/* Right Column: Personal Skills Radar & AI Tutor Helper (5 Cols) */}

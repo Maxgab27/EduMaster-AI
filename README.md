@@ -43,7 +43,26 @@ El proyecto aborda las limitaciones críticas de las plataformas educativas conv
 
 ## 2. Estado del Avance y Progreso
 
-El proyecto se encuentra en un estado funcional avanzado con validación de diseño profesional y compilación limpia:
+El proyecto se encuentra en un estado funcional avanzado **como frontend base/demo** con validación de diseño profesional y compilación limpia.
+
+> ⚠️ **Estado real:** existe un **backend DEMO** en `api/` con FastAPI y lógica MTL entrenada sobre dataset sintético, pero todavía no hay base de datos, autenticación real, WebSocket/SSE ni RBAC validado en servidor. Los KPIs, logs y flujos siguen siendo sintéticos y están etiquetados como `DEMO`. La tabla siguiente describe la **capa visual**, no un sistema en producción.
+
+### 2.1 Capa de contrato y RBAC de demostración (agregado recientemente)
+
+- `src/services/dashboardApi.ts` define el contrato `GET /api/v1/dashboard/summary` con envelope `{ data, meta }`.
+- Si `VITE_API_BASE_URL` está vacío, el servicio usa un adaptador DEMO (ver `.env.example` en `frontend/`).
+- `src/auth/permissions.ts` implementa RBAC de **frontend** por rol y módulo; la autoridad real debe validarse en backend.
+- Los rótulos engañosos (`PRODUCCIÓN VERIFICADA`, `WS EN VIVO (14ms)`, `Sincronizado`, `99.8%`) fueron reemplazados por estados honestos de DEMO/sin conexión.
+- `npm run lint` termina con **0 errores y 0 warnings**; `npm run build` compila correctamente.
+
+### 2.2 Backend DEMO de lógica MTL (agregado recientemente)
+
+- `api/` contiene una API FastAPI con contrato `/api/v1`, correlation id, auditoría en memoria y envelope `{ data, meta }`.
+- `api/ml/` implementa la sección 9 del documento: baselines interpretables, red multitarea compacta en Python puro, pérdida ponderada enmascarada, early stopping, calibración y métricas por tarea.
+- El artefacto `api/ml/artifacts/model.json` se entrega entrenado; la inferencia no entrena en el hilo HTTP.
+- `api/ml/artifacts/evaluation.json` compara MTL contra regresión logística y gradient boosting. En datos DEMO el baseline gana en varias tareas, por lo que la decisión registrada es **no publicar**.
+- El visualizador neural consume los valores reales del endpoint cuando `VITE_API_BASE_URL` apunta a la API; sin él muestra estado DEMO local sin métricas inventadas.
+- Ver `api/README.md` para ejecución local y despliegue en Railway Free.
 
 | Componente / Módulo | Estado | Avance / Descripción Técnica |
 | :--- | :---: | :--- |
@@ -110,6 +129,13 @@ Entregable Final/
 ├── EduMaster_AI_Informe_Ejecutivo.html # Informe técnico-estratégico empresarial
 ├── EduMaster_AI_Informe_Ejecutivo.pdf  # Versión compilada en PDF del informe ejecutivo
 ├── generate_report.py                  # Script Python para compilar el informe ejecutivo
+│
+├── api/                                # Backend DEMO (FastAPI + lógica MTL sin PyTorch)
+│   ├── app/                            # Routers, contratos Pydantic y servicios
+│   ├── ml/                             # Dataset DEMO, baselines, MTL y train/evaluate/predict
+│   ├── requirements.txt                # Dependencias mínimas para Railway Free
+│   ├── Procfile / railway.json         # Arranque con uvicorn en $PORT
+│   └── README.md                       # Ejecución, endpoints y límites DEMO
 │
 └── frontend/                           # Aplicación Web Cliente (React 19 + TypeScript)
     ├── package.json                    # Dependencias y scripts de ejecución
@@ -214,7 +240,7 @@ El sistema cuenta con un selector de temas en la barra superior con tres variant
 - **Node.js:** Versión 18.0.0 o superior (recomendado Node.js 20 LTS o 22 LTS).
 - **npm:** Versión 9.0.0 o superior (incluido con Node.js).
 - **Navegador Web Moderno:** Google Chrome, Edge, Firefox o Brave.
-- *(Opcional)* **Python:** Versión 3.10+ (necesario únicamente si se desea ejecutar el generador de reportes `generate_report.py`).
+- **Python:** Versión 3.10+ (necesario para `api/` y, opcionalmente, para `generate_report.py`).
 
 ---
 
@@ -247,6 +273,20 @@ Una vez ejecutado, la terminal mostrará la URL de acceso local:
 ```
 
 Abre tu navegador en `http://localhost:5173/` para comenzar a interactuar con la plataforma.
+
+### Paso 4 (opcional): Backend DEMO con lógica MTL
+```bash
+cd api
+python -m venv .venv
+source .venv/bin/activate      # Windows: .venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+Luego crea `frontend/.env.local` con:
+```text
+VITE_API_BASE_URL=http://127.0.0.1:8000
+```
+Reinicia el frontend. Si la variable está vacía, la app sigue funcionando con el adaptador DEMO local.
 
 ---
 

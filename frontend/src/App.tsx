@@ -7,10 +7,12 @@ import { GeoProgressMap } from './components/dashboard/GeoProgressMap';
 import { CourseCompletionDonut } from './components/dashboard/CourseCompletionDonut';
 import { SkillMasteryHeatmap } from './components/dashboard/SkillMasteryHeatmap';
 import { RecentActivityFeed } from './components/dashboard/RecentActivityFeed';
+import { AIRecommendationsCard } from './components/dashboard/AIRecommendationsCard';
 import { LearningPathsView } from './components/modules/LearningPathsView';
 import { CoursesView } from './components/modules/CoursesView';
 import { AnalyticsView } from './components/modules/AnalyticsView';
 import { AITutorView } from './components/modules/AITutorView';
+import { CommunityView } from './components/modules/CommunityView';
 import { AssessmentsView } from './components/modules/AssessmentsView';
 import { CertificatesView } from './components/modules/CertificatesView';
 import { NeuralInspectorView } from './components/modules/NeuralInspectorView';
@@ -20,15 +22,20 @@ import { TeacherDashboard } from './components/teacher/TeacherDashboard';
 import { AdminGovernanceView } from './components/admin/AdminGovernanceView';
 import { GlobalCommandPalette } from './components/common/GlobalCommandPalette';
 import { AITutorDrawer } from './components/common/AITutorDrawer';
-import { currentUser, metricCards } from './data/mockData';
-import { NavTab, UserProfile, UserRole, ThemeMode } from './types';
-import { Users2, AlertCircle } from 'lucide-react';
+import { currentUser } from './data/mockData';
+import { getDashboardSummary } from './services/dashboardApi';
+import { canViewTab } from './auth/permissions';
+import { ApiMeta, DashboardSummary, NavTab, UserProfile, UserRole, ThemeMode } from './types';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
   const [user, setUser] = useState<UserProfile>(currentUser);
-  const [isDemoMode, setIsDemoMode] = useState<boolean>(true);
   const [globalScore] = useState<number>(92.6);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [apiMeta, setApiMeta] = useState<ApiMeta | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [dashboardReloadKey, setDashboardReloadKey] = useState(0);
   const [isCmdPaletteOpen, setIsCmdPaletteOpen] = useState(false);
   const [isAITutorDrawerOpen, setIsAITutorDrawerOpen] = useState(false);
   
@@ -46,6 +53,21 @@ export const App: React.FC = () => {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    getDashboardSummary(controller.signal)
+      .then(response => {
+        setSummary(response.data);
+        setApiMeta(response.meta);
+        setApiError(null);
+      })
+      .catch(error => {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        setApiError(error instanceof Error ? error.message : 'Error al cargar el resumen');
+      });
+    return () => controller.abort();
+  }, [dashboardReloadKey]);
 
   const handleRoleChange = (newRole: UserRole) => {
     let name = 'Dra. López';
@@ -77,6 +99,10 @@ export const App: React.FC = () => {
       title,
       avatar
     }));
+
+    if (!canViewTab(newRole, activeTab)) {
+      setActiveTab('dashboard');
+    }
   };
 
   const isMono = theme === 'monochrome';
@@ -94,6 +120,7 @@ export const App: React.FC = () => {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onlineCount={user.onlineCount}
+        role={user.role}
         theme={theme}
       />
 
@@ -102,8 +129,6 @@ export const App: React.FC = () => {
         <Topbar
           user={user}
           onRoleChange={handleRoleChange}
-          isDemoMode={isDemoMode}
-          onToggleDemoMode={() => setIsDemoMode(!isDemoMode)}
           globalScore={globalScore}
           theme={theme}
           onThemeChange={handleThemeChange}
@@ -113,7 +138,7 @@ export const App: React.FC = () => {
 
         <main className="flex-1 p-6 space-y-6 max-w-[1600px] w-full mx-auto">
           {/* Transparency / Demo Notice Banner */}
-          {isDemoMode && activeTab === 'dashboard' && (
+          {activeTab === 'dashboard' && (
             <div className={`p-3 rounded-xl border flex items-center justify-between text-xs transition-colors ${
               isLight
                 ? 'bg-amber-50/90 border-amber-200 text-amber-900 shadow-sm'
@@ -127,18 +152,20 @@ export const App: React.FC = () => {
                   <strong>Aviso de Gobernanza (Principio de Transparencia):</strong> Este panel opera con un dataset sintético etiquetado <code>DEMO</code> para validación funcional. La puesta en producción institucional requiere base de datos autorizada y validación legal según Ley N.° 29733.
                 </span>
               </div>
-              <button
-                onClick={() => setIsDemoMode(false)}
-                className={`px-2.5 py-1 rounded text-xs font-semibold border shrink-0 transition-colors ${
-                  isLight
-                    ? 'bg-white hover:bg-amber-100 text-amber-900 border-amber-300 shadow-sm'
-                    : isMono 
-                    ? 'bg-[#242A38] hover:bg-[#2F3648] text-white border-[#3B4254]' 
-                    : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border-amber-500/40'
-                }`}
-              >
-                Ocultar Aviso
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="hidden sm:inline font-mono text-[10px] opacity-60">
+                  {apiMeta ? `${apiMeta.source} · ${apiMeta.correlationId.slice(0, 14)}` : 'cargando...'}
+                </span>
+                <button
+                  onClick={() => setDashboardReloadKey(key => key + 1)}
+                  className={`p-1.5 rounded-lg border transition-colors ${
+                    isLight ? 'bg-white border-amber-200 hover:bg-amber-100' : isMono ? 'bg-[#202532] border-[#3B4254] hover:bg-[#2A3040]' : 'bg-white/5 border-white/10 hover:bg-white/10'
+                  }`}
+                  title="Recargar resumen"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
           )}
 
@@ -151,20 +178,37 @@ export const App: React.FC = () => {
               />
             ) : (user.role === 'docente' || user.role === 'coordinador') ? (
               <TeacherDashboard theme={theme} />
+            ) : apiError ? (
+              <div className={`p-6 rounded-3xl border text-sm ${
+                isLight ? 'bg-rose-50 border-rose-200 text-rose-900' : isMono ? 'bg-[#211618] border-[#4A262A] text-rose-200' : 'bg-rose-500/10 border-rose-500/30 text-rose-200'
+              }`}>
+                <p className="font-bold m-0">No se pudo cargar el resumen.</p>
+                <p className="font-mono text-xs mt-2 mb-0">{apiError}</p>
+              </div>
+            ) : !summary ? (
+              <div className={`p-6 rounded-3xl border text-sm animate-pulse ${
+                isLight ? 'bg-white border-slate-200 text-slate-600' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-300' : 'glass-panel border-edumaster-cardBorder text-slate-300'
+              }`}>
+                Cargando resumen desde {import.meta.env.VITE_API_BASE_URL ? 'la API configurada' : 'el adaptador DEMO'}...
+              </div>
             ) : (
               <div className="space-y-6 animate-in fade-in duration-300">
                 {/* Row 1: Executive KPI Metrics Cards at the Top */}
-                <MetricCardsRow metrics={metricCards} theme={theme} />
+                <MetricCardsRow metrics={summary.metrics} theme={theme} />
 
                 {/* Row 2: Neural Visualizer (8 cols) & Compact Donut + Activity (4 cols) */}
                 <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
                   <div className="xl:col-span-8 h-[440px]">
-                    <NeuralVisualizer theme={theme} />
+                    <NeuralVisualizer theme={theme} neural={summary.neural} />
                   </div>
                   <div className="xl:col-span-4 flex flex-col gap-4">
                     <CourseCompletionDonut theme={theme} />
                     <div className="flex-1 min-h-[200px]">
-                      <RecentActivityFeed theme={theme} onViewAll={() => setActiveTab('analytics')} />
+                      <RecentActivityFeed
+                        theme={theme}
+                        activity={summary.activity}
+                        onViewAll={() => setActiveTab('analytics')}
+                      />
                     </div>
                   </div>
                 </div>
@@ -172,87 +216,47 @@ export const App: React.FC = () => {
                 {/* Row 3: High-Definition Geo Progress Map & Competency Heatmap */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                   <div className="lg:col-span-7">
-                    <GeoProgressMap theme={theme} />
+                    <GeoProgressMap theme={theme} regions={summary.regions} />
                   </div>
                   <div className="lg:col-span-5">
-                    <SkillMasteryHeatmap theme={theme} />
+                    <SkillMasteryHeatmap theme={theme} skills={summary.skills} />
+                  </div>
+                </div>
+
+                {/* Row 4: Recomendaciones derivadas del artefacto MTL + catálogo */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                  <div className="lg:col-span-12 h-[360px]">
+                    <AIRecommendationsCard theme={theme} />
                   </div>
                 </div>
               </div>
             )
           )}
 
-          {activeTab === 'learning-paths' && <LearningPathsView theme={theme} />}
-          {activeTab === 'courses' && <CoursesView theme={theme} />}
-          {activeTab === 'analytics' && <AnalyticsView theme={theme} />}
-          {activeTab === 'ai-tutor' && <AITutorView theme={theme} />}
-          {activeTab === 'assessments' && <AssessmentsView theme={theme} />}
-          {activeTab === 'certificates' && <CertificatesView theme={theme} />}
-          {activeTab === 'neural-inspector' && <NeuralInspectorView theme={theme} />}
-          {activeTab === 'governance' && <AdminGovernanceView theme={theme} />}
-          {activeTab === 'settings' && <SettingsView currentTheme={theme} onThemeChange={handleThemeChange} />}
-
-          {/* Community Tab */}
-          {activeTab === 'community' && (
-            <div className="space-y-6">
-              <div>
-                <h1 className="text-xl font-black flex items-center gap-2 m-0">
-                  <Users2 className="w-5 h-5 opacity-80" />
-                  Comunidad de Aprendizaje y Espacios de Debate
-                </h1>
-                <p className="text-xs opacity-60 mt-1 m-0">
-                  Interacción moderada por cohortes, foros de consulta técnica y retroalimentación entre pares.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className={`p-5 rounded-2xl border transition-all ${
-                  isLight ? 'bg-white border-slate-200 shadow-sm text-slate-900' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-100' : 'glass-panel text-slate-100'
-                }`}>
-                  <div className={`flex items-center justify-between pb-3 border-b mb-3 ${
-                    isLight ? 'border-slate-100' : isMono ? 'border-[#2A2F3D]' : 'border-white/10'
-                  }`}>
-                    <span className="font-bold text-sm">#deep-learning-transformers</span>
-                    <span className={`text-[10px] font-mono ${isLight ? 'text-slate-500' : 'opacity-60'}`}>1,420 miembros</span>
-                  </div>
-                  <p className={`text-xs leading-relaxed mb-4 ${isLight ? 'text-slate-600' : 'opacity-75'}`}>
-                    Discusión sobre implementación de matrices de atención FlashAttention-2 y reducción de complejidad cuadrática $O(N^2)$.
-                  </p>
-                  <button className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${
-                    isMono 
-                      ? 'bg-white text-zinc-950 font-black hover:bg-zinc-200' 
-                      : isLight
-                      ? 'bg-slate-900 text-white font-bold hover:bg-slate-800'
-                      : 'bg-edumaster-blue hover:bg-edumaster-blue/80 text-white'
-                  }`}>
-                    Entrar al Canal
-                  </button>
-                </div>
-
-                <div className={`p-5 rounded-2xl border transition-all ${
-                  isLight ? 'bg-white border-slate-200 shadow-sm text-slate-900' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-100' : 'glass-panel text-slate-100'
-                }`}>
-                  <div className={`flex items-center justify-between pb-3 border-b mb-3 ${
-                    isLight ? 'border-slate-100' : isMono ? 'border-[#2A2F3D]' : 'border-white/10'
-                  }`}>
-                    <span className="font-bold text-sm">#mlops-pipeline-fastapi</span>
-                    <span className={`text-[10px] font-mono ${isLight ? 'text-slate-500' : 'opacity-60'}`}>980 miembros</span>
-                  </div>
-                  <p className={`text-xs leading-relaxed mb-4 ${isLight ? 'text-slate-600' : 'opacity-75'}`}>
-                    Buenas prácticas de versionado de modelos con MLflow, contenedores ligeros en Docker y rollback en staging.
-                  </p>
-                  <button className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${
-                    isMono 
-                      ? 'bg-white text-zinc-950 font-black hover:bg-zinc-200' 
-                      : isLight
-                      ? 'bg-slate-900 text-white font-bold hover:bg-slate-800'
-                      : 'bg-edumaster-violet hover:bg-edumaster-violet/80 text-white'
-                  }`}>
-                    Entrar al Canal
-                  </button>
-                </div>
-              </div>
+          {!canViewTab(user.role, activeTab) && (
+            <div className={`p-6 rounded-3xl border text-sm ${
+              isLight ? 'bg-amber-50 border-amber-200 text-amber-900' : isMono ? 'bg-[#1F1C16] border-[#4A3B2C] text-amber-200' : 'bg-amber-500/10 border-amber-500/30 text-amber-200'
+            }`}>
+              <p className="font-bold m-0">Acceso restringido para el rol {user.role}.</p>
+              <p className="text-xs opacity-75 mt-1 mb-0">
+                Guarda visual implementado con RBAC de demostración. La autoridad real debe validarse en backend (RBAC + ABAC).
+              </p>
             </div>
+          )}
+
+          {canViewTab(user.role, activeTab) && activeTab === 'learning-paths' && <LearningPathsView theme={theme} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'courses' && <CoursesView theme={theme} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'analytics' && <AnalyticsView theme={theme} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'ai-tutor' && <AITutorView theme={theme} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'assessments' && <AssessmentsView theme={theme} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'certificates' && <CertificatesView theme={theme} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'neural-inspector' && <NeuralInspectorView theme={theme} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'governance' && <AdminGovernanceView theme={theme} role={user.role} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'settings' && <SettingsView currentTheme={theme} onThemeChange={handleThemeChange} />}
+
+          {/* Community Tab: vista funcional con hilos, mensajes y moderación */}
+          {canViewTab(user.role, activeTab) && activeTab === 'community' && (
+            <CommunityView theme={theme} role={user.role} actor={user.name} />
           )}
         </main>
       </div>
@@ -261,9 +265,11 @@ export const App: React.FC = () => {
       <GlobalCommandPalette
         isOpen={isCmdPaletteOpen}
         onClose={() => setIsCmdPaletteOpen(false)}
+        onOpen={() => setIsCmdPaletteOpen(true)}
         onNavigate={setActiveTab}
         onRoleChange={handleRoleChange}
         onThemeChange={handleThemeChange}
+        role={user.role}
         theme={theme}
       />
 

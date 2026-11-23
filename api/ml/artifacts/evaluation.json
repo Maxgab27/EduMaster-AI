@@ -1,0 +1,270 @@
+{
+  "label": "DEMO - comparacion tecnica sobre datos sinteticos, no evidencia pedagogica",
+  "dataset": {
+    "source": "synthetic_demo_v1",
+    "rows": 240,
+    "train_rows": 168,
+    "test_rows": 72,
+    "split": "temporal 70/30"
+  },
+  "model": {
+    "name": "edumaster_mtl_network",
+    "version": "0.1.0-demo",
+    "trained_epochs": 7,
+    "training_seconds": 13.227,
+    "loss_last": 1.0252,
+    "temperature": {
+      "completion": 1.0,
+      "dropout_risk": 1.0
+    },
+    "decision_thresholds": {
+      "completion": 0.45,
+      "dropout_risk": 0.5
+    },
+    "lambdas": {
+      "completion": 1.0,
+      "mastery": 1.0,
+      "dropout_risk": 1.0,
+      "ranking": 0.5
+    }
+  },
+  "mtl_train": {
+    "rows": 168,
+    "label": "DEMO - metricas sobre dataset sintetico; no son evidencia de validez educativa",
+    "completion": {
+      "roc_auc": 0.835,
+      "pr_auc": 0.9069,
+      "f1": 0.8685,
+      "recall": 0.9237,
+      "brier": 0.1417,
+      "calibration": 0.0921,
+      "positives": 118
+    },
+    "mastery": {
+      "macro_f1": 0.6702,
+      "balanced_accuracy": 0.6785,
+      "mae_ordinal": 0.125,
+      "confusion_matrix": [
+        [
+          21,
+          6,
+          0,
+          0
+        ],
+        [
+          1,
+          68,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          58,
+          0
+        ],
+        [
+          0,
+          0,
+          11,
+          0
+        ]
+      ]
+    },
+    "dropout_risk": {
+      "roc_auc": 0.7672,
+      "pr_auc": 0.5476,
+      "f1": 0.5672,
+      "recall": 0.4634,
+      "brier": 0.1437,
+      "calibration": 0.1087,
+      "positives": 41
+    },
+    "recommendation": {
+      "ndcg_at_k": 0.6918,
+      "recall_at_k": 0.8333,
+      "coverage": 0.4167,
+      "diversity": 1.0
+    }
+  },
+  "mtl_test": {
+    "rows": 72,
+    "label": "DEMO - metricas sobre dataset sintetico; no son evidencia de validez educativa",
+    "completion": {
+      "roc_auc": 0.7875,
+      "pr_auc": 0.9071,
+      "f1": 0.8257,
+      "recall": 0.8491,
+      "brier": 0.1647,
+      "calibration": 0.1619,
+      "positives": 53
+    },
+    "mastery": {
+      "macro_f1": 0.6129,
+      "balanced_accuracy": 0.6282,
+      "mae_ordinal": 0.2083,
+      "confusion_matrix": [
+        [
+          12,
+          6,
+          0,
+          0
+        ],
+        [
+          0,
+          23,
+          0,
+          0
+        ],
+        [
+          0,
+          4,
+          22,
+          0
+        ],
+        [
+          0,
+          0,
+          5,
+          0
+        ]
+      ]
+    },
+    "dropout_risk": {
+      "roc_auc": 0.6888,
+      "pr_auc": 0.4265,
+      "f1": 0.4828,
+      "recall": 0.4118,
+      "brier": 0.1517,
+      "calibration": 0.1903,
+      "positives": 17
+    },
+    "recommendation": {
+      "ndcg_at_k": 0.6564,
+      "recall_at_k": 0.8102,
+      "coverage": 0.4167,
+      "diversity": 1.0
+    }
+  },
+  "baselines_test": {
+    "logistic_regression": {
+      "rows": 72,
+      "label": "DEMO - metricas sobre dataset sintetico; no son evidencia de validez educativa",
+      "completion": {
+        "roc_auc": 0.7776,
+        "pr_auc": 0.8988,
+        "f1": 0.781,
+        "recall": 0.7736,
+        "brier": 0.1818,
+        "calibration": 0.2567,
+        "positives": 53
+      },
+      "mastery": {
+        "macro_f1": 0.7731,
+        "balanced_accuracy": 0.7378,
+        "mae_ordinal": 0.1667,
+        "confusion_matrix": [
+          [
+            12,
+            6,
+            0,
+            0
+          ],
+          [
+            0,
+            23,
+            0,
+            0
+          ],
+          [
+            0,
+            3,
+            23,
+            0
+          ],
+          [
+            0,
+            0,
+            3,
+            2
+          ]
+        ]
+      },
+      "dropout_risk": {
+        "roc_auc": 0.7465,
+        "pr_auc": 0.533,
+        "f1": 0.5806,
+        "recall": 0.5294,
+        "brier": 0.1461,
+        "calibration": 0.2203,
+        "positives": 17
+      },
+      "recommendation": {
+        "ndcg_at_k": 0.7271,
+        "recall_at_k": 0.8426,
+        "coverage": 0.5,
+        "diversity": 1.0
+      }
+    },
+    "gradient_boosting_stumps": {
+      "rows": 72,
+      "label": "DEMO - metricas sobre dataset sintetico; no son evidencia de validez educativa",
+      "completion": {
+        "roc_auc": 0.7329,
+        "pr_auc": 0.4069,
+        "f1": 0.848,
+        "recall": 1.0,
+        "brier": 0.1754,
+        "calibration": 0.1256,
+        "positives": 53
+      },
+      "mastery": {
+        "macro_f1": 0.5779,
+        "balanced_accuracy": 0.5926,
+        "mae_ordinal": 0.25,
+        "confusion_matrix": [
+          [
+            11,
+            7,
+            0,
+            0
+          ],
+          [
+            1,
+            21,
+            1,
+            0
+          ],
+          [
+            0,
+            4,
+            22,
+            0
+          ],
+          [
+            0,
+            0,
+            5,
+            0
+          ]
+        ]
+      },
+      "dropout_risk": {
+        "roc_auc": 0.7064,
+        "pr_auc": 0.3509,
+        "f1": 0.0,
+        "recall": 0.0,
+        "brier": 0.1601,
+        "calibration": 0.0874,
+        "positives": 17
+      },
+      "recommendation": {
+        "ndcg_at_k": 0.4183,
+        "recall_at_k": 0.5185,
+        "coverage": 0.75,
+        "diversity": 1.0
+      }
+    }
+  },
+  "publication_decision": "DEMO: no publicar. Comparar en dataset real, validar calibracion/equidad/coste y obtener aprobacion de responsable tecnico y dueno funcional."
+}

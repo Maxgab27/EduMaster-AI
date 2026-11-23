@@ -7,24 +7,28 @@ import {
   Zap
 } from 'lucide-react';
 import { neuralLayersNodes } from '../../data/mockData';
-import { NeuralNode, ThemeMode } from '../../types';
+import { DashboardSummary, NeuralNode, ThemeMode } from '../../types';
 
 interface NeuralVisualizerProps {
   theme?: ThemeMode;
   onSelectNode?: (node: NeuralNode) => void;
+  neural?: DashboardSummary['neural'];
 }
 
 export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({ 
   theme = 'monochrome', 
-  onSelectNode 
+  onSelectNode,
+  neural
 }) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [mode, setMode] = useState<'inferencia' | 'entrenamiento'>('inferencia');
   const [selectedNode, setSelectedNode] = useState<NeuralNode | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
-  const [epoch, setEpoch] = useState<number>(38);
-  const [loss, setLoss] = useState<number>(0.0421);
-  const [valMetric, setValMetric] = useState<number>(0.914);
+  const epoch = neural?.epoch ?? 0;
+  const loss = neural?.loss ?? 0;
+  const valMetric = neural?.valMetric ?? 0;
+  const modelVersion = neural?.modelVersion ?? 'demo-local';
+  const runtimeStatus = neural?.status ?? 'detenido';
   const [speed, setSpeed] = useState<number>(1);
   const [pulsePhase, setPulsePhase] = useState<number>(0);
   const animFrameId = useRef<number | null>(null);
@@ -43,12 +47,6 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
           return (prev + step) % 100;
         });
 
-        // Live micro-updates when training
-        if (mode === 'entrenamiento' && Math.random() < 0.04) {
-          setEpoch(e => (e >= 50 ? 1 : e + 1));
-          setLoss(l => Math.max(0.012, +(l * (0.994 + Math.random() * 0.009)).toFixed(4)));
-          setValMetric(m => Math.min(0.968, +(m * (1.0004 + (Math.random() - 0.5) * 0.002)).toFixed(3)));
-        }
       }
 
       animFrameId.current = requestAnimationFrame(animate);
@@ -153,8 +151,8 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
                   ? 'bg-emerald-50 border-emerald-200 text-emerald-700 font-bold'
                   : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
               }`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${isMono ? 'bg-white' : isLight ? 'bg-emerald-600' : 'bg-emerald-400'} animate-ping`} />
-                Sincronizado
+                <span className={`w-1.5 h-1.5 rounded-full ${isMono ? 'bg-white' : isLight ? 'bg-amber-600' : 'bg-amber-400'}`} />
+                DEMO · SINCRONIZACIÓN SIMULADA
               </span>
             </div>
             <p className="text-[11px] opacity-60 m-0">
@@ -194,13 +192,9 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
             </button>
 
             <button
-              onClick={() => {
-                setPulsePhase(0);
-                setLoss(0.0421);
-                setEpoch(38);
-              }}
+              onClick={() => setPulsePhase(0)}
               className="w-7 h-7 rounded-md opacity-75 hover:opacity-100 flex items-center justify-center transition-colors"
-              title="Reiniciar métricas"
+              title="Reiniciar animación"
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>
@@ -488,28 +482,32 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
         <div className="flex items-center gap-5">
           <div className="flex items-center gap-1.5">
             <span className="opacity-60 text-[11px]">Modelo:</span>
-            <span className="font-mono font-bold text-[11px]">EduMaster_MTL_v1.0</span>
+            <span className="font-mono font-bold text-[11px]">{modelVersion}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="opacity-60 text-[11px]">Estado:</span>
+            <span className="font-mono font-bold text-[11px]">{runtimeStatus}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="opacity-60 text-[11px]">Época:</span>
-            <span className="font-mono font-bold text-[11px] tabular-numbers">{epoch} / 50</span>
+            <span className="font-mono font-bold text-[11px] tabular-numbers">{epoch}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="opacity-60 text-[11px]">Loss Multitarea:</span>
+            <span className="opacity-60 text-[11px]">Loss multitarea:</span>
             <span className="font-mono font-bold text-[11px] tabular-numbers">{loss}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="opacity-60 text-[11px]">PR-AUC:</span>
+            <span className="opacity-60 text-[11px]">Loss validación:</span>
             <span className="font-mono font-bold text-[11px] tabular-numbers">{valMetric}</span>
           </div>
         </div>
 
         <div className="flex items-center gap-2 text-[11px]">
-          <span className="opacity-60">Latencia Inferencia:</span>
+          <span className="opacity-60">Trazabilidad:</span>
           <span className={`px-2 py-0.5 rounded-md font-mono font-bold border ${
             isLight ? 'bg-white border-slate-200 text-slate-800' : isMono ? 'bg-[#202532] border-[#3B4254] text-zinc-200' : 'border-white/10'
           }`}>
-            18.4 ms (p95)
+            DEMO · sin medición de latencia
           </span>
         </div>
       </div>
