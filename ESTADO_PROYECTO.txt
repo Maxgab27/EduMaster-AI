@@ -1,0 +1,166 @@
+================================================================================
+EDUMASTER.AI - ESTADO DEL PROYECTO
+================================================================================
+Fecha: 2026-11-22
+Rama: main (sincronizada con origin/main)
+Estado: Fases 1, 2, 3 y 4 completadas, validadas y pusheadas.
+Fase 5: pendiente de definir alcance.
+
+--------------------------------------------------------------------------------
+1. COMMITS
+--------------------------------------------------------------------------------
+e0da0d5  feat: completar fase 3 con cursos, rutas, evaluaciones y sandbox auditado
+f172b6b  feat: completar fase 4 con autoridad RBAC/ABAC DEMO y settings persistentes
+b71c716  docs: registrar hash real del commit de fase 4 en el plan
+
+--------------------------------------------------------------------------------
+2. QUE SE CONSTRUYO
+--------------------------------------------------------------------------------
+FASE 1 - Dashboard, Analytics, Certificados, Gobernanza y Neural Inspector
+          consumen el contrato /api/v1 con fallback DEMO local.
+          No se muestran metricas falsas ni etiquetas de produccion.
+
+FASE 2 - Comunidad, Tutor IA, Recomendaciones y Notificaciones funcionan
+          con API y con store DEMO versionado; acciones auditadas sin duplicados.
+
+FASE 3 - Cursos, Rutas de Aprendizaje, Evaluaciones/SpeedGrader y Sandbox
+          con estados reales. Nota oficial requiere firma docente obligatoria.
+          El sandbox solo analiza estaticamente: nunca ejecuta codigo.
+
+FASE 4 - Autoridad RBAC/ABAC en backend, settings institucionales,
+          preferencias por actor, auditoria enriquecida y DDL de Supabase.
+
+--------------------------------------------------------------------------------
+3. BACKEND (api/)
+--------------------------------------------------------------------------------
+Contrato versionado: /api/v1, envelope { data, meta } con correlationId.
+
+Archivos nuevos en Fase 4:
+  api/app/auth.py
+    - Roles: superadmin, admin, coordinador, docente, estudiante, analista,
+      mle, auditor.
+    - require(permiso): dependencia FastAPI con 403 auditada.
+    - require_signature(): la firma docente debe coincidir con el actor.
+    - RBAC_ENFORCE (default 1) y DEMO_DEFAULT_ROLE (default estudiante).
+  api/app/services/audit.py
+    - add_audit() y audit_denied() con role, actor_id, tenant_id, method,
+      path, ip_address y status (success/denied).
+  api/app/services/settings.py
+    - Configuracion institucional persistida con el patron storage.py.
+
+Endpoints relevantes:
+  GET  /health                       -> auth=demo-header-rbac, rbacEnforced,
+                                        tenantId, storage=memory-demo
+  GET/POST /api/v1/audit/logs        -> requiere audit:read / audit:write
+  GET/PUT  /api/v1/settings          -> requiere settings:view / settings:edit
+  GET/PUT  /api/v1/settings/preferences    -> preferencias por actor
+  GET/PUT  /api/v1/notification-preferences -> alias legacy actor-scoped
+  GET/POST /api/v1/courses           -> RBAC (courses:view / courses:edit)
+  POST     /api/v1/courses/{id}/enroll     -> courses:enroll
+  GET/POST /api/v1/learning-paths    -> progreso ABAC por actor
+  GET/POST /api/v1/assessments, /api/v1/submissions -> firma docente ABAC
+  GET/POST /api/v1/sandbox/attempts  -> analisis estatico, sin ejecucion
+
+Persistencia:
+  - Sin credenciales Supabase: almacenamiento en memoria (DEMO).
+  - api/supabase/schema.sql preparado con certificate, audit_logs enriquecido,
+    settings, notification_preferences, submissions y sandbox_attempts.
+  - RLS queda COMENTADO: "rlsEnabled" es informativo, nunca activa RLS real.
+
+Variables de entorno nuevas (api/.env.example):
+  RBAC_ENFORCE=1
+  DEMO_DEFAULT_ROLE=estudiante
+  TENANT_ID=org-ute-peru-2026
+
+--------------------------------------------------------------------------------
+4. FRONTEND (frontend/src/)
+--------------------------------------------------------------------------------
+  auth/permissions.ts        -> mapa espejo del backend con permisos Fase 4
+                                (courses:edit, courses:enroll,
+                                learning-paths:progress, moderation:execute,
+                                audit:write, sandbox:use, submissions:view).
+                                Es solo UX; la autoridad real esta en la API.
+  services/apiClient.ts      -> envia X-Actor y X-Role desde
+                                localStorage.edumaster_demo_user.
+  services/auditSink.ts      -> usa actor/rol reales; no duplica auditoria
+                                cuando el backend ya la escribe (onlyDemo).
+  services/auditApi.ts       -> filtros actor/accion/correlationId/limit
+                                tanto en API como en DEMO.
+  services/settingsApi.ts    -> servicio nuevo con adaptador API y DEMO.
+  components/modules/SettingsView.tsx
+                             -> carga y guarda configuracion y preferencias,
+                                badge DEMO/API, RLS informativo, solo-lectura
+                                segun permisos.
+  App.tsx                    -> rehidrata el rol DEMO al recargar (antes
+                                siempre volvia a admin).
+  types/index.ts             -> AppSettings, SettingsUpdate,
+                                SettingsPreferences y campos nuevos de
+                                ApiAuditLog.
+
+--------------------------------------------------------------------------------
+5. VALIDACION REALIZADA
+--------------------------------------------------------------------------------
+Backend:
+  - python -m compileall -q api            -> OK
+  - import de app.main                     -> OK
+  - Smoke con TestClient:
+      * /health anuncia auth demo
+      * settings GET/PUT con admin -> 200
+      * settings GET con estudiante -> 403
+      * preferencias aisladas por actor
+      * auditoria con role/status/path/tenant_id
+      * firma ajena -> 403; firma correcta -> 200
+      * eventos de denegacion auditados
+  - Uvicorn reiniciado en 127.0.0.1:8000 con el codigo Fase 4.
+
+Frontend:
+  - npm.cmd run lint  -> 0 errores, 0 warnings
+  - npm.cmd run build -> OK
+      dist/assets/index-*.js  546.83 kB / gzip 145.42 kB
+      (advertencia no bloqueante de chunk > 500 kB)
+  - Smoke en navegador:
+      * DEMO  http://127.0.0.1:5173  -> guardado de settings en store local
+      * API   http://127.0.0.1:5174  -> PUT /settings devolvio 200
+      * header x-role: admin confirmado en la red
+      * sin errores de consola
+      * Cursos, Evaluaciones, Gobernanza y Neural Inspector siguen funcionando
+
+--------------------------------------------------------------------------------
+6. LIMITACIONES IMPORTANTES (NO CAMBIAR)
+--------------------------------------------------------------------------------
+  - No hay OIDC/JWT real. La autoridad backend es DEMO de headers
+    X-Actor/X-Role. No presentarla como seguridad de produccion.
+  - Sin credenciales de Supabase: storage=memory-demo, la auditoria se
+    pierde al reiniciar el servicio.
+  - "settings.rlsEnabled" es informativo; no activa Row Level Security.
+  - La decision oficial del artefacto MTL permanece: DEMO: no publicar.
+    El modelo nunca publica nota oficial.
+  - El frontend RBAC es solo UX; la API revalida permisos en servidor.
+  - No publicar metricas falsas ni etiquetas de produccion.
+  - Backend sin PyTorch, Redis, Celery ni MLflow. REST con urllib.
+
+--------------------------------------------------------------------------------
+7. COMO LEVANTARLO
+--------------------------------------------------------------------------------
+API:
+  cd api
+  python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+
+Frontend DEMO (sin VITE_API_BASE_URL):
+  cd frontend
+  npm.cmd run dev -- --host 127.0.0.1 --port 5173
+
+Frontend con API:
+  $env:VITE_API_BASE_URL='http://127.0.0.1:8000'
+  npm.cmd run dev -- --host 127.0.0.1 --port 5174
+
+Nota: usar npm.cmd en PowerShell (no npm).
+
+--------------------------------------------------------------------------------
+8. SIGUIENTE PASO
+--------------------------------------------------------------------------------
+Definir el alcance de la Fase 5. No activar RLS real ni etiquetas de
+produccion sin OIDC y credenciales de Supabase.
+
+Plan detallado: PLAN_DESARROLLO_MODULOS.md (seccion 6 actualizada).
+================================================================================

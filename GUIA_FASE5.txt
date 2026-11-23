@@ -1,0 +1,154 @@
+================================================================================
+GUIA PARA ENTREGAR LOS DATOS DE LA FASE 5
+Supabase real + OIDC (Supabase Auth) + autoridad en la API
+================================================================================
+
+REGLA DE ORO
+--------------------------------------------------------------------------------
+NO pegues en el chat la service_role key ni la anon key.
+NO las escribas en archivos que se suban a git.
+
+El repo ya ignora .env y .env.* (ver .gitignore), así que puedes usarlos para
+desarrollo local. En produccion configuralas directamente en los dashboards de
+Railway y Vercel. Yo solo necesito que me confirms QUE estan puestas, no sus
+valores.
+
+--------------------------------------------------------------------------------
+PASO 1 - CREAR / VERIFICAR EL PROYECTO EN SUPABASE
+--------------------------------------------------------------------------------
+1. Entra a https://supabase.com/dashboard y crea un proyecto nuevo (o usa uno
+   vacio). No uses un proyecto con datos reales.
+2. Copia el "Project Reference" (los caracteres despues de supabase.co).
+   Ejemplo: si la URL es https://abcdefgh.supabase.co, el ref es abcdefgh.
+3. En Project Settings -> API obtendras:
+     - Project URL            -> https://<ref>.supabase.co
+     - anon / public key      -> publica, va en el frontend (Vercel)
+     - service_role key       -> SECRETA, va solo en Railway
+4. En SQL Editor pega y ejecuta el contenido completo de:
+     api/supabase/schema.sql
+   Verifica que no de errores. Las tablas deben quedar vacias (base limpia).
+   No actives RLS: la decision de la Fase 5 es autoridad solo en la API.
+
+--------------------------------------------------------------------------------
+PASO 2 - CREAR USUARIOS DE PRUEBA EN SUPABASE AUTH
+--------------------------------------------------------------------------------
+En Authentication -> Users -> Add user crea al menos 4 usuarios con password:
+
+     admin@demo.test
+     docente@demo.test
+     estudiante@demo.test
+     auditor@demo.test
+
+Luego, en SQL Editor, asigna los claims. Ejemplo para el docente:
+
+  update auth.users
+  set
+    raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb)
+      || '{"role":"docente","tenantId":"org-ute-peru-2026"}'::jsonb,
+    raw_user_meta_data = coalesce(raw_user_meta_data, '{}'::jsonb)
+      || '{"full_name":"Dr. Alejandro Morales"}'::jsonb
+  where email = 'docente@demo.test';
+
+Repite cambiando el email, el role y el full_name para los demas:
+
+  admin@demo.test       -> role "admin"        -> "Dra. Lopez"
+  docente@demo.test     -> role "docente"      -> "Dr. Alejandro Morales"
+  estudiante@demo.test  -> role "estudiante"   -> "Sofia Ramirez Vargas"
+  auditor@demo.test     -> role "auditor"      -> "Abg. Roberto Castillo"
+
+Roles validos (allowlist del backend):
+  superadmin, admin, coordinador, docente, estudiante, analista, mle, auditor
+
+IMPORTANTE: si ya habias iniciado sesion con esos usuarios, cierra sesion y
+vuelve a entrar para que el JWT traiga los claims nuevos.
+
+--------------------------------------------------------------------------------
+PASO 3 - CONFIRMAR LOS DATOS DEL JWT
+--------------------------------------------------------------------------------
+En Supabase Auth los valores por defecto son:
+
+  ISSUER      https://<ref>.supabase.co/auth/v1
+  JWKS        https://<ref>.supabase.co/auth/v1/.well-known/jwks.json
+  AUDIENCE    authenticated
+  CLAIM ROL   app_metadata.role
+  CLAIM NOMBRE user_metadata.full_name
+  CLAIM TENANT app_metadata.tenantId
+
+Si tu proyecto usa otros nombres, anotalos en la plantilla del PASO 6.
+
+Opcional para verificar: inicia sesion, copia el access_token y pegalo en
+https://jwt.io. Debe aparecer "aud": "authenticated", "iss" con tu ref y dentro
+de app_metadata el role.
+
+--------------------------------------------------------------------------------
+PASO 4 - CONFIGURAR RAILWAY (BACKEND)
+--------------------------------------------------------------------------------
+En tu servicio de la API -> Variables, agrega:
+
+  SUPABASE_URL=https://<ref>.supabase.co
+  SUPABASE_KEY=<service_role_key>            # SECRETA, no la compartas
+  OIDC_ISSUER=https://<ref>.supabase.co/auth/v1
+  OIDC_JWKS_URL=https://<ref>.supabase.co/auth/v1/.well-known/jwks.json
+  OIDC_AUDIENCE=authenticated
+  OIDC_ROLE_CLAIM=app_metadata.role
+  OIDC_NAME_CLAIM=user_metadata.full_name
+  OIDC_TENANT_CLAIM=app_metadata.tenantId
+  RBAC_ENFORCE=1
+  DEMO_DEFAULT_ROLE=estudiante
+  TENANT_ID=org-ute-peru-2026
+  CORS_ORIGINS=https://<tu-frontend>.vercel.app
+  PUBLIC_VERIFY_BASE_URL=https://<tu-backend>.railway.app/api/v1/certificates/verify
+
+--------------------------------------------------------------------------------
+PASO 5 - CONFIGURAR VERCEL (FRONTEND)
+--------------------------------------------------------------------------------
+En el proyecto de Vercel -> Settings -> Environment Variables:
+
+  VITE_API_BASE_URL=https://<tu-backend>.railway.app
+  VITE_SUPABASE_URL=https://<ref>.supabase.co
+  VITE_SUPABASE_ANON_KEY=<anon_key>           # publica, segun Supabase
+
+En Supabase -> Authentication -> URL Configuration agrega a "Redirect URLs":
+
+  http://127.0.0.1:5173/**
+  http://127.0.0.1:5174/**
+  https://<tu-frontend>.vercel.app/**
+
+--------------------------------------------------------------------------------
+PASO 6 - LO QUE SI ME ENVIAS (rellena y pegame solo esto)
+--------------------------------------------------------------------------------
+SUPABASE_REF=______________________________
+OIDC_ISSUER=https://______________.supabase.co/auth/v1
+OIDC_JWKS_URL=https://______________.supabase.co/auth/v1/.well-known/jwks.json
+OIDC_AUDIENCE=authenticated
+OIDC_ROLE_CLAIM=app_metadata.role
+OIDC_NAME_CLAIM=user_metadata.full_name
+OIDC_TENANT_CLAIM=app_metadata.tenantId
+TENANT_ID=org-ute-peru-2026
+CORS_ORIGINS=https://______________________________.vercel.app
+PUBLIC_VERIFY_BASE_URL=https://______________________________.railway.app/api/v1/certificates/verify
+VITE_API_BASE_URL=https://______________________________.railway.app
+
+CHECKBOXES (responde si/no):
+[ ] schema.sql ejecutado sin errores en Supabase
+[ ] Tablas vacias (base limpia, sin datos DEMO migrados)
+[ ] RLS NO activado
+[ ] service_role key configurada en Railway (no la pegues aqui)
+[ ] anon key configurada en Vercel
+[ ] Usuarios de prueba creados con sus roles en app_metadata
+[ ] Redirect URLs configuradas
+
+--------------------------------------------------------------------------------
+QUE HAGO YO CON ESO
+--------------------------------------------------------------------------------
+1. Verificador JWT con JWKS via urllib + cache, sin dependencias pesadas.
+2. Actor derivado del token (sub, rol, tenant) reemplazando a X-Actor/X-Role
+   cuando OIDC este configurado; modo DEMO intacto si no hay variables.
+3. Ajuste de storage.py para usar la service role key (RLS apagado).
+4. Quito el fallback en memoria de certificates.list_certificates() para que
+   la base limpia se respete de verdad.
+5. /health reportara auth=oidc-supabase y storage=supabase.
+6. Tests con tokens firmados localmente y verificacion de permisos por rol.
+7. Mantengo DEMO: no publicar y todas las etiquetas de no produccion.
+
+================================================================================
