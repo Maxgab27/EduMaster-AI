@@ -56,7 +56,11 @@ function profileForRole(newRole: UserRole, base: UserProfile, persistedName?: st
 }
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
+  // Un QR escaneado abre la SPA con ?verify=<folio> y debe llevar a verificación.
+  const [verifyFolio] = useState<string | null>(
+    () => new URLSearchParams(window.location.search).get('verify'),
+  );
+  const [activeTab, setActiveTab] = useState<NavTab>(verifyFolio ? 'certificates' : 'dashboard');
   // Fase 4: rehidratamos el rol DEMO guardado para que X-Role sobreviva a recargas.
   const [user, setUser] = useState<UserProfile>(() => {
     try {
@@ -91,6 +95,11 @@ export const App: React.FC = () => {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    if (!verifyFolio) return;
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }, [verifyFolio]);
 
   // El actor DEMO viaja como X-Actor en las peticiones /api/v1.
   useEffect(() => {
@@ -268,7 +277,9 @@ export const App: React.FC = () => {
           {canViewTab(user.role, activeTab) && activeTab === 'analytics' && <AnalyticsView theme={theme} />}
           {canViewTab(user.role, activeTab) && activeTab === 'ai-tutor' && <AITutorView theme={theme} />}
           {canViewTab(user.role, activeTab) && activeTab === 'assessments' && <AssessmentsView theme={theme} role={user.role} />}
-          {canViewTab(user.role, activeTab) && activeTab === 'certificates' && <CertificatesView theme={theme} />}
+          {canViewTab(user.role, activeTab) && activeTab === 'certificates' && (
+            <CertificatesView theme={theme} initialVerifyFolio={verifyFolio ?? undefined} />
+          )}
           {canViewTab(user.role, activeTab) && activeTab === 'neural-inspector' && <NeuralInspectorView theme={theme} />}
           {canViewTab(user.role, activeTab) && activeTab === 'governance' && <AdminGovernanceView theme={theme} role={user.role} />}
           {canViewTab(user.role, activeTab) && activeTab === 'settings' && (

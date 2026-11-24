@@ -1,88 +1,117 @@
-import type { CertificateRecord, CertificateVerification } from '../types';
-import { requestWithDemo } from './apiClient';
+import * as QRCode from 'qrcode';
+import type { ApiResponse, CertificateRecord, CertificateVerification } from '../types';
+import { requestCoreWithDemo } from './apiClient';
 
-const DEMO_CERTIFICATES: CertificateRecord[] = [
+/**
+ * Registro sintético de respaldo. Con VITE_CORE_API_BASE_URL configurado,
+ * la lista y la verificación vienen de SQLite por HTTP; sin él se usa este
+ * registro local, pero el QR sigue siendo escaneable y apunta a la misma SPA.
+ */
+const DEMO_CERTIFICATES: Omit<CertificateRecord, 'hash' | 'qrDataUrl'>[] = [
   {
     id: 'cert-1',
     folio: 'EDU-2026-98124',
     student: 'Carlos Mendoza Ramos',
     course: 'Especialista en Redes Neuronales & PyTorch MTL',
-    issuedAt: '2026-11-12T00:00:00Z',
+    issuedAt: '2026-11-12T00:00:00+00:00',
     grade: '19.4 / 20 (Sobresaliente)',
-    hash: '9f83ab412c98d4e7b89f2a01',
     status: 'Emitido',
-    verificationUrl: 'demo://verify/EDU-2026-98124',
+    verificationUrl: '/?verify=EDU-2026-98124',
   },
   {
     id: 'cert-2',
     folio: 'EDU-2026-98125',
     student: 'Sofia Ramírez Vargas',
     course: 'Ingeniería de Características & DataOps',
-    issuedAt: '2026-11-14T00:00:00Z',
+    issuedAt: '2026-11-14T00:00:00+00:00',
     grade: '19.8 / 20 (Sobresaliente)',
-    hash: '3e41ba980c55f11a88cb7402',
     status: 'Emitido',
-    verificationUrl: 'demo://verify/EDU-2026-98125',
+    verificationUrl: '/?verify=EDU-2026-98125',
   },
   {
     id: 'cert-3',
     folio: 'EDU-2026-98126',
     student: 'Mateo Vargas Quispe',
     course: 'MLOps: Despliegue con FastAPI y MLflow',
-    issuedAt: '2026-11-15T00:00:00Z',
+    issuedAt: '2026-11-15T00:00:00+00:00',
     grade: '18.2 / 20 (Notable)',
-    hash: '6a11cd980f77e23b99ef8803',
     status: 'Emitido',
-    verificationUrl: 'demo://verify/EDU-2026-98126',
+    verificationUrl: '/?verify=EDU-2026-98126',
   },
 ];
 
-/**
- * QR ilustrativo y determinista para DEMO local; no es scannable.
- * El esquema `demo://` es un identificador, no una URL enrutable: aún no existe
- * endpoint público de verificación en el backend activo.
- */
-function demoQrSvg(value: string): string {
-  let seed = 2166136261;
-  for (let i = 0; i < value.length; i += 1) {
-    seed = Math.imul(seed ^ value.charCodeAt(i), 16777619) >>> 0;
-  }
-  const size = 21;
-  const cells: string[] = [];
-  for (let y = 0; y < size; y += 1) {
-    for (let x = 0; x < size; x += 1) {
-      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-      if ((seed >>> 30) & 1) {
-        cells.push(`<rect x="${x}" y="${y}" width="1" height="1"/>`);
-      }
-    }
-  }
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 23 23" width="144" height="144" shape-rendering="crispEdges"><rect x="-1" y="-1" width="23" height="23" fill="#fff"/><g fill="#0f172a">${cells.join('')}</g></svg>`;
+/** Serialización canónica equivalente a json.dumps(sort_keys=True) del backend. */
+function canonicalJson(payload: Record<string, string>): string {
+  const members = Object.keys(payload)
+    .sort()
+    .map(key => `${JSON.stringify(key)}: ${JSON.stringify(payload[key])}`);
+  return `{${members.join(', ')}}`;
 }
 
-function withDemoQr(cert: CertificateRecord): CertificateRecord {
-  return { ...cert, qrSvg: cert.qrSvg ?? demoQrSvg(cert.folio) };
+function certificatePayload(cert: Pick<CertificateRecord, 'folio' | 'student' | 'course' | 'issuedAt' | 'grade'>) {
+  return {
+    folio: cert.folio,
+    student: cert.student,
+    course: cert.course,
+    issuedAt: cert.issuedAt,
+    grade: cert.grade,
+  };
 }
 
-export function listCertificates(signal?: AbortSignal) {
-  return requestWithDemo<CertificateRecord[]>(
-    '/api/v1/certificates',
+async function sha256(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(digest))
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+function absoluteVerificationUrl(cert: CertificateRecord): string {
+  const raw = cert.verificationUrl || `/?verify=${encodeURIComponent(cert.folio)}`;
+  if (/^https?:\/\//i.test(raw)) return raw;
+  return new URL(raw, window.location.origin).toString();
+}
+
+async function withQr(cert: CertificateRecord): Promise<CertificateRecord> {
+  const verificationUrl = absoluteVerificationUrl(cert);
+  const qrDataUrl = await QRCode.toDataURL(verificationUrl, {
+    width: 192,
+    margin: 1,
+    errorCorrectionLevel: 'M',
+    color: { dark: '#0f172a', light: '#ffffff' },
+  });
+  return { ...cert, verificationUrl, qrDataUrl };
+}
+
+export async function listCertificates(signal?: AbortSignal): Promise<ApiResponse<CertificateRecord[]>> {
+  const response = await requestCoreWithDemo<CertificateRecord[]>(
+    '/api/v1/compat/certificates',
     { signal },
-    () => DEMO_CERTIFICATES.map(withDemoQr),
+    async () => Promise.all(
+      DEMO_CERTIFICATES.map(async cert => ({
+        ...cert,
+        hash: await sha256(canonicalJson(certificatePayload(cert))),
+      })),
+    ),
   );
+  const data = await Promise.all(response.data.map(withQr));
+  return { data, meta: response.meta };
 }
 
-export function verifyCertificate(folio: string, signal?: AbortSignal) {
-  return requestWithDemo<CertificateVerification>(
-    `/api/v1/certificates/verify/${encodeURIComponent(folio)}`,
+export async function verifyCertificate(
+  folio: string,
+  signal?: AbortSignal,
+): Promise<ApiResponse<CertificateVerification>> {
+  const normalized = folio.trim().toUpperCase();
+  return requestCoreWithDemo<CertificateVerification>(
+    `/api/v1/compat/certificates/verify/${encodeURIComponent(normalized)}`,
     { signal },
-    () => {
-      const cert = DEMO_CERTIFICATES.find(item => item.folio === folio.trim().toUpperCase());
+    async () => {
+      const cert = DEMO_CERTIFICATES.find(item => item.folio === normalized);
       const verifiedAt = new Date().toISOString();
       if (!cert) {
         return {
           valid: false,
-          folio,
+          folio: normalized,
           student: '',
           course: '',
           issuedAt: '',
@@ -94,16 +123,11 @@ export function verifyCertificate(folio: string, signal?: AbortSignal) {
         };
       }
       return {
+        ...cert,
+        hash: await sha256(canonicalJson(certificatePayload(cert))),
         valid: cert.status === 'Emitido',
-        folio: cert.folio,
-        student: cert.student,
-        course: cert.course,
-        issuedAt: cert.issuedAt,
-        grade: cert.grade,
-        hash: cert.hash,
-        status: cert.status,
         verifiedAt,
-        message: 'DEMO · folio y hash coinciden con el registro sintético.',
+        message: 'DEMO · folio encontrado en el registro sintético; sin API configurada.',
       };
     },
   );

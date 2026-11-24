@@ -71,9 +71,17 @@ El proyecto se encuentra en un estado funcional avanzado **como frontend base/de
 - Persistencia: **SQLite local** (`sqlite+aiosqlite:///./edumaster_enterprise.db`). No usa PostgreSQL ni Supabase todavía.
 - Motor de inferencia: detecta Torch si está disponible; si no, usa el **fallback NumPy**. El Dockerfile ya no instala PyTorch.
 - Firmas: hash SHA-256 en `audit_logs`. Si no se envía `X-Actor`, la respuesta marca `actor_source=body_unverified`; **no es autenticación real**.
-- Las 6 rutas anteriores siguen intactas. Se añadió un **contrato de compatibilidad** bajo `/api/v1/compat` con envelope `{ data, meta }` para el frontend: entregas, riesgo, inferencia, firma y auditoría.
+- Las 6 rutas anteriores siguen intactas. Se añadió un **contrato de compatibilidad** bajo `/api/v1/compat` con envelope `{ data, meta }` para el frontend: entregas, riesgo, inferencia, firma, auditoría, más el listado y la verificación de certificados.
 - El frontend sigue en **DEMO** mientras `VITE_API_BASE_URL` esté vacío, **excepto el núcleo real**: con `VITE_CORE_API_BASE_URL=http://127.0.0.1:8000`, riesgo, SpeedGrader, firma y auditoría van por HTTP real a SQLite. Los otros módulos no cambian.
 - Evidencia: `backend/tests/test_smoke.py` (**34/34**; conserva las 6 rutas y valida `/compat`), `FUNCIONALIDADES_Y_MEJORAS.md` §7, `MATRIZ_CUMPLIMIENTO_DOCUMENTO.md` y `PLAN_MEJORA_OBJETIVO.md`.
+
+### 2.4 Verificación de certificados con QR escaneable (2026-11-24)
+
+- El panel de certificados genera un **QR PNG real** con `qrcode`; antes era un SVG ilustrativo que ningún lector podía decodificar.
+- El QR codifica la URL absoluta `/?verify=<folio>` construida desde `window.location.origin`, por ejemplo `http://127.0.0.1:5173/?verify=EDU-2026-98124`.
+- Al escanearlo, la SPA abre “Certificados” y valida el folio y su hash SHA-256 contra `GET /api/v1/compat/certificates/verify/{folio}`; el evento queda en la auditoría como `certificate.verify`.
+- OpenCV decodificó el PNG a la URL exacta y el navegador mostró “Folio válido · EDU-2026-98124” con **0 errores de consola**.
+- Límite honesto: `127.0.0.1` solo funciona en esta PC. Para escanear desde un celular hay que desplegar el frontend; los registros son sintéticos y el propio mensaje advierte que **no es un certificado oficial**. Ver `FUNCIONALIDADES_Y_MEJORAS.md` §8.
 
 | Componente / Módulo | Estado | Avance / Descripción Técnica |
 | :--- | :---: | :--- |
@@ -147,6 +155,11 @@ Entregable Final/
 │   ├── requirements.txt                # Dependencias mínimas para Railway Free
 │   ├── Procfile / railway.json         # Arranque con uvicorn en $PORT
 │   └── README.md                       # Ejecución, endpoints y límites DEMO
+│
+├── backend/                            # Backend activo (FastAPI + SQLite + motor NumPy)
+│   ├── app/api/v1/compat.py            # Contrato /compat y verificación de certificados
+│   ├── app/models/certificate.py       # Tabla SQLite de certificados sintéticos
+│   └── tests/test_smoke.py             # Smoke versionado: 34 comprobaciones
 │
 └── frontend/                           # Aplicación Web Cliente (React 19 + TypeScript)
     ├── package.json                    # Dependencias y scripts de ejecución
@@ -243,6 +256,12 @@ El sistema cuenta con un selector de temas en la barra superior con tres variant
 2. **Cyber Blue:** Estética de alta tecnología con toques de azul cian e iluminación sutil.
 3. **Light Minimalista:** Diseñado para entornos luminosos, con tipografías oscuras (`slate-900`) y verdes certificados (`emerald-800`) sobre fondos limpios para máximo contraste y cero fatiga visual.
 
+### 5.6. Certificados con QR escaneable y verificación HTTP
+- Cada certificado genera un QR PNG con la URL `/?verify=<folio>`; al escanearlo se abre la vista de certificados con la verificación ya resuelta.
+- El folio y su hash SHA-256 se validan contra `GET /api/v1/compat/certificates/verify/{folio}` en SQLite; los datos son sintéticos y el mensaje lo declara explícitamente.
+- La verificación genera un evento `certificate.verify` en la auditoría con `correlation_id`. Sin API configurada existe un fallback Web Crypto, rotulado como DEMO local.
+- Para escanear desde otro dispositivo es necesario desplegar el frontend: `127.0.0.1` apunta al propio dispositivo, no a esta computadora.
+
 ---
 
 ## 6. Guía de Instalación y Activación
@@ -331,6 +350,12 @@ cd frontend
 npm run preview
 ```
 *Permite validar localmente la compilación de producción en el puerto `http://localhost:4173/`.*
+
+### 4. Smoke test del backend activo
+```bash
+python backend/tests/test_smoke.py
+```
+*Resultado observado: 34/34. Conserva las 6 rutas originales y valida el contrato `/compat`, incluidos los endpoints de certificados.*
 
 ---
 

@@ -363,6 +363,9 @@ export interface CertificateRecord {
   hash: string;
   status: string;
   verificationUrl: string;
+  /** QR real en data URL PNG; se genera desde la URL de verificación. */
+  qrDataUrl?: string | null;
+  /** Campo heredado del antiguo QR ilustrativo DEMO. */
   qrSvg?: string | null;
 }
 

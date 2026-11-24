@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Award,
   QrCode,
@@ -17,6 +17,8 @@ import { writeAudit } from '../../services/auditSink';
 
 interface CertificatesViewProps {
   theme?: ThemeMode;
+  /** Folio llegado desde un QR escaneado (?verify=...). */
+  initialVerifyFolio?: string;
 }
 
 function formatDate(value: string): string {
@@ -25,12 +27,10 @@ function formatDate(value: string): string {
   return date.toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 }
 
-function qrDataUrl(svg: string | null | undefined): string | null {
-  if (!svg) return null;
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-}
-
-export const CertificatesView: React.FC<CertificatesViewProps> = ({ theme = 'monochrome' }) => {
+export const CertificatesView: React.FC<CertificatesViewProps> = ({
+  theme = 'monochrome',
+  initialVerifyFolio,
+}) => {
   const [certificates, setCertificates] = useState<CertificateRecord[]>([]);
   const [meta, setMeta] = useState<ApiMeta | null>(null);
   const [loading, setLoading] = useState(true);
@@ -60,19 +60,21 @@ export const CertificatesView: React.FC<CertificatesViewProps> = ({ theme = 'mon
     return () => controller.abort();
   }, [reloadKey]);
 
-  const handleVerify = async (event?: React.FormEvent) => {
+  const handleVerify = async (event?: React.FormEvent, explicitFolio?: string) => {
     event?.preventDefault();
-    if (!folio.trim()) return;
+    const target = (explicitFolio ?? folio).trim().toUpperCase();
+    if (!target) return;
     setVerifying(true);
     setNotice(null);
     try {
-      const response = await verifyCertificate(folio.trim().toUpperCase());
+      const response = await verifyCertificate(target);
+      setFolio(target);
       setVerification(response.data);
       if (isDemoMode()) {
         await writeAudit({
           action: 'certificate.verify',
           correlationId: response.meta.correlationId,
-          detail: { folio: folio.trim().toUpperCase(), valid: response.data.valid },
+          detail: { folio: target, valid: response.data.valid },
         });
       }
     } catch (err) {
@@ -82,8 +84,18 @@ export const CertificatesView: React.FC<CertificatesViewProps> = ({ theme = 'mon
     }
   };
 
+  const autoVerifiedFolio = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!initialVerifyFolio || autoVerifiedFolio.current === initialVerifyFolio) return;
+    autoVerifiedFolio.current = initialVerifyFolio;
+    void handleVerify(undefined, initialVerifyFolio);
+    // El folio del QR se procesa una sola vez al abrir la URL, incluso en StrictMode.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialVerifyFolio]);
+
   const handleDownload = async (cert: CertificateRecord) => {
-    const qr = qrDataUrl(cert.qrSvg);
+    const qr = cert.qrDataUrl ?? null;
     const html = `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Certificado ${cert.folio}</title>
 <style>body{font-family:system-ui,sans-serif;max-width:760px;margin:48px auto;padding:0 24px;color:#0f172a}
 .badge{font:12px monospace;letter-spacing:.08em;text-transform:uppercase;color:#0f766e}
@@ -132,7 +144,7 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
             Emisión y Verificación Pública de Certificados
           </h1>
           <p className={`text-xs mt-1 m-0 ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
-            Folio y hash verificables en el registro sintético. En DEMO el QR es ilustrativo y se genera en local; no existe endpoint público de verificación.
+            QR escaneable con verificación SHA-256 del folio contra la API activa. Los datos del registro son sintéticos y no equivalen a certificados oficiales.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -339,15 +351,17 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
 
             <div className="flex justify-center my-4">
               <div className="p-3 bg-white rounded-xl shadow-inner border border-slate-200">
-                {qrDataUrl(selectedCert.qrSvg) ? (
-                  <img src={qrDataUrl(selectedCert.qrSvg) ?? ''} alt={`QR de ${selectedCert.folio}`} className="w-36 h-36" />
+                {selectedCert.qrDataUrl ? (
+                  <img src={selectedCert.qrDataUrl} alt={`QR de ${selectedCert.folio}`} className="w-36 h-36" />
                 ) : (
                   <QrCode className="w-36 h-36 text-slate-900" />
                 )}
               </div>
             </div>
             <p className={`text-center text-[10px] -mt-2 mb-3 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-              {isDemoMode() ? 'QR ilustrativo DEMO · requiere API para código escaneable' : 'QR scannable generado en backend'}
+              {meta?.source === 'api'
+                ? 'QR escaneable · verificación SHA-256 en API · datos sintéticos'
+                : 'QR escaneable · verificación DEMO local · datos sintéticos'}
             </p>
 
             <div className={`p-3 rounded-xl border text-[11px] font-mono space-y-1 mb-4 ${
@@ -356,18 +370,17 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
               <div className="truncate">Hash SHA-256: {selectedCert.hash}</div>
               <div>Emisión: {formatDate(selectedCert.issuedAt)}</div>
               <div>Nota Oficial: <span className="text-emerald-600 font-bold">{selectedCert.grade}</span></div>
-              <div className="truncate">
-                {isDemoMode()
-                  ? 'Verificación: DEMO local · sin endpoint público'
-                  : `URL: ${selectedCert.verificationUrl}`}
+              <div className="truncate" title={selectedCert.verificationUrl}>
+                URL: {selectedCert.verificationUrl}
               </div>
             </div>
 
             <button
               onClick={() => {
-                setFolio(selectedCert.folio);
+                const target = selectedCert.folio;
+                setFolio(target);
                 setSelectedCert(null);
-                void handleVerify();
+                void handleVerify(undefined, target);
               }}
               className={`w-full py-2.5 rounded-xl text-xs font-bold transition-colors mb-2 ${
                 isLight ? 'bg-emerald-600 text-white hover:bg-emerald-700' : isMono ? 'bg-white text-zinc-950 font-black hover:bg-zinc-200' : 'bg-edumaster-blue hover:bg-edumaster-blue/80 text-white'

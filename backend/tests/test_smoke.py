@@ -67,7 +67,8 @@ compat_paths = {
     "/api/v1/compat/submissions", "/api/v1/compat/submissions/{submission_id}/grade",
     "/api/v1/compat/submissions/{submission_id}/feedback",
     "/api/v1/compat/students/at-risk", "/api/v1/compat/inference/dropout-risk",
-    "/api/v1/compat/audit/logs",
+    "/api/v1/compat/audit/logs", "/api/v1/compat/certificates",
+    "/api/v1/compat/certificates/verify/{folio}",
 }
 check("catálogo conserva las 6 rutas originales y expone /compat",
       required_paths.issubset(paths) and compat_paths.issubset(paths), f"rutas={paths}")

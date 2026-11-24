@@ -2,7 +2,7 @@
 
 **Prueba realizada:** navegación real en Chromium sobre `http://127.0.0.1:5173` + backend activo en `http://127.0.0.1:8000`.
 **Fecha:** 2026-11-23 (inventario) · 2026-11-24 (núcleo real por HTTP).
-**Resultado general:** 11 módulos abiertos, interacciones ejecutadas, **0 errores de consola**. El resto de la UI opera en modo **DEMO** con `localStorage`; el **núcleo** (riesgo de abandono, SpeedGrader, firma y auditoría) ya llama por HTTP real al backend activo. Ver §7.
+**Resultado general:** 11 módulos abiertos, interacciones ejecutadas, **0 errores de consola**. El resto de la UI opera en modo **DEMO** con `localStorage`; el **núcleo** (riesgo de abandono, SpeedGrader, firma y auditoría) ya llama por HTTP real al backend activo. Ver §7. El QR de certificados también es escaneable y verifica por HTTP. Ver §8.
 
 ---
 
@@ -16,7 +16,7 @@
 | **Análisis** | Series semanales de progreso, actividad por semana, dominio por competencia, filtros por materia y botón “Exportar CSV”. | Gráficos y tabla renderizan con datos sintéticos. No se observó cambio visible al pulsar “Exportar CSV” (podría descargar un archivo). | Verificar la descarga real del CSV; añadir fecha de corte y fuente en el archivo exportado. | P1 |
 | **IA Tutor** | Respuestas por reglas, con confianza y fuentes; conversación persistida. | Pregunta “¿Cómo se calcula el riesgo de abandono?” → respuesta con `Documento §9.5`, confianza 86% y guardrail. | El saludo muestra “Confianza: 99%” sin base. Cambiar a “reglas DEMO”. Hacer clicables las fuentes y añadir preguntas sugeridas. | P0 |
 | **Evaluaciones / SpeedGrader** | Comparador nota oficial vs estimación IA, 3 entregas, SpeedGrader con rúbrica de 4 criterios, borrador asistido, firma docente obligatoria. | Abrí SpeedGrader, ajusté rúbrica, escribí nombre del docente y firmé: pendientes pasaron de **3 a 2**, apareció “Ver / Editar” y se registró `submissions.graded` con actor “Dr. Alejandro Morales”. | Enviar `X-Actor` del rol seleccionado al backend al firmar (el endpoint ya lo acepta desde la mejora anterior). Mostrar el `audit_log_id` devuelto. Sin eso la firma es solo local. | P0 |
-| **Certificados** | 3 certificados con folio, hash, fecha y nota; panel “Verificación Pública” con QR ilustrativo. | “Ver QR / Folio” abre el verificador; advierte explícitamente “QR ilustrativo DEMO · requiere API para código escaneable”. | La URL mostrada apunta a `/api/v1/certificates/verify/<folio>`, ruta que **no existe** en las 6 del backend. Quitar la URL o implementar el endpoint. | P0 |
+| **Certificados** | 3 certificados sintéticos con folio, hash, fecha y nota; QR PNG escaneable que codifica `http://127.0.0.1:5173/?verify=<folio>` y verificación SHA-256 contra la API activa. | OpenCV decodificó el QR a esa URL exacta; al abrirla se habilitó “Certificados”, apareció “Folio válido · EDU-2026-98124” con hash `6f5f33d8…` y se registró `certificate.verify` en auditoría. | Desplegar el frontend y usar su `window.location.origin` para escanear fuera de esta máquina; hoy `127.0.0.1` solo es local. | P1 |
 | **Redes Neuronales** | Inspector con pestañas Arquitectura / Evaluación / Gobernanza, función de pérdida multitarea y metadatos del artefacto. | Texto: “Implementación DEMO en Python puro, sin PyTorch”, versión `0.1.0-demo`, épocas 7. | Conectar la pestaña Evaluación con `api/ml/artifacts/evaluation.json` (ya existe) para mostrar baselines reales del dataset sintético. | P1 |
 | **Gobierno & Ley 29733** | Pestañas Ley/ARCO, Registro de Auditoría y Telemetría MLOps; exportar informe ANPD; bandeja ARCO con 3 solicitudes. | “Marcar atendida” cambió el estado a **Atendida** y generó `arco.request.resolved`. El registro de auditoría mostró **5 eventos** con correlation ID. | Los eventos son de `localStorage`. Enviarlos también al backend cuando haya API. Añadir filtros y exportación CSV de auditoría. El toggle de RLS ya dice “informativo”, mantenerlo así. | P1 |
 | **Comunidad** | Hilos, mensajes y moderación; botón “Nuevo hilo”. | “Nuevo hilo” abre el formulario “Crear hilo”. No hay hilos sembrados: la vista dice “Selecciona un hilo…”. | Sembrar 2–3 hilos DEMO para que la pantalla no se vea vacía en la sustentación. | P2 |
@@ -45,24 +45,24 @@
 
 ## 4. Orden recomendado de mejoras
 
-1. **P0 (antes de sustentar):** quitar la URL de verificación inexistente; bajar el “99%” del tutor; desactivar el “Forward 1x” del dashboard; enviar `X-Actor` al firmar. Los cuatro ya están aplicados (ver §5 y §7).
+1. **P0 (antes de sustentar):** corregir la URL de verificación (hoy es real, ver §8); bajar el “99%” del tutor; desactivar el “Forward 1x” del dashboard; enviar `X-Actor` al firmar. Los cuatro ya están aplicados (ver §5, §7 y §8).
 2. **P1 (si hay un día):** conectar Evaluación y Gobierno al backend; sembrar hilos de Comunidad; verificar exportación CSV.
-3. **P2 (Fase 5):** Supabase + OIDC, RLS real, QR escaneable, persistencia de rutas y cursos.
+3. **P2 (Fase 5):** Supabase + OIDC, RLS real, despliegue del frontend para QR externo, persistencia de rutas y cursos. El QR escaneable ya está aplicado (§8).
 
 ## 5. Estado real de los arreglos P0 (2026-11-23)
 
 | Arreglo | Estado | Evidencia |
 |---|---|---|
-| URL de verificación inexistente | **Aplicado** | Los certificados usan `demo://verify/<folio>`; la vista muestra “Verificación: DEMO local · sin endpoint público”. El QR se genera desde el folio. |
+| URL de verificación inexistente | **Aplicado y superado** | Los certificados usan `GET /api/v1/compat/certificates/verify/{folio}`; el QR PNG apunta a `/?verify=<folio>` y se valida por SHA-256 en SQLite. Ver §8. |
 | “Confianza: 99%” del tutor | **Aplicado** | El saludo ya no muestra peso; las respuestas regladas dicen “Peso regla DEMO”. Se limpia también el valor guardado en `localStorage` de versiones anteriores. |
 | “Inferencia (Forward)” / “PyTorch • GRU” | **Aplicado** | El visualizador dice “DEMO · ANIMACIÓN ILUSTRATIVA”, “motor DEMO en NumPy (sin PyTorch)” y “Propagación (animada)”. |
 | Enviar `X-Actor` al firmar | **Aplicado** | El frontend llama a `/api/v1/compat/submissions/{id}/grade`, el header `X-Actor` llega al backend y la respuesta confirma `actor_source=header`, hash SHA-256 e `audit_log_id`. Ver §7. |
 
-Verificación tras los cambios: `npm.cmd run lint` sin errores, `npm.cmd run build` correcto, navegador con **0 errores de consola** y smoke test del backend **34/34** (las 6 rutas originales siguen intactas y se añadió el contrato `/compat`).
+Verificación tras los cambios: `npm.cmd run lint` sin errores, `npm.cmd run build` correcto, navegador con **0 errores de consola**, smoke test del backend **34/34** (las 6 rutas originales siguen intactas y se añadió el contrato `/compat`) y QR decodificado con OpenCV cuya URL abrió la verificación real.
 
 ## 6. Frase para la sustentación
 
-> "Probamos el sistema en navegador: los 11 módulos abren y, en el núcleo real, el docente firma una nota contra la API por HTTP, el backend devuelve un hash SHA-256 y el evento aparece en la auditoría con el actor y el correlation ID. Lo hace con datos sintéticos y SQLite local, etiquetado como DEMO; Supabase y la autenticación real quedan para la siguiente fase."
+> "Probamos el sistema en navegador: los 11 módulos abren y, en el núcleo real, el docente firma una nota contra la API por HTTP, el backend devuelve un hash SHA-256 y el evento aparece en la auditoría con el actor y el correlation ID. El QR de certificados se decodifica como URL, abre la vista y valida el folio contra la API, dejando también su evento `certificate.verify`. Lo hace con datos sintéticos y SQLite local, etiquetado como DEMO; Supabase y la autenticación real quedan para la siguiente fase."
 
 ---
 
@@ -81,3 +81,20 @@ Alcance elegido: **núcleo real**, no los 11 módulos en modo API ni Supabase/OI
 **Configuración:** `frontend/.env.local` define `VITE_CORE_API_BASE_URL=http://127.0.0.1:8000`. `VITE_API_BASE_URL` se deja vacío, así que los otros 9 módulos permanecen en DEMO. Si la variable del núcleo se borra, el núcleo vuelve al adaptador local sin endpoints falsos.
 
 **Límites honestos:** `X-Actor` es opt-in del frontend, todavía no hay OIDC; no se publica en actas reales; `confidence=0.94`, `calibrated_brier_score=0.082` y `PR-AUC 0.914` son constantes del contrato, no resultados medidos.
+
+---
+
+## 8. QR escaneable y verificación de certificados (2026-11-24)
+
+Antes el QR era un patrón SVG decorativo sin patrones de localización ni codificación: se veía, pero ningún lector podía escanearlo. Ahora se genera con la librería `qrcode` como **PNG real** y codifica una URL absoluta de la SPA.
+
+| Elemento | Implementación | Evidencia |
+|---|---|---|
+| QR | `QRCode.toDataURL()` en `certificatesApi.ts`, 192 px, corrección `M`. | `cv2.QRCodeDetector().detectAndDecode()` devolvió exactamente `http://127.0.0.1:5173/?verify=EDU-2026-98124`. |
+| URL del QR | `new URL('/?verify=<folio>', window.location.origin)`. | La vista muestra `URL: http://127.0.0.1:5173/?verify=EDU-2026-98124`. |
+| Escaneo | `App.tsx` abre “Certificados” si llega `?verify=`; `CertificatesView.tsx` verifica una sola vez y limpia el query string. | Al abrir la URL se mostró “Folio válido · EDU-2026-98124” y el hash `6f5f33d8e27b8088167eee46c44e77dabdb35555276a3d3b89f8a65830dadb11`. |
+| API | `GET /api/v1/compat/certificates` y `GET /api/v1/compat/certificates/verify/{folio}` sobre SQLite. | Lista 3 folios con hashes de 64 caracteres; folio inexistente devuelve `status=No encontrado`. |
+| Hash | Payload canónico `folio/student/course/issuedAt/grade` con SHA-256; el backend compara con `hmac.compare_digest`. | Mensaje: “DEMO · folio y hash SHA-256 coinciden en la API; no es un certificado oficial.” |
+| Auditoría | Evento `certificate.verify` con folio, `valid` y `correlation_id`. | Visible en `/api/v1/compat/audit/logs`; se añadió deduplicación para que un escaneo genere una sola verificación. |
+
+**Límites honestos:** el QR funciona en esta máquina porque apunta a `127.0.0.1`; desde un celular ese host es el propio dispositivo. Para escanear fuera de la PC hay que desplegar el frontend y dejar que `window.location.origin` genere la URL pública. Los 3 registros son sintéticos, SQLite es local y el mensaje de verificación dice explícitamente que **no es un certificado oficial**. Si falta la API, el fallback calcula el mismo hash con Web Crypto, pero el QR sigue siendo escaneable y la UI lo rotula como verificación DEMO local.

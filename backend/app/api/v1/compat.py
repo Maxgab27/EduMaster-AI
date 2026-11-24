@@ -6,10 +6,12 @@ que apiClient.ts exige. Los datos siguen siendo sintéticos y se etiquetan como
 DEMO; lo que es real es el transporte HTTP, la persistencia SQLite y la firma.
 """
 
+import hmac
 import json
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
+from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
@@ -20,6 +22,7 @@ from app.api.v1.grades import submit_teacher_grade
 from app.core.database import get_db
 from app.core.security import hash_audit_payload
 from app.models.audit import AuditLogModel
+from app.models.certificate import CertificateModel
 from app.models.student import StudentMetricModel
 from app.models.submission import SubmissionModel
 from app.schemas.inference import StudentInferenceInput
@@ -131,6 +134,81 @@ SEED_STUDENTS = [
 ]
 
 
+SEED_CERTIFICATES = [
+    {
+        "id": "cert-1",
+        "folio": "EDU-2026-98124",
+        "student": "Carlos Mendoza Ramos",
+        "course": "Especialista en Redes Neuronales & PyTorch MTL",
+        "issued_at": datetime(2026, 11, 12, tzinfo=timezone.utc),
+        "grade": "19.4 / 20 (Sobresaliente)",
+        "status": "Emitido",
+    },
+    {
+        "id": "cert-2",
+        "folio": "EDU-2026-98125",
+        "student": "Sofia Ramírez Vargas",
+        "course": "Ingeniería de Características & DataOps",
+        "issued_at": datetime(2026, 11, 14, tzinfo=timezone.utc),
+        "grade": "19.8 / 20 (Sobresaliente)",
+        "status": "Emitido",
+    },
+    {
+        "id": "cert-3",
+        "folio": "EDU-2026-98126",
+        "student": "Mateo Vargas Quispe",
+        "course": "MLOps: Despliegue con FastAPI y MLflow",
+        "issued_at": datetime(2026, 11, 15, tzinfo=timezone.utc),
+        "grade": "18.2 / 20 (Notable)",
+        "status": "Emitido",
+    },
+]
+
+
+def certificate_payload(
+    folio: str,
+    student: str,
+    course: str,
+    issued_at: datetime,
+    grade: str,
+) -> Dict[str, str]:
+    """Payload canónico; el mismo que calcula el frontend con Web Crypto."""
+    issued = issued_at
+    if issued.tzinfo is None:
+        issued = issued.replace(tzinfo=timezone.utc)
+    return {
+        "folio": folio,
+        "student": student,
+        "course": course,
+        "issuedAt": issued.isoformat(),
+        "grade": grade,
+    }
+
+
+def certificate_hash(row: CertificateModel) -> str:
+    return hash_audit_payload(
+        certificate_payload(row.folio, row.student, row.course, row.issued_at, row.grade)
+    )
+
+
+def certificate_to_api(row: CertificateModel) -> Dict[str, Any]:
+    issued = row.issued_at
+    if issued.tzinfo is None:
+        issued = issued.replace(tzinfo=timezone.utc)
+    return {
+        "id": row.id,
+        "folio": row.folio,
+        "student": row.student,
+        "course": row.course,
+        "issuedAt": issued.isoformat(),
+        "grade": row.grade,
+        "hash": row.hash,
+        "status": row.status,
+        # Ruta relativa: el frontend la convierte en URL absoluta con su origin.
+        "verificationUrl": f"/?verify={quote(row.folio)}",
+    }
+
+
 SEED_AVATARS = {item["student_id"]: item["avatar"] for item in SEED_STUDENTS}
 
 
@@ -171,6 +249,24 @@ async def ensure_seed(db: AsyncSession) -> None:
             unexcused_absences=1,
             dropout_risk_score=item["score"],
             risk_level=level,
+        ))
+    await db.commit()
+
+    existing_certificates = set((await db.execute(select(CertificateModel.folio))).scalars().all())
+    for item in SEED_CERTIFICATES:
+        if item["folio"] in existing_certificates:
+            continue
+        db.add(CertificateModel(
+            id=item["id"],
+            folio=item["folio"],
+            student=item["student"],
+            course=item["course"],
+            issued_at=item["issued_at"],
+            grade=item["grade"],
+            status=item["status"],
+            hash=hash_audit_payload(certificate_payload(
+                item["folio"], item["student"], item["course"], item["issued_at"], item["grade"]
+            )),
         ))
     await db.commit()
 
@@ -316,6 +412,53 @@ async def compat_at_risk(request: Request, db: AsyncSession = Depends(get_db)):
             "interventionSent": False,
         })
     return envelope(result, request)
+
+
+@router.get("/certificates")
+async def compat_list_certificates(request: Request, db: AsyncSession = Depends(get_db)):
+    await ensure_seed(db)
+    rows = (await db.execute(select(CertificateModel).order_by(CertificateModel.issued_at))).scalars().all()
+    return envelope([certificate_to_api(row) for row in rows], request)
+
+
+@router.get("/certificates/verify/{folio}")
+async def compat_verify_certificate(
+    folio: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    await ensure_seed(db)
+    normalized = folio.strip().upper()
+    row = (
+        await db.execute(select(CertificateModel).where(CertificateModel.folio == normalized))
+    ).scalars().one_or_none()
+    if not row:
+        return envelope({
+            "valid": False,
+            "folio": normalized,
+            "student": "",
+            "course": "",
+            "issuedAt": "",
+            "grade": "",
+            "hash": "",
+            "status": "No encontrado",
+            "verifiedAt": datetime.now(timezone.utc).isoformat(),
+            "message": "DEMO · folio no encontrado en el registro sintético.",
+        }, request)
+
+    data = certificate_to_api(row)
+    hash_matches = hmac.compare_digest(certificate_hash(row), row.hash)
+    valid = row.status == "Emitido" and hash_matches
+    data.update({
+        "valid": valid,
+        "verifiedAt": datetime.now(timezone.utc).isoformat(),
+        "message": (
+            "DEMO · folio y hash SHA-256 coinciden en la API; no es un certificado oficial."
+            if valid
+            else "DEMO · el hash no coincide o el folio no está emitido."
+        ),
+    })
+    return envelope(data, request)
 
 
 @router.post("/inference/dropout-risk")

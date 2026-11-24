@@ -25,6 +25,7 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         # Import models so they are registered with Base.metadata
         from app.models.audit import AuditLogModel
+        from app.models.certificate import CertificateModel
         from app.models.submission import SubmissionModel
         from app.models.student import StudentMetricModel
         await conn.run_sync(Base.metadata.create_all)
