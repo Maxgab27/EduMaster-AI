@@ -132,7 +132,7 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
             Emisión y Verificación Pública de Certificados
           </h1>
           <p className={`text-xs mt-1 m-0 ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
-            Folio y hash verificables con QR generado en backend. Los datos son DEMO cuando no hay API configurada.
+            Folio y hash verificables en el registro sintético. En DEMO el QR es ilustrativo y se genera en local; no existe endpoint público de verificación.
           </p>
         </div>
         <div className="flex items-center gap-2">
