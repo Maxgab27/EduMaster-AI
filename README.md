@@ -68,7 +68,7 @@ El proyecto se encuentra en un estado funcional avanzado **como frontend base/de
 
 - Es el servicio que usa `railway.json` y el que responde en `http://127.0.0.1:8000`.
 - Expone **6 rutas**: `/`, `/health`, `/api/v1/inference/dropout-risk`, `/api/v1/grades/submit`, `/api/v1/audit/logs` y `/api/v1/students/at-risk`.
-- Persistencia: **SQLite local** (`sqlite+aiosqlite:///./edumaster_enterprise.db`). No usa PostgreSQL ni Supabase todavía.
+- Persistencia: **SQLite local** por defecto (`sqlite+aiosqlite:///./edumaster_enterprise.db`). Con `DATABASE_URL` (por ejemplo, la que inyecta Railway) usa PostgreSQL vía `asyncpg`, sin cambiar código. Supabase sigue fuera de alcance.
 - Motor de inferencia: detecta Torch si está disponible; si no, usa el **fallback NumPy**. El Dockerfile ya no instala PyTorch.
 - Firmas: hash SHA-256 en `audit_logs`. Si no se envía `X-Actor`, la respuesta marca `actor_source=body_unverified`; **no es autenticación real**.
 - Las 6 rutas anteriores siguen intactas. Se añadió un **contrato de compatibilidad** bajo `/api/v1/compat` con envelope `{ data, meta }` para el frontend: entregas, riesgo, inferencia, firma, auditoría, más el listado y la verificación de certificados.
@@ -82,7 +82,7 @@ El proyecto se encuentra en un estado funcional avanzado **como frontend base/de
 - Al escanearlo, la SPA abre “Certificados” y valida el folio y su hash SHA-256 contra `GET /api/v1/compat/certificates/verify/{folio}`; el evento queda en la auditoría como `certificate.verify`.
 - OpenCV decodificó el PNG a la URL exacta y el navegador mostró “Folio válido · EDU-2026-98124” con **0 errores de consola**.
 - Para escanearlo con un celular en la **misma Wi-Fi**: `frontend/.env.local` define `VITE_PUBLIC_ORIGIN=http://192.168.18.36:5173`, Vite y Uvicorn escuchan en `0.0.0.0`, y el cliente HTTP reemplaza `127.0.0.1` por el host de la página. Así el QR y la API apuntan a la PC, no al celular. Si cambia la red, actualiza la IP con `ipconfig`.
-- Límite honesto: fuera de esa Wi-Fi todavía hace falta desplegar. Los registros son sintéticos y el propio mensaje advierte que **no es un certificado oficial**. Ver `FUNCIONALIDADES_Y_MEJORAS.md` §8.
+- Límite honesto: la publicación en Internet la ejecuta el usuario siguiendo `RAILWAY.md`; no se realizó desde esta sesión. Los registros son sintéticos y el propio mensaje advierte que **no es un certificado oficial**. Ver `FUNCIONALIDADES_Y_MEJORAS.md` §8.
 
 | Componente / Módulo | Estado | Avance / Descripción Técnica |
 | :--- | :---: | :--- |
@@ -326,7 +326,11 @@ VITE_PUBLIC_ORIGIN=http://192.168.18.36:5173
 ```
 Reinicia el frontend. `VITE_API_BASE_URL` se deja vacío: el resto de la app sigue con el adaptador DEMO local y solo el núcleo usa HTTP real. `VITE_PUBLIC_ORIGIN` es la IP Wi-Fi de la PC; cámbiala si la red asigna otra. En Windows, usa `npm.cmd` en lugar de `npm`. `start_project.bat` levanta ambos servicios en `0.0.0.0` con esta configuración.
 
-Para probar desde el celular ZTE en la misma Wi-Fi: abre `http://192.168.18.36:5173` en la PC, entra a **Certificados**, pulsa **Ver QR / Folio** y escanea con la cámara. El QR codifica esa IP, no `127.0.0.1`, y la verificación llama a `http://192.168.18.36:8000`. En el celular, el menú lateral se abre con el botón hamburger y el modal del QR ofrece **“Abrir comprobante (celular)”**, que muestra una página simple con **“Guardar como PDF”**. Para un despliegue público en Railway, sigue la guía corta de `RAILWAY.md`: sin `VITE_PUBLIC_ORIGIN`, el QR usa automáticamente la URL pública del frontend.
+Para probar desde el celular ZTE en la misma Wi-Fi: abre `http://192.168.18.36:5173` en la PC, entra a **Certificados**, pulsa **Ver QR / Folio** y escanea con la cámara. El QR codifica esa IP, no `127.0.0.1`, y la verificación llama a `http://192.168.18.36:8000`. En el celular, el menú lateral se abre con el botón hamburger y el modal del QR ofrece **“Abrir comprobante (celular)”**, que muestra una página simple con **“Guardar como PDF”**.
+
+### Paso 5 (opcional): publicar en Railway — lo haces tú
+
+El repositorio queda listo; **no se ejecutó ningún despliegue**. La checklist completa está en `RAILWAY.md`. En resumen: dos servicios en el mismo proyecto, API desde la raíz (`railway.json` + `backend/Dockerfile`) y web con Root Directory `frontend` (`npm ci && npm run build`, `npm run start`, healthcheck `/health`). Define solo `VITE_CORE_API_BASE_URL` con la URL pública de la API y deja `VITE_PUBLIC_ORIGIN` sin definir para que el QR use el dominio del frontend. Si quieres conservar la auditoría entre despliegues, conecta un Postgres de Railway mediante `DATABASE_URL`; sin él, SQLite es efímero.
 
 **Mejoras recientes:** las vistas secundarias se cargan bajo demanda (`React.lazy`), por lo que el chunk inicial bajó de 580.79 kB a 465.45 kB y ya no aparece el aviso de tamaño. El drawer móvil es accesible por teclado: `aria-expanded`/`aria-controls`, `role="dialog"` en móvil, cierre con `Escape`, foco atrapado y retorno al hamburger. Si la API falla, la UI distingue “sin conexión”, “formato inválido” y “configuración faltante” con mensajes claros; el comprobante ofrece **“Reintentar”**. Detalle y evidencia en `FUNCIONALIDADES_Y_MEJORAS.md` §10.
 
@@ -348,7 +352,7 @@ npm run lint
 cd frontend
 npm run build
 ```
-*Genera los archivos optimizados y minificados en `frontend/dist/` listos para desplegar en Vercel, Netlify o cualquier servidor web estático.*
+*Genera los archivos optimizados y minificados en `frontend/dist/`. En Railway los sirve `npm run start` (servidor mínimo en `frontend/scripts/serve.mjs`, respeta `$PORT`); también sirven para Vercel, Netlify o cualquier servidor estático.*
 
 ### 3. Previsualizar la Versión de Producción
 ```bash
@@ -362,6 +366,16 @@ npm run preview
 python backend/tests/test_smoke.py
 ```
 *Resultado observado: 34/34. Conserva las 6 rutas originales y valida el contrato `/compat`, incluidos los endpoints de certificados.*
+
+### 5. Servidor estático local (simula el servicio web de Railway)
+
+```powershell
+cd frontend
+$env:PORT = 4317
+npm.cmd run start
+```
+
+Abre `http://127.0.0.1:4317/health` → `{"status":"ok",...,"mode":"DEMO"}`. Cualquier ruta sin archivo vuelve a `index.html`, así que `http://127.0.0.1:4317/?verify=EDU-2026-98124` abre directamente la verificación. Es el mismo arranque que usa `frontend/railway.json`.
 
 ---
 
