@@ -14,9 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY requirements.txt ./
 
-# Instalar PyTorch CPU ligero oficial (sin CUDA/GPU pesada) y dependencias de la API
-RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
-    && pip install --no-cache-dir -r requirements.txt
+# Solo dependencias de la API. PyTorch se omite a propósito:
+# app/services/pytorch_engine.py ya usa el fallback de NumPy si no está instalado.
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
 
