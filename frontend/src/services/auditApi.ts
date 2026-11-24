@@ -1,5 +1,5 @@
 import type { ApiAuditLog } from '../types';
-import { requestWithDemo } from './apiClient';
+import { requestCoreWithDemo } from './apiClient';
 import { readLocalAudit } from './demoStore';
 
 export interface AuditFilters {
@@ -10,8 +10,8 @@ export interface AuditFilters {
 }
 
 export function getAuditLogs(filters: AuditFilters = {}, signal?: AbortSignal) {
-  return requestWithDemo<ApiAuditLog[]>(
-    '/api/v1/audit/logs',
+  return requestCoreWithDemo<ApiAuditLog[]>(
+    '/api/v1/compat/audit/logs',
     {
       query: {
         actor: filters.actor,

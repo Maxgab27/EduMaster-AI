@@ -71,8 +71,9 @@ El proyecto se encuentra en un estado funcional avanzado **como frontend base/de
 - Persistencia: **SQLite local** (`sqlite+aiosqlite:///./edumaster_enterprise.db`). No usa PostgreSQL ni Supabase todavía.
 - Motor de inferencia: detecta Torch si está disponible; si no, usa el **fallback NumPy**. El Dockerfile ya no instala PyTorch.
 - Firmas: hash SHA-256 en `audit_logs`. Si no se envía `X-Actor`, la respuesta marca `actor_source=body_unverified`; **no es autenticación real**.
-- El frontend sigue en **DEMO** mientras `VITE_API_BASE_URL` esté vacío: no llama a este backend por defecto.
-- Evidencia: `backend/tests/test_smoke.py`, `MATRIZ_CUMPLIMIENTO_DOCUMENTO.md` y `PLAN_MEJORA_OBJETIVO.md`.
+- Las 6 rutas anteriores siguen intactas. Se añadió un **contrato de compatibilidad** bajo `/api/v1/compat` con envelope `{ data, meta }` para el frontend: entregas, riesgo, inferencia, firma y auditoría.
+- El frontend sigue en **DEMO** mientras `VITE_API_BASE_URL` esté vacío, **excepto el núcleo real**: con `VITE_CORE_API_BASE_URL=http://127.0.0.1:8000`, riesgo, SpeedGrader, firma y auditoría van por HTTP real a SQLite. Los otros módulos no cambian.
+- Evidencia: `backend/tests/test_smoke.py` (**34/34**; conserva las 6 rutas y valida `/compat`), `FUNCIONALIDADES_Y_MEJORAS.md` §7, `MATRIZ_CUMPLIMIENTO_DOCUMENTO.md` y `PLAN_MEJORA_OBJETIVO.md`.
 
 | Componente / Módulo | Estado | Avance / Descripción Técnica |
 | :--- | :---: | :--- |
@@ -292,11 +293,17 @@ source .venv/bin/activate      # Windows: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
+Para el backend **activo** de la sustentación, usa `backend/` en vez de `api/`:
+```bash
+cd backend
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
 Luego crea `frontend/.env.local` con:
 ```text
-VITE_API_BASE_URL=http://127.0.0.1:8000
+VITE_CORE_API_BASE_URL=http://127.0.0.1:8000
 ```
-Reinicia el frontend. Si la variable está vacía, la app sigue funcionando con el adaptador DEMO local.
+Reinicia el frontend. `VITE_API_BASE_URL` se deja vacío: el resto de la app sigue con el adaptador DEMO local y solo el núcleo usa HTTP real. En Windows, usa `npm.cmd` en lugar de `npm`. `start_project.bat` levanta ambos servicios con esta configuración.
 
 ---
 

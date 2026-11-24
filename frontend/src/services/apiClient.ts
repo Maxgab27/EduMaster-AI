@@ -15,6 +15,12 @@ export function getBaseUrl(): string | null {
   return typeof raw === 'string' && raw.trim() ? raw.trim().replace(/\/$/, '') : null;
 }
 
+/** Base del núcleo real (riesgo + SpeedGrader + auditoría). Independiente del modo DEMO global. */
+export function getCoreBaseUrl(): string | null {
+  const raw = import.meta.env.VITE_CORE_API_BASE_URL;
+  return typeof raw === 'string' && raw.trim() ? raw.trim().replace(/\/$/, '') : null;
+}
+
 export function isDemoMode(): boolean {
   return getBaseUrl() === null;
 }
@@ -67,12 +73,7 @@ export interface RequestOptions extends Omit<RequestInit, 'headers'> {
   headers?: Record<string, string>;
 }
 
-export async function request<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
-  const baseUrl = getBaseUrl();
-  if (!baseUrl) {
-    throw new Error('VITE_API_BASE_URL no está configurado');
-  }
-
+async function requestFrom<T>(baseUrl: string, path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
   const { query, headers, ...init } = options;
   const url = new URL(`${baseUrl}${path}`);
   Object.entries(query ?? {}).forEach(([key, value]) => {
@@ -117,6 +118,36 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
     throw new Error(`Respuesta inválida de ${path}: falta envelope { data, meta }`);
   }
   return payload;
+}
+
+export async function request<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+  const baseUrl = getBaseUrl();
+  if (!baseUrl) {
+    throw new Error('VITE_API_BASE_URL no está configurado');
+  }
+  return requestFrom<T>(baseUrl, path, options);
+}
+
+/** Llama al núcleo real por HTTP. Sin fallback silencioso: si falla, se ve el error. */
+export async function requestCore<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+  const baseUrl = getCoreBaseUrl();
+  if (!baseUrl) {
+    throw new Error('VITE_CORE_API_BASE_URL no está configurado');
+  }
+  return requestFrom<T>(baseUrl, path, options);
+}
+
+/** Núcleo real cuando hay base configurada; adaptador DEMO local cuando no. */
+export async function requestCoreWithDemo<T>(
+  path: string,
+  options: RequestOptions,
+  demoFactory: () => T | Promise<T>,
+): Promise<ApiResponse<T>> {
+  if (!getCoreBaseUrl()) {
+    await delay();
+    return demoEnvelope(await demoFactory());
+  }
+  return requestCore<T>(path, options);
 }
 
 export async function requestWithDemo<T>(

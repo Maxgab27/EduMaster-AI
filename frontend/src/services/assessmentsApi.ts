@@ -6,7 +6,7 @@ import type {
   SubmissionFeedbackInput,
 } from '../types';
 import { pendingSubmissions } from '../data/mockData';
-import { requestWithDemo } from './apiClient';
+import { requestCoreWithDemo, requestWithDemo } from './apiClient';
 import { readSlice, writeSlice } from './demoStore';
 
 const SUBMISSIONS_KEY = 'phase3Submissions';
@@ -99,15 +99,19 @@ export function listAssessments(signal?: AbortSignal): Promise<ApiResponse<ApiAs
 }
 
 export function listSubmissions(signal?: AbortSignal): Promise<ApiResponse<ApiSubmission[]>> {
-  return requestWithDemo<ApiSubmission[]>('/api/v1/submissions', { signal }, () => submissions());
+  return requestCoreWithDemo<ApiSubmission[]>(
+    '/api/v1/compat/submissions',
+    { signal },
+    () => submissions(),
+  );
 }
 
 export function gradeSubmission(
   id: string,
   payload: GradeSubmissionInput,
 ): Promise<ApiResponse<ApiSubmission>> {
-  return requestWithDemo<ApiSubmission>(
-    `/api/v1/submissions/${encodeURIComponent(id)}/grade`,
+  return requestCoreWithDemo<ApiSubmission>(
+    `/api/v1/compat/submissions/${encodeURIComponent(id)}/grade`,
     { method: 'POST', body: JSON.stringify(payload) },
     () => updateSubmission(id, item => {
       const maximum = item.rubricScores.reduce((sum, row) => sum + row.maxPts, 0) || 20;
@@ -130,8 +134,8 @@ export function addSubmissionFeedback(
   id: string,
   payload: SubmissionFeedbackInput,
 ): Promise<ApiResponse<ApiSubmission>> {
-  return requestWithDemo<ApiSubmission>(
-    `/api/v1/submissions/${encodeURIComponent(id)}/feedback`,
+  return requestCoreWithDemo<ApiSubmission>(
+    `/api/v1/compat/submissions/${encodeURIComponent(id)}/feedback`,
     { method: 'POST', body: JSON.stringify(payload) },
     () => updateSubmission(id, item => ({
       ...item,

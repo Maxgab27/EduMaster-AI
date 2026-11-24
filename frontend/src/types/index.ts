@@ -242,6 +242,10 @@ export interface ApiSubmission {
   signedBy: string | null;
   gradedAt: string | null;
   predictionId: string | null;
+  /** Campos devueltos por la firma real del backend (ausentes en modo DEMO). */
+  signatureHash?: string;
+  auditLogId?: string;
+  actorSource?: 'header' | 'body_unverified';
 }
 
 export interface GradeSubmissionInput {

@@ -10,6 +10,7 @@ from app.api.v1.inference import router as inference_router
 from app.api.v1.grades import router as grades_router
 from app.api.v1.audit import router as audit_router
 from app.api.v1.students import router as students_router
+from app.api.v1.compat import router as compat_router
 
 logging.basicConfig(
     level=getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO),
@@ -58,6 +59,7 @@ app.include_router(inference_router, prefix=settings.API_V1_STR)
 app.include_router(grades_router, prefix=settings.API_V1_STR)
 app.include_router(audit_router, prefix=settings.API_V1_STR)
 app.include_router(students_router, prefix=settings.API_V1_STR)
+app.include_router(compat_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/")

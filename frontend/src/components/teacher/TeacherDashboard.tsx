@@ -13,12 +13,12 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import type { ApiMeta, ApiSubmission, AtRiskStudent, ThemeMode } from '../../types';
-import { atRiskStudents as initialRisks } from '../../data/mockData';
 import {
   addSubmissionFeedback,
   gradeSubmission,
   listSubmissions,
 } from '../../services/assessmentsApi';
+import { listAtRiskStudents } from '../../services/riskApi';
 import { writeAudit } from '../../services/auditSink';
 import { TeacherSpeedGraderModal } from './TeacherSpeedGraderModal';
 
@@ -37,7 +37,7 @@ function initials(name: string): string {
 
 export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'monochrome' }) => {
   const [submissions, setSubmissions] = useState<ApiSubmission[]>([]);
-  const [risks, setRisks] = useState<AtRiskStudent[]>(initialRisks);
+  const [risks, setRisks] = useState<AtRiskStudent[]>([]);
   const [meta, setMeta] = useState<ApiMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +62,17 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
         setError(err instanceof Error ? err.message : 'No se pudieron cargar las entregas');
       })
       .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [reloadKey]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    listAtRiskStudents(controller.signal)
+      .then(response => setRisks(response.data))
+      .catch(err => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setError(err instanceof Error ? err.message : 'No se pudo cargar el triaje de riesgo');
+      });
     return () => controller.abort();
   }, [reloadKey]);
 
@@ -97,8 +108,9 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
         signedBy,
       },
     });
+    const hash = response.data.signatureHash ? ` · SHA-256 ${response.data.signatureHash.slice(0, 12)}…` : '';
     setActionNotice(
-      `✓ Nota ${officialScore}/${response.data.rubricScores.reduce((sum, row) => sum + row.maxPts, 0)} firmada por ${signedBy} y registrada en ${response.meta.source.toUpperCase()}. Sin publicación en actas reales.`,
+      `✓ Nota ${officialScore}/${response.data.rubricScores.reduce((sum, row) => sum + row.maxPts, 0)} firmada por ${signedBy} y registrada en ${response.meta.source.toUpperCase()}${hash}. Sin publicación en actas reales.`,
     );
   };
 
@@ -142,7 +154,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
             <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
               isLight ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : isMono ? 'bg-[#262B37] border-[#3B4254] text-white' : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
             }`}>
-              ESPACIO DOCENTE • DEMO
+              {meta?.source === 'api' ? 'ESPACIO DOCENTE · API REAL · DATOS SINTÉTICOS' : 'ESPACIO DOCENTE • DEMO'}
             </span>
             <span className="text-xs opacity-60">
               {meta ? `${meta.source.toUpperCase()} · ${meta.correlationId.slice(0, 12)}` : 'cargando fuente...'}
@@ -378,7 +390,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
                   <AlertTriangle className="w-4 h-4 text-rose-400" />
                   Triaje de Riesgo de Abandono
                 </h2>
-                <p className="text-xs opacity-60 m-0">Inferencia DEMO Cabeza C · no califica al estudiante.</p>
+                <p className="text-xs opacity-60 m-0">Inferencia Cabeza C sobre datos sintéticos · no califica al estudiante.</p>
               </div>
               <span className="text-[10px] font-mono text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/30">
                 Alerta temprana

@@ -1,8 +1,8 @@
 # Funcionalidades reales y mejoras posibles — EduMaster.ai
 
 **Prueba realizada:** navegación real en Chromium sobre `http://127.0.0.1:5173` + backend activo en `http://127.0.0.1:8000`.
-**Fecha:** 2026-11-23.
-**Resultado general:** 11 módulos abiertos, interacciones ejecutadas, **0 errores de consola**. Todo opera en modo **DEMO** con `localStorage`; el backend no está conectado al frontend.
+**Fecha:** 2026-11-23 (inventario) · 2026-11-24 (núcleo real por HTTP).
+**Resultado general:** 11 módulos abiertos, interacciones ejecutadas, **0 errores de consola**. El resto de la UI opera en modo **DEMO** con `localStorage`; el **núcleo** (riesgo de abandono, SpeedGrader, firma y auditoría) ya llama por HTTP real al backend activo. Ver §7.
 
 ---
 
@@ -45,7 +45,7 @@
 
 ## 4. Orden recomendado de mejoras
 
-1. **P0 (antes de sustentar):** quitar la URL de verificación inexistente; bajar el “99%” del tutor; desactivar el “Forward 1x” del dashboard; enviar `X-Actor` al firmar. Los tres primeros ya están aplicados (ver §5); el cuarto sigue pendiente por incompatibilidad de contrato.
+1. **P0 (antes de sustentar):** quitar la URL de verificación inexistente; bajar el “99%” del tutor; desactivar el “Forward 1x” del dashboard; enviar `X-Actor` al firmar. Los cuatro ya están aplicados (ver §5 y §7).
 2. **P1 (si hay un día):** conectar Evaluación y Gobierno al backend; sembrar hilos de Comunidad; verificar exportación CSV.
 3. **P2 (Fase 5):** Supabase + OIDC, RLS real, QR escaneable, persistencia de rutas y cursos.
 
@@ -56,10 +56,28 @@
 | URL de verificación inexistente | **Aplicado** | Los certificados usan `demo://verify/<folio>`; la vista muestra “Verificación: DEMO local · sin endpoint público”. El QR se genera desde el folio. |
 | “Confianza: 99%” del tutor | **Aplicado** | El saludo ya no muestra peso; las respuestas regladas dicen “Peso regla DEMO”. Se limpia también el valor guardado en `localStorage` de versiones anteriores. |
 | “Inferencia (Forward)” / “PyTorch • GRU” | **Aplicado** | El visualizador dice “DEMO · ANIMACIÓN ILUSTRATIVA”, “motor DEMO en NumPy (sin PyTorch)” y “Propagación (animada)”. |
-| Enviar `X-Actor` al firmar | **Pendiente** | El header ya se envía desde `apiClient.ts`, pero el frontend llama a `/api/v1/submissions/{id}/grade`, ruta inexistente en el backend activo de 6 rutas. Requiere alinear contratos. |
+| Enviar `X-Actor` al firmar | **Aplicado** | El frontend llama a `/api/v1/compat/submissions/{id}/grade`, el header `X-Actor` llega al backend y la respuesta confirma `actor_source=header`, hash SHA-256 e `audit_log_id`. Ver §7. |
 
-Verificación tras los cambios: `npm.cmd run lint` sin errores, `npm.cmd run build` correcto, navegador con **0 errores de consola** y smoke test del backend **34/34**.
+Verificación tras los cambios: `npm.cmd run lint` sin errores, `npm.cmd run build` correcto, navegador con **0 errores de consola** y smoke test del backend **34/34** (las 6 rutas originales siguen intactas y se añadió el contrato `/compat`).
 
 ## 6. Frase para la sustentación
 
-> "Probamos el sistema en navegador: los 11 módulos abren, el docente puede firmar una nota, la auditoría registra la acción con correlation ID y no hay errores de consola. Todo funciona en modo DEMO con datos locales; la integración con Supabase y la autenticación real quedan para la siguiente fase."
+> "Probamos el sistema en navegador: los 11 módulos abren y, en el núcleo real, el docente firma una nota contra la API por HTTP, el backend devuelve un hash SHA-256 y el evento aparece en la auditoría con el actor y el correlation ID. Lo hace con datos sintéticos y SQLite local, etiquetado como DEMO; Supabase y la autenticación real quedan para la siguiente fase."
+
+---
+
+## 7. Núcleo real por HTTP (2026-11-24)
+
+Alcance elegido: **núcleo real**, no los 11 módulos en modo API ni Supabase/OIDC. Lo que es real es el **transporte HTTP, la persistencia SQLite y la firma**; los datos siguen siendo sintéticos y están etiquetados como DEMO.
+
+| Capacidad | Contrato | Evidencia observada |
+|---|---|---|
+| Triaje de riesgo | `GET /api/v1/compat/students/at-risk` | 3 alumnos desde SQLite, riesgo máximo **88%**; badge “API REAL · DATOS SINTÉTICOS”. |
+| Inferencia Cabeza C | `POST /api/v1/compat/inference/dropout-risk` | Probabilidad calculada por el motor NumPy y factor dominante; `confidence` y `brier` siguen siendo constantes, no mediciones. |
+| Bandeja de entregas | `GET /api/v1/compat/submissions` | 3 entregas (`sub-101` a `sub-103`) leídas de SQLite; artefactos del smoke test filtrados. |
+| Firma del SpeedGrader | `POST /api/v1/compat/submissions/{id}/grade` | “✓ Nota 16/20 … registrada en API · SHA-256 `6cb0b5ea1567…`”. Pendientes **2 → 1**; desglose de 4 criterios / 20 pts conservado. |
+| Auditoría | `GET /api/v1/compat/audit/logs` | Fila `OFFICIAL_GRADE_SIGN` con actor `Dr. Alejandro Morales`, rol `docente`, hash y correlation ID; 0 errores de consola. |
+
+**Configuración:** `frontend/.env.local` define `VITE_CORE_API_BASE_URL=http://127.0.0.1:8000`. `VITE_API_BASE_URL` se deja vacío, así que los otros 9 módulos permanecen en DEMO. Si la variable del núcleo se borra, el núcleo vuelve al adaptador local sin endpoints falsos.
+
+**Límites honestos:** `X-Actor` es opt-in del frontend, todavía no hay OIDC; no se publica en actas reales; `confidence=0.94`, `calibrated_brier_score=0.082` y `PR-AUC 0.914` son constantes del contrato, no resultados medidos.

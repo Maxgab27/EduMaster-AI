@@ -18,6 +18,6 @@ echo Servicios iniciados en ventanas independientes:
 echo  - Frontend Web:        http://localhost:5173
 echo  - API Swagger Docs:    http://localhost:8000/docs
 echo  - API Healthcheck:     http://localhost:8000/health
-echo  - Modo datos:          DEMO (el frontend no llama a la API sin VITE_API_BASE_URL)
+echo  - Modo datos:          DEMO con nucleo REAL por HTTP (VITE_CORE_API_BASE_URL)
 echo =====================================================================
 pause

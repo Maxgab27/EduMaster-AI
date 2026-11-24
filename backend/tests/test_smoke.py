@@ -59,7 +59,18 @@ check("health.protocol = HTTP/1.1", health.get("protocol") == "HTTP/1.1", str(he
 status, spec = request("GET", "/openapi.json")
 paths = list(spec.get("paths", {}).keys()) if isinstance(spec, dict) else []
 check("GET /openapi.json responde 200", status == 200, f"status={status}")
-check("catálogo tiene 6 rutas", len(paths) == 6, f"rutas={paths}")
+required_paths = {
+    "/", "/health", "/api/v1/students/at-risk", "/api/v1/inference/dropout-risk",
+    "/api/v1/grades/submit", "/api/v1/audit/logs",
+}
+compat_paths = {
+    "/api/v1/compat/submissions", "/api/v1/compat/submissions/{submission_id}/grade",
+    "/api/v1/compat/submissions/{submission_id}/feedback",
+    "/api/v1/compat/students/at-risk", "/api/v1/compat/inference/dropout-risk",
+    "/api/v1/compat/audit/logs",
+}
+check("catálogo conserva las 6 rutas originales y expone /compat",
+      required_paths.issubset(paths) and compat_paths.issubset(paths), f"rutas={paths}")
 
 # ---------------------------------------------------------------- alumnos
 status, students = request("GET", "/api/v1/students/at-risk")
