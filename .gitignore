@@ -41,6 +41,12 @@ venv/
 ENV/
 .venv
 
+# SQLite & Local databases
+*.db
+*.sqlite
+*.sqlite3
+backend/edumaster_enterprise.db
+
 # Editor and OS files
 .vscode/*
 !.vscode/extensions.json
