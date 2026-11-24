@@ -19,7 +19,12 @@ export function getBaseUrl(): string | null {
 export function getCoreBaseUrl(): string | null {
   const raw = import.meta.env.VITE_CORE_API_BASE_URL;
   if (typeof raw !== 'string' || !raw.trim()) return null;
-  const url = new URL(raw.trim());
+  let url: URL;
+  try {
+    url = new URL(raw.trim());
+  } catch {
+    throw new ApiClientError('config', 'VITE_CORE_API_BASE_URL no es una URL válida');
+  }
   // Solo reescribimos en escenarios LAN: la página se abre desde la IP privada
   // de la PC (celular en la misma Wi-Fi) y la API sigue configurada en loopback.
   // En Railway/Vercel se respeta la URL pública configurada en el entorno.
@@ -38,6 +43,39 @@ export function isDemoMode(): boolean {
 
 export function newCorrelationId(): string {
   return `web-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+export type ApiClientErrorKind = 'offline' | 'http' | 'invalid' | 'config';
+
+/** Error tipado para distinguir “sin conexión” de “folio no encontrado”. */
+export class ApiClientError extends Error {
+  readonly kind: ApiClientErrorKind;
+
+  constructor(kind: ApiClientErrorKind, message: string) {
+    super(message);
+    this.name = 'ApiClientError';
+    this.kind = kind;
+  }
+}
+
+/** Mensajes listos para mostrar en la UI; no exponen detalles internos. */
+export function friendlyApiError(error: unknown): string {
+  if (error instanceof DOMException && error.name === 'AbortError') {
+    return 'Verificación cancelada. Vuelve a intentarlo.';
+  }
+  if (error instanceof ApiClientError) {
+    if (error.kind === 'offline') {
+      return 'No se pudo contactar con la API. Revisa la Wi-Fi o el dominio publicado y vuelve a intentarlo.';
+    }
+    if (error.kind === 'config') {
+      return 'La API no está configurada. Revisa VITE_API_BASE_URL o VITE_CORE_API_BASE_URL y vuelve a intentarlo.';
+    }
+    if (error.kind === 'invalid') {
+      return 'La API respondió un formato inesperado. Intenta de nuevo.';
+    }
+    return error.message;
+  }
+  return error instanceof Error ? error.message : 'No se pudo completar la solicitud';
 }
 
 export function demoEnvelope<T>(data: T): ApiResponse<T> {
@@ -103,7 +141,14 @@ async function requestFrom<T>(baseUrl: string, path: string, options: RequestOpt
     ...headers,
   };
 
-  const response = await fetch(url.toString(), { ...init, headers: finalHeaders });
+  let response: Response;
+  try {
+    response = await fetch(url.toString(), { ...init, headers: finalHeaders });
+  } catch (error) {
+    // AbortSignal debe seguir llegando como DOMException a los useEffect.
+    if (error instanceof DOMException && error.name === 'AbortError') throw error;
+    throw new ApiClientError('offline', `No se pudo contactar con ${baseUrl}`);
+  }
 
   if (!response.ok) {
     let detail = '';
@@ -124,9 +169,14 @@ async function requestFrom<T>(baseUrl: string, path: string, options: RequestOpt
     throw new Error(`${path} devolvió HTTP ${response.status}${detail}`);
   }
 
-  const payload = (await response.json()) as ApiResponse<T>;
+  let payload: ApiResponse<T>;
+  try {
+    payload = (await response.json()) as ApiResponse<T>;
+  } catch {
+    throw new ApiClientError('invalid', `${path} devolvió una respuesta JSON inválida`);
+  }
   if (!payload || !Object.prototype.hasOwnProperty.call(payload, 'data') || !payload.meta) {
-    throw new Error(`Respuesta inválida de ${path}: falta envelope { data, meta }`);
+    throw new ApiClientError('invalid', `Respuesta inválida de ${path}: falta envelope { data, meta }`);
   }
   return payload;
 }
@@ -134,7 +184,7 @@ async function requestFrom<T>(baseUrl: string, path: string, options: RequestOpt
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
   const baseUrl = getBaseUrl();
   if (!baseUrl) {
-    throw new Error('VITE_API_BASE_URL no está configurado');
+    throw new ApiClientError('config', 'VITE_API_BASE_URL no está configurado');
   }
   return requestFrom<T>(baseUrl, path, options);
 }
@@ -143,7 +193,7 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
 export async function requestCore<T>(path: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
   const baseUrl = getCoreBaseUrl();
   if (!baseUrl) {
-    throw new Error('VITE_CORE_API_BASE_URL no está configurado');
+    throw new ApiClientError('config', 'VITE_CORE_API_BASE_URL no está configurado');
   }
   return requestFrom<T>(baseUrl, path, options);
 }

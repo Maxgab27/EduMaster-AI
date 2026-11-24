@@ -120,3 +120,19 @@ Antes el QR era un patrón SVG decorativo sin patrones de localización ni codif
 **Flujo más simple en Railway:** publicar backend y frontend, definir solo `VITE_CORE_API_BASE_URL` apuntando al backend y dejar `VITE_PUBLIC_ORIGIN` sin definir. El QR codificará `https://<frontend>.up.railway.app/?verify=<folio>`; al escanearlo se abre la verificación, y el botón del modal muestra el comprobante en pantalla. La guía operativa está en `RAILWAY.md`.
 
 **Límites honestos:** no se hizo el despliegue real porque requiere la cuenta y las URLs del usuario. Supabase/OIDC siguen pendientes y no se compartieron secretos. Los certificados y el comprobante mantienen la etiqueta `DEMO` y advierten que no son oficiales.
+
+---
+
+## 10. Tercera tanda: bundle, accesibilidad y errores claros (2026-11-24)
+
+Se ejecutaron los puntos **M-03, M-05 y M-06** del informe de mejoras. Criterio: cambios medibles, sin credenciales nuevas y sin tocar el flujo QR/comprobante ya validado.
+
+| Punto | Implementación | Evidencia |
+|---|---|---|
+| M-03 · División del bundle | `App.tsx` carga con `React.lazy()` las nueve vistas secundarias (Planes, Cursos, Análisis, Tutor, Evaluaciones, Inspector, Gobierno, Comunidad, Configuración) dentro de un `Suspense` con aviso *“Cargando módulo…”*. Inicio, dashboard y certificados siguen inmediatos para no retrasar el QR. | Build: chunk principal **580.79 kB → 465.45 kB** (gzip 158.45 → 135.04 kB). Nueve chunks de 5.69 a 18.40 kB se descargan solo al abrir cada módulo. **Desapareció el aviso de chunk > 500 kB.** |
+| M-05 · Accesibilidad del drawer | `Topbar.tsx` añade `aria-controls="app-sidebar"` y `aria-expanded`; `Sidebar.tsx` expone `id="app-sidebar"`, `role="dialog"` y `aria-modal` solo en móvil abierto, e `inert` cuando está cerrado; `App.tsx` gestiona `Escape`, focus trap con `Tab`/`Shift+Tab` y retorno de foco al hamburger. Respeta el cambio de viewport con `matchMedia`. | CDP a **390 px**: `scrollWidth=390`; hamburger `aria-expanded=false → true`; drawer `x=-288 → 0`; `role=dialog`, `aria-modal=true`, `inert=false` al abrir; 12 elementos enfocables y `Tab` desde el último vuelve al primero; `Escape` cierra a `x=-288`, reactiva `inert` y devuelve el foco al hamburger. |
+| M-06 · Estados offline y de error | `apiClient.ts` introduce `ApiClientError` con tipos `offline`, `http`, `invalid` y `config`, más `friendlyApiError()`; distingue fallo de red, envelope inválido y variable faltante. `CertificatesView.tsx` y `CertificateReceiptView` muestran esos mensajes; el comprobante añade **“Reintentar”** cuando falla la carga. | Con la API bloqueada por CDP se mostró: *“No se pudo contactar con la API. Revisa la Wi-Fi o el dominio publicado y vuelve a intentarlo.”* Sin `Failed to fetch` ni la IP del backend en pantalla; `scrollWidth=390`. |
+
+**Regresión verificada:** `npm.cmd run lint` sin hallazgos; `npm.cmd run build` correcto; smoke test **34/34**. Flujo QR `?verify=EDU-2026-98124` → “Folio válido” y comprobante `?receipt=EDU-2026-98124` → QR de 96 px, “Volver” y “Guardar como PDF”, sin desbordamiento y **0 errores de consola**.
+
+**Límites honestos:** la división por módulos reduce la carga inicial, pero no sustituye a las pruebas E2E automáticas (M-04, Playwright sigue sin instalarse). El `focus trap` cubre el drawer lateral; el modal del QR y el command palette no forman parte de este cambio. M-01 (Railway real) y M-02 (Supabase/OIDC) continúan pendientes por falta de URLs, cuenta y credenciales. Todo sigue etiquetado `DEMO` y los certificados no son oficiales.

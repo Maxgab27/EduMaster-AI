@@ -25,6 +25,7 @@ interface SidebarProps {
   role: UserRole;
   theme?: ThemeMode;
   mobileOpen?: boolean;
+  isMobile?: boolean;
   onClose?: () => void;
 }
 
@@ -35,6 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   role,
   theme = 'monochrome',
   mobileOpen = false,
+  isMobile = false,
   onClose,
 }) => {
   const isMono = theme === 'monochrome';
@@ -55,7 +57,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className={`fixed inset-y-0 left-0 w-72 flex flex-col justify-between shrink-0 select-none h-screen overflow-y-auto z-50 transition-all duration-200 md:sticky md:top-0 md:z-40 md:w-64 ${
+    <aside
+      id="app-sidebar"
+      aria-label="Navegación principal"
+      role={isMobile && mobileOpen ? 'dialog' : undefined}
+      aria-modal={isMobile && mobileOpen ? true : undefined}
+      inert={isMobile && !mobileOpen ? true : undefined}
+      className={`fixed inset-y-0 left-0 w-72 flex flex-col justify-between shrink-0 select-none h-screen overflow-y-auto z-50 transition-all duration-200 md:sticky md:top-0 md:z-40 md:w-64 ${
       mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
     } ${
       isMono ? 'bg-[#151820] border-r border-[#2A2F3D] text-gray-100' : isLight ? 'bg-white border-r border-slate-200 text-slate-900' : 'bg-[#06152B]/95 border-r border-edumaster-cardBorder text-slate-100'

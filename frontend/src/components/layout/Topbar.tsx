@@ -34,6 +34,8 @@ interface TopbarProps {
   onOpenCommandPalette: () => void;
   onOpenAITutor: () => void;
   onOpenMobileNav: () => void;
+  mobileNavOpen: boolean;
+  menuButtonRef?: React.Ref<HTMLButtonElement>;
 }
 
 export const Topbar: React.FC<TopbarProps> = ({
@@ -45,6 +47,8 @@ export const Topbar: React.FC<TopbarProps> = ({
   onOpenCommandPalette,
   onOpenAITutor,
   onOpenMobileNav,
+  mobileNavOpen,
+  menuButtonRef,
 }) => {
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -145,8 +149,11 @@ export const Topbar: React.FC<TopbarProps> = ({
       {/* Slogan & Breadcrumb */}
       <div className="flex items-center gap-2 sm:gap-5 min-w-0">
         <button
+          ref={menuButtonRef}
           onClick={onOpenMobileNav}
           aria-label="Abrir menú de navegación"
+          aria-controls="app-sidebar"
+          aria-expanded={mobileNavOpen}
           className={`md:hidden w-9 h-9 shrink-0 rounded-xl border flex items-center justify-center ${
             isMono ? 'bg-[#1E222C] border-[#2A2F3D] text-white' : isLight ? 'bg-slate-100 border-slate-200 text-slate-800' : 'bg-[#0A1F3D] border-edumaster-cardBorder text-white'
           }`}

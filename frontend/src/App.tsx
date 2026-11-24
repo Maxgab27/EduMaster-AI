@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
 import { Sidebar } from './components/layout/Sidebar';
 import { Topbar } from './components/layout/Topbar';
 import { NeuralVisualizer } from './components/dashboard/NeuralVisualizer';
@@ -8,18 +8,9 @@ import { CourseCompletionDonut } from './components/dashboard/CourseCompletionDo
 import { SkillMasteryHeatmap } from './components/dashboard/SkillMasteryHeatmap';
 import { RecentActivityFeed } from './components/dashboard/RecentActivityFeed';
 import { AIRecommendationsCard } from './components/dashboard/AIRecommendationsCard';
-import { LearningPathsView } from './components/modules/LearningPathsView';
-import { CoursesView } from './components/modules/CoursesView';
-import { AnalyticsView } from './components/modules/AnalyticsView';
-import { AITutorView } from './components/modules/AITutorView';
-import { CommunityView } from './components/modules/CommunityView';
-import { AssessmentsView } from './components/modules/AssessmentsView';
 import { CertificatesView, CertificateReceiptView } from './components/modules/CertificatesView';
-import { NeuralInspectorView } from './components/modules/NeuralInspectorView';
-import { SettingsView } from './components/modules/SettingsView';
 import { StudentDashboard } from './components/student/StudentDashboard';
 import { TeacherDashboard } from './components/teacher/TeacherDashboard';
-import { AdminGovernanceView } from './components/admin/AdminGovernanceView';
 import { GlobalCommandPalette } from './components/common/GlobalCommandPalette';
 import { AITutorDrawer } from './components/common/AITutorDrawer';
 import { currentUser } from './data/mockData';
@@ -55,6 +46,38 @@ function profileForRole(newRole: UserRole, base: UserProfile, persistedName?: st
   return { ...base, role: newRole, name: persistedName || name, title, avatar };
 }
 
+/**
+ * División por módulos: el inicio y el flujo QR (certificados) cargan de forma
+ * inmediata; las vistas secundarias se descargan solo cuando se abren.
+ */
+const LearningPathsView = lazy(() =>
+  import('./components/modules/LearningPathsView').then(module => ({ default: module.LearningPathsView })),
+);
+const CoursesView = lazy(() =>
+  import('./components/modules/CoursesView').then(module => ({ default: module.CoursesView })),
+);
+const AnalyticsView = lazy(() =>
+  import('./components/modules/AnalyticsView').then(module => ({ default: module.AnalyticsView })),
+);
+const AITutorView = lazy(() =>
+  import('./components/modules/AITutorView').then(module => ({ default: module.AITutorView })),
+);
+const AssessmentsView = lazy(() =>
+  import('./components/modules/AssessmentsView').then(module => ({ default: module.AssessmentsView })),
+);
+const NeuralInspectorView = lazy(() =>
+  import('./components/modules/NeuralInspectorView').then(module => ({ default: module.NeuralInspectorView })),
+);
+const AdminGovernanceView = lazy(() =>
+  import('./components/admin/AdminGovernanceView').then(module => ({ default: module.AdminGovernanceView })),
+);
+const CommunityView = lazy(() =>
+  import('./components/modules/CommunityView').then(module => ({ default: module.CommunityView })),
+);
+const SettingsView = lazy(() =>
+  import('./components/modules/SettingsView').then(module => ({ default: module.SettingsView })),
+);
+
 export const App: React.FC = () => {
   // Un QR escaneado abre la SPA con ?verify=<folio> y debe llevar a verificación.
   const [verifyFolio] = useState<string | null>(
@@ -85,6 +108,10 @@ export const App: React.FC = () => {
   const [isCmdPaletteOpen, setIsCmdPaletteOpen] = useState(false);
   const [isAITutorDrawerOpen, setIsAITutorDrawerOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches,
+  );
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   
   // Theme state: defaults to 'monochrome' (Blanco y Negro / Charcoal)
   const [theme, setTheme] = useState<ThemeMode>(() => {
@@ -100,6 +127,64 @@ export const App: React.FC = () => {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  // El drawer solo existe como modal en celular; al pasar a escritorio se cierra.
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 767px)');
+    const syncViewport = (event: MediaQueryListEvent) => {
+      setIsMobileViewport(event.matches);
+      if (!event.matches) setIsMobileNavOpen(false);
+    };
+    query.addEventListener('change', syncViewport);
+    return () => query.removeEventListener('change', syncViewport);
+  }, []);
+
+  const closeMobileNav = useCallback(() => {
+    setIsMobileNavOpen(false);
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      menuButtonRef.current?.focus();
+    }
+  }, []);
+
+  // Accesibilidad del drawer: Escape, foco atrapado y retorno al botón que lo abrió.
+  useEffect(() => {
+    if (!isMobileNavOpen || !isMobileViewport) return;
+    const sidebar = document.getElementById('app-sidebar');
+    if (!sidebar) return;
+    const focusableItems = () =>
+      Array.from(
+        sidebar.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter(element => element.getClientRects().length > 0);
+
+    focusableItems()[0]?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeMobileNav();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const items = focusableItems();
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      } else if (!sidebar.contains(document.activeElement)) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isMobileNavOpen, isMobileViewport, closeMobileNav]);
 
   useEffect(() => {
     if (!verifyFolio) return;
@@ -157,7 +242,7 @@ export const App: React.FC = () => {
       {isMobileNavOpen && (
         <div
           className="fixed inset-0 bg-black/60 z-40 md:hidden"
-          onClick={() => setIsMobileNavOpen(false)}
+          onClick={closeMobileNav}
           aria-hidden="true"
         />
       )}
@@ -165,13 +250,14 @@ export const App: React.FC = () => {
         activeTab={activeTab}
         onTabChange={tab => {
           setActiveTab(tab);
-          setIsMobileNavOpen(false);
+          closeMobileNav();
         }}
         onlineCount={user.onlineCount}
         role={user.role}
         theme={theme}
         mobileOpen={isMobileNavOpen}
-        onClose={() => setIsMobileNavOpen(false)}
+        isMobile={isMobileViewport}
+        onClose={closeMobileNav}
       />
 
       {/* Main Content Area */}
@@ -185,6 +271,8 @@ export const App: React.FC = () => {
           onOpenCommandPalette={() => setIsCmdPaletteOpen(true)}
           onOpenAITutor={() => setIsAITutorDrawerOpen(true)}
           onOpenMobileNav={() => setIsMobileNavOpen(true)}
+          mobileNavOpen={isMobileNavOpen}
+          menuButtonRef={menuButtonRef}
         />
 
         <main className="flex-1 p-4 sm:p-6 space-y-5 sm:space-y-6 max-w-[1600px] w-full mx-auto">
@@ -295,29 +383,37 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {canViewTab(user.role, activeTab) && activeTab === 'learning-paths' && <LearningPathsView theme={theme} />}
-          {canViewTab(user.role, activeTab) && activeTab === 'courses' && <CoursesView theme={theme} role={user.role} />}
-          {canViewTab(user.role, activeTab) && activeTab === 'analytics' && <AnalyticsView theme={theme} />}
-          {canViewTab(user.role, activeTab) && activeTab === 'ai-tutor' && <AITutorView theme={theme} />}
-          {canViewTab(user.role, activeTab) && activeTab === 'assessments' && <AssessmentsView theme={theme} role={user.role} />}
-          {canViewTab(user.role, activeTab) && activeTab === 'certificates' && (
-            <CertificatesView theme={theme} initialVerifyFolio={verifyFolio ?? undefined} />
-          )}
-          {canViewTab(user.role, activeTab) && activeTab === 'neural-inspector' && <NeuralInspectorView theme={theme} />}
-          {canViewTab(user.role, activeTab) && activeTab === 'governance' && <AdminGovernanceView theme={theme} role={user.role} />}
-          {canViewTab(user.role, activeTab) && activeTab === 'settings' && (
-            <SettingsView
-              currentTheme={theme}
-              onThemeChange={handleThemeChange}
-              role={user.role}
-              actor={user.name}
-            />
-          )}
+          <Suspense fallback={(
+            <div className={`p-6 rounded-2xl border text-xs animate-pulse ${
+              isLight ? 'bg-white border-slate-200 text-slate-500' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-400' : 'glass-panel border-edumaster-cardBorder text-slate-400'
+            }`}>
+              Cargando módulo...
+            </div>
+          )}>
+            {canViewTab(user.role, activeTab) && activeTab === 'learning-paths' && <LearningPathsView theme={theme} />}
+            {canViewTab(user.role, activeTab) && activeTab === 'courses' && <CoursesView theme={theme} role={user.role} />}
+            {canViewTab(user.role, activeTab) && activeTab === 'analytics' && <AnalyticsView theme={theme} />}
+            {canViewTab(user.role, activeTab) && activeTab === 'ai-tutor' && <AITutorView theme={theme} />}
+            {canViewTab(user.role, activeTab) && activeTab === 'assessments' && <AssessmentsView theme={theme} role={user.role} />}
+            {canViewTab(user.role, activeTab) && activeTab === 'certificates' && (
+              <CertificatesView theme={theme} initialVerifyFolio={verifyFolio ?? undefined} />
+            )}
+            {canViewTab(user.role, activeTab) && activeTab === 'neural-inspector' && <NeuralInspectorView theme={theme} />}
+            {canViewTab(user.role, activeTab) && activeTab === 'governance' && <AdminGovernanceView theme={theme} role={user.role} />}
+            {canViewTab(user.role, activeTab) && activeTab === 'settings' && (
+              <SettingsView
+                currentTheme={theme}
+                onThemeChange={handleThemeChange}
+                role={user.role}
+                actor={user.name}
+              />
+            )}
 
-          {/* Community Tab: vista funcional con hilos, mensajes y moderación */}
-          {canViewTab(user.role, activeTab) && activeTab === 'community' && (
-            <CommunityView theme={theme} role={user.role} actor={user.name} />
-          )}
+            {/* Community Tab: vista funcional con hilos, mensajes y moderación */}
+            {canViewTab(user.role, activeTab) && activeTab === 'community' && (
+              <CommunityView theme={theme} role={user.role} actor={user.name} />
+            )}
+          </Suspense>
         </main>
       </div>
 

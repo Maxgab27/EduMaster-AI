@@ -12,7 +12,7 @@ import {
   ArrowLeft,
 } from 'lucide-react';
 import type { ApiMeta, CertificateRecord, CertificateVerification, ThemeMode } from '../../types';
-import { isDemoMode } from '../../services/apiClient';
+import { friendlyApiError, isDemoMode } from '../../services/apiClient';
 import { listCertificates, verifyCertificate } from '../../services/certificatesApi';
 import { writeAudit } from '../../services/auditSink';
 
@@ -55,7 +55,7 @@ export const CertificatesView: React.FC<CertificatesViewProps> = ({
       })
       .catch(err => {
         if (err instanceof DOMException && err.name === 'AbortError') return;
-        setError(err instanceof Error ? err.message : 'No se pudo cargar el registro de certificados');
+        setError(friendlyApiError(err));
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
@@ -79,7 +79,7 @@ export const CertificatesView: React.FC<CertificatesViewProps> = ({
         });
       }
     } catch (err) {
-      setNotice(err instanceof Error ? err.message : 'No se pudo verificar el folio');
+      setNotice(friendlyApiError(err));
     } finally {
       setVerifying(false);
     }
@@ -449,6 +449,7 @@ export const CertificateReceiptView: React.FC<CertificateReceiptViewProps> = ({
   const [cert, setCert] = useState<CertificateRecord | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -459,11 +460,11 @@ export const CertificateReceiptView: React.FC<CertificateReceiptViewProps> = ({
       })
       .catch(err => {
         if (err instanceof DOMException && err.name === 'AbortError') return;
-        setError(err instanceof Error ? err.message : 'No se pudo cargar el comprobante');
+        setError(friendlyApiError(err));
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [folio]);
+  }, [folio, reloadKey]);
 
   const goBack = () => {
     const url = new URL(window.location.href);
@@ -483,6 +484,14 @@ export const CertificateReceiptView: React.FC<CertificateReceiptViewProps> = ({
     return (
       <div data-theme={theme} className="min-h-screen flex flex-col items-center justify-center gap-4 bg-edumaster-ambient p-6 text-center">
         <p className="text-sm text-rose-300 m-0">{error ?? `No se encontró el folio ${folio}.`}</p>
+        {error ? (
+          <button
+            onClick={() => { setError(null); setLoading(true); setReloadKey(key => key + 1); }}
+            className="px-4 py-2 rounded-xl bg-white text-slate-900 text-xs font-bold"
+          >
+            Reintentar
+          </button>
+        ) : null}
         <button onClick={goBack} className="px-4 py-2 rounded-xl border border-white/20 text-xs font-bold">
           Volver a la aplicación
         </button>

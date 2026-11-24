@@ -328,6 +328,8 @@ Reinicia el frontend. `VITE_API_BASE_URL` se deja vacío: el resto de la app sig
 
 Para probar desde el celular ZTE en la misma Wi-Fi: abre `http://192.168.18.36:5173` en la PC, entra a **Certificados**, pulsa **Ver QR / Folio** y escanea con la cámara. El QR codifica esa IP, no `127.0.0.1`, y la verificación llama a `http://192.168.18.36:8000`. En el celular, el menú lateral se abre con el botón hamburger y el modal del QR ofrece **“Abrir comprobante (celular)”**, que muestra una página simple con **“Guardar como PDF”**. Para un despliegue público en Railway, sigue la guía corta de `RAILWAY.md`: sin `VITE_PUBLIC_ORIGIN`, el QR usa automáticamente la URL pública del frontend.
 
+**Mejoras recientes:** las vistas secundarias se cargan bajo demanda (`React.lazy`), por lo que el chunk inicial bajó de 580.79 kB a 465.45 kB y ya no aparece el aviso de tamaño. El drawer móvil es accesible por teclado: `aria-expanded`/`aria-controls`, `role="dialog"` en móvil, cierre con `Escape`, foco atrapado y retorno al hamburger. Si la API falla, la UI distingue “sin conexión”, “formato inválido” y “configuración faltante” con mensajes claros; el comprobante ofrece **“Reintentar”**. Detalle y evidencia en `FUNCIONALIDADES_Y_MEJORAS.md` §10.
+
 ---
 
 ## 7. Verificación de Calidad y Compilación
