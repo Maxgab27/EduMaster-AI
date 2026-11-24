@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -23,25 +23,34 @@ async def submit_teacher_grade(
     SOP 70-75 (Principio de Autoridad Docente):
     El docente oficializa y firma la calificación evaluada en el SpeedGrader.
     Se sella con hash SHA-256 inmutable en audit_logs bajo la Ley 29733.
+
+    Modo DEMO: X-Actor/X-Role son opcionales. Si no viene X-Actor se usa el
+    teacher_id del body y se registra actor_source=body_unverified. Esto hace
+    visible la limitación; NO es autenticación real.
     """
     client_ip = request.client.host if request.client else "127.0.0.1"
     now_utc = datetime.now(timezone.utc)
+
+    header_actor = (request.headers.get("x-actor") or "").strip()
+    signed_by = header_actor or payload.teacher_id
+    actor_source = "header" if header_actor else "body_unverified"
 
     # 1. Generar hash criptográfico inmutable de la firma
     audit_data = {
         "submission_id": payload.submission_id,
         "official_score": payload.official_score,
-        "teacher_id": payload.teacher_id,
+        "teacher_id": signed_by,
+        "actor_source": actor_source,
         "feedback_length": len(payload.teacher_feedback),
         "rubric_scores": payload.rubric_scores,
         "timestamp": now_utc.isoformat(),
-        "ip_address": client_ip
+        "ip_address": client_ip,
     }
     signature_hash = hash_audit_payload(audit_data)
 
     # 2. Registrar en la tabla inmutable audit_logs
     audit_entry = AuditLogModel(
-        user_id=payload.teacher_id,
+        user_id=signed_by,
         user_role="docente",
         action="OFFICIAL_GRADE_SIGN",
         resource=f"submission:{payload.submission_id}",
@@ -61,7 +70,7 @@ async def submit_teacher_grade(
         submission.official_score = payload.official_score
         submission.teacher_feedback = payload.teacher_feedback
         submission.rubric_scores_json = json.dumps(payload.rubric_scores)
-        submission.signed_by_teacher_id = payload.teacher_id
+        submission.signed_by_teacher_id = signed_by
         submission.signature_hash = signature_hash
         submission.status = "FIRMADO"
         submission.signed_at = now_utc
@@ -76,7 +85,7 @@ async def submit_teacher_grade(
             official_score=payload.official_score,
             teacher_feedback=payload.teacher_feedback,
             rubric_scores_json=json.dumps(payload.rubric_scores),
-            signed_by_teacher_id=payload.teacher_id,
+            signed_by_teacher_id=signed_by,
             signature_hash=signature_hash,
             status="FIRMADO",
             signed_at=now_utc
@@ -90,7 +99,8 @@ async def submit_teacher_grade(
         submission_id=payload.submission_id,
         official_score=payload.official_score,
         signature_hash=signature_hash,
-        signed_by=payload.teacher_id,
+        signed_by=signed_by,
+        actor_source=actor_source,
         signed_at=now_utc.isoformat(),
         audit_log_id=audit_entry.id,
         message="Calificación oficial firmada y registrada exitosamente en audit_logs bajo la Ley 29733."

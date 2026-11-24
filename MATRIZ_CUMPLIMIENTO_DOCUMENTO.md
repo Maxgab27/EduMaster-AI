@@ -62,7 +62,9 @@ Fuentes:
 
 ## 3. Evidencia de pruebas (2026-11-23)
 
-- Backend: **25/25** comprobaciones HTTP pasaron.
+- Backend: **34/34** comprobaciones HTTP pasaron (`backend/tests/test_smoke.py`, versionado).
+- `/health` reporta `mode=DEMO`, `engine=numpy-fallback`, `database=sqlite`, `protocol=HTTP/1.1`.
+- Firma: `X-Actor` opcional con `actor_source=header`; sin él, `actor_source=body_unverified` en respuesta y auditoría.
 - Fallback sin torch: `HAS_TORCH=False`, `model=None`, probability `0.7474`, 4 factores → funciona.
 - Frontend: lint 0 errores, build en 4.20 s, 2166 módulos, bundle 546.83 kB / gzip 145.42 kB.
 - Navegador: 0 errores de consola, badge `DATASET DEMO · SIN API` visible.

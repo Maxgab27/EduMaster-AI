@@ -64,6 +64,16 @@ El proyecto se encuentra en un estado funcional avanzado **como frontend base/de
 - El visualizador neural consume los valores reales del endpoint cuando `VITE_API_BASE_URL` apunta a la API; sin él muestra estado DEMO local sin métricas inventadas.
 - Ver `api/README.md` para ejecución local y despliegue en Railway Free.
 
+### 2.3 Backend activo en la sustentación (`backend/`)
+
+- Es el servicio que usa `railway.json` y el que responde en `http://127.0.0.1:8000`.
+- Expone **6 rutas**: `/`, `/health`, `/api/v1/inference/dropout-risk`, `/api/v1/grades/submit`, `/api/v1/audit/logs` y `/api/v1/students/at-risk`.
+- Persistencia: **SQLite local** (`sqlite+aiosqlite:///./edumaster_enterprise.db`). No usa PostgreSQL ni Supabase todavía.
+- Motor de inferencia: detecta Torch si está disponible; si no, usa el **fallback NumPy**. El Dockerfile ya no instala PyTorch.
+- Firmas: hash SHA-256 en `audit_logs`. Si no se envía `X-Actor`, la respuesta marca `actor_source=body_unverified`; **no es autenticación real**.
+- El frontend sigue en **DEMO** mientras `VITE_API_BASE_URL` esté vacío: no llama a este backend por defecto.
+- Evidencia: `backend/tests/test_smoke.py`, `MATRIZ_CUMPLIMIENTO_DOCUMENTO.md` y `PLAN_MEJORA_OBJETIVO.md`.
+
 | Componente / Módulo | Estado | Avance / Descripción Técnica |
 | :--- | :---: | :--- |
 | **Arquitectura de Frontend** | `100% Completo` | React 19 + TypeScript + Vite + Tailwind CSS. Arquitectura modular por componentes y vistas. |

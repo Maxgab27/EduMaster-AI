@@ -162,3 +162,16 @@ Conclusión de pruebas: **lo que existe funciona**. El problema no es que esté 
 - [ ] Queda claro qué backend se está usando y por qué.
 
 **Regla final:** para SENATI 4.º semestre no hace falta "producción". Hace falta que funcione, que se pueda explicar y que no se diga algo que el código no hace.
+
+---
+
+## 7. Mejoras aplicadas después del plan (2026-11-23)
+
+- ✅ **P0-3:** `/health` ahora reporta `mode=DEMO`, `dataset=sintético`, `engine=numpy-fallback`, `database=sqlite` y `protocol=HTTP/1.1`.
+- ✅ **P0-5:** PyTorch eliminado del `backend/Dockerfile`; el fallback NumPy quedó verificado sin torch.
+- ✅ **P0-6:** `start_project.bat` indica que el backend es SQLite sin PyTorch y que el frontend está en DEMO.
+- ◐ **P0-4:** la firma acepta `X-Actor`/`X-Role` opcionales y registra `actor_source` en la respuesta y en `audit_logs`. Sigue sin ser autenticación real.
+- ✅ **P1-7:** smoke test versionado en `backend/tests/test_smoke.py`: **34/34** pruebas pasaron.
+- ✅ README con sección 2.3 que identifica el backend activo y sus 6 rutas.
+
+**Sin tocar a propósito:** Supabase/OIDC, conexión frontend↔backend (`VITE_API_BASE_URL`) y los PDFs del compañero.

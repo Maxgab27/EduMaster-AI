@@ -1,4 +1,5 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -16,6 +17,10 @@ class GradeSubmissionResponse(BaseModel):
     official_score: float
     signature_hash: str
     signed_by: str
+    actor_source: str = Field(
+        default="body_unverified",
+        description="Origen del actor: header (X-Actor) o body_unverified (demo)",
+    )
     signed_at: str
     audit_log_id: str
     message: str

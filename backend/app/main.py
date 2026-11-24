@@ -2,7 +2,6 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.database import init_db
@@ -21,23 +20,24 @@ logger = logging.getLogger("edumaster.api")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Iniciando motor EduMaster.ai Enterprise API...")
+    logger.info("Iniciando API EduMaster.ai (modo DEMO)...")
     try:
         await init_db()
         logger.info("Tablas y esquemas de base de datos verificados exitosamente.")
     except Exception as e:
         logger.error(f"Error inicializando base de datos: {e}")
     yield
-    logger.info("Apagando motor EduMaster.ai Enterprise API.")
+    logger.info("Apagando API EduMaster.ai.")
 
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     description=(
-        "API oficial de EduMaster.ai Enterprise para el Caso de Uso: "
-        "Detección Temprana de Riesgo de Abandono (PyTorch MTL) e Intervención "
-        "Formativa Docente (SpeedGrader Human-in-the-Loop & Ley 29733)."
+        "API del caso de uso EduMaster.ai: Detección de Riesgo de Abandono "
+        "(motor NumPy/Torch según disponibilidad) e Intervención Formativa Docente "
+        "(SpeedGrader con firma SHA-256 y auditoría). "
+        "Demostración académica con datos sintéticos, sin autenticación real."
     ),
     lifespan=lifespan
 )
@@ -65,6 +65,7 @@ async def root():
     return {
         "service": settings.PROJECT_NAME,
         "version": settings.VERSION,
+        "mode": "DEMO",
         "docs": "/docs",
         "health": "/health",
         "case_of_use": "Detección de Abandono Estudiantil & SpeedGrader Docente (Ley 29733)"
