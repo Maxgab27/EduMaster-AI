@@ -47,7 +47,15 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
-    allow_origin_regex=r"https:\/\/.*\.vercel\.app",
+    # Incluye orígenes de la red local (192.168.x.x, 10.x.x.x y 172.16-31.x.x)
+    # para probar el QR de certificados desde un celular en la misma Wi-Fi.
+    allow_origin_regex=(
+        r"(https://.*\.vercel\.app|"
+        r"http://(localhost|127\.0\.0\.1|"
+        r"192\.168\.\d{1,3}\.\d{1,3}|"
+        r"10\.\d{1,3}\.\d{1,3}\.\d{1,3}|"
+        r"172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}):(5173|4173))"
+    ),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

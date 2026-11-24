@@ -81,7 +81,8 @@ El proyecto se encuentra en un estado funcional avanzado **como frontend base/de
 - El QR codifica la URL absoluta `/?verify=<folio>` construida desde `window.location.origin`, por ejemplo `http://127.0.0.1:5173/?verify=EDU-2026-98124`.
 - Al escanearlo, la SPA abre “Certificados” y valida el folio y su hash SHA-256 contra `GET /api/v1/compat/certificates/verify/{folio}`; el evento queda en la auditoría como `certificate.verify`.
 - OpenCV decodificó el PNG a la URL exacta y el navegador mostró “Folio válido · EDU-2026-98124” con **0 errores de consola**.
-- Límite honesto: `127.0.0.1` solo funciona en esta PC. Para escanear desde un celular hay que desplegar el frontend; los registros son sintéticos y el propio mensaje advierte que **no es un certificado oficial**. Ver `FUNCIONALIDADES_Y_MEJORAS.md` §8.
+- Para escanearlo con un celular en la **misma Wi-Fi**: `frontend/.env.local` define `VITE_PUBLIC_ORIGIN=http://192.168.18.36:5173`, Vite y Uvicorn escuchan en `0.0.0.0`, y el cliente HTTP reemplaza `127.0.0.1` por el host de la página. Así el QR y la API apuntan a la PC, no al celular. Si cambia la red, actualiza la IP con `ipconfig`.
+- Límite honesto: fuera de esa Wi-Fi todavía hace falta desplegar. Los registros son sintéticos y el propio mensaje advierte que **no es un certificado oficial**. Ver `FUNCIONALIDADES_Y_MEJORAS.md` §8.
 
 | Componente / Módulo | Estado | Avance / Descripción Técnica |
 | :--- | :---: | :--- |
@@ -260,7 +261,7 @@ El sistema cuenta con un selector de temas en la barra superior con tres variant
 - Cada certificado genera un QR PNG con la URL `/?verify=<folio>`; al escanearlo se abre la vista de certificados con la verificación ya resuelta.
 - El folio y su hash SHA-256 se validan contra `GET /api/v1/compat/certificates/verify/{folio}` en SQLite; los datos son sintéticos y el mensaje lo declara explícitamente.
 - La verificación genera un evento `certificate.verify` en la auditoría con `correlation_id`. Sin API configurada existe un fallback Web Crypto, rotulado como DEMO local.
-- Para escanear desde otro dispositivo es necesario desplegar el frontend: `127.0.0.1` apunta al propio dispositivo, no a esta computadora.
+- Con `VITE_PUBLIC_ORIGIN` apuntando a la IP Wi-Fi de la PC, el QR se escanea desde el celular en la misma red; `127.0.0.1` en el celular apuntaría al propio celular. Fuera de la Wi-Fi sí hace falta desplegar.
 
 ---
 
@@ -321,8 +322,11 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 Luego crea `frontend/.env.local` con:
 ```text
 VITE_CORE_API_BASE_URL=http://127.0.0.1:8000
+VITE_PUBLIC_ORIGIN=http://192.168.18.36:5173
 ```
-Reinicia el frontend. `VITE_API_BASE_URL` se deja vacío: el resto de la app sigue con el adaptador DEMO local y solo el núcleo usa HTTP real. En Windows, usa `npm.cmd` en lugar de `npm`. `start_project.bat` levanta ambos servicios con esta configuración.
+Reinicia el frontend. `VITE_API_BASE_URL` se deja vacío: el resto de la app sigue con el adaptador DEMO local y solo el núcleo usa HTTP real. `VITE_PUBLIC_ORIGIN` es la IP Wi-Fi de la PC; cámbiala si la red asigna otra. En Windows, usa `npm.cmd` en lugar de `npm`. `start_project.bat` levanta ambos servicios en `0.0.0.0` con esta configuración.
+
+Para probar desde el celular ZTE en la misma Wi-Fi: abre `http://192.168.18.36:5173` en la PC, entra a **Certificados**, pulsa **Ver QR / Folio** y escanea con la cámara. El QR codifica esa IP, no `127.0.0.1`, y la verificación llama a `http://192.168.18.36:8000`.
 
 ---
 

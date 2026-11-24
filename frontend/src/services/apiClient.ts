@@ -18,7 +18,16 @@ export function getBaseUrl(): string | null {
 /** Base del núcleo real (riesgo + SpeedGrader + auditoría). Independiente del modo DEMO global. */
 export function getCoreBaseUrl(): string | null {
   const raw = import.meta.env.VITE_CORE_API_BASE_URL;
-  return typeof raw === 'string' && raw.trim() ? raw.trim().replace(/\/$/, '') : null;
+  if (typeof raw !== 'string' || !raw.trim()) return null;
+  const url = new URL(raw.trim());
+  // Si la página se abre desde otra IP (por ejemplo el celular en la misma
+  // Wi-Fi), 127.0.0.1 ya no es la PC: se sustituye por el host de la página.
+  const loopback = ['127.0.0.1', 'localhost', '::1'];
+  const pageHost = typeof window !== 'undefined' ? window.location.hostname : '';
+  if (loopback.includes(url.hostname) && pageHost && !loopback.includes(pageHost)) {
+    url.hostname = pageHost;
+  }
+  return url.toString().replace(/\/$/, '');
 }
 
 export function isDemoMode(): boolean {

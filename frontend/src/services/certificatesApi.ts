@@ -68,7 +68,13 @@ async function sha256(text: string): Promise<string> {
 function absoluteVerificationUrl(cert: CertificateRecord): string {
   const raw = cert.verificationUrl || `/?verify=${encodeURIComponent(cert.folio)}`;
   if (/^https?:\/\//i.test(raw)) return raw;
-  return new URL(raw, window.location.origin).toString();
+  // VITE_PUBLIC_ORIGIN permite que el QR apunte a la IP de la PC aunque la
+  // vista se abra en 127.0.0.1. Útil para escanear desde el celular por Wi-Fi.
+  const configured = import.meta.env.VITE_PUBLIC_ORIGIN;
+  const origin = typeof configured === 'string' && configured.trim()
+    ? configured.trim().replace(/\/$/, '')
+    : window.location.origin;
+  return new URL(raw, origin).toString();
 }
 
 async function withQr(cert: CertificateRecord): Promise<CertificateRecord> {
