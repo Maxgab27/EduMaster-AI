@@ -11,7 +11,7 @@ const LOCAL_WELCOME: TutorMessageData = {
   sender: 'tutor',
   text: 'Hola. Soy el tutor DEMO de EduMaster.ai. Respondo con reglas trazables y señalo fuentes, sin inventar datos institucionales.',
   createdAt: '',
-  confidence: 0.99,
+  confidence: null,
   sources: ['Guardrails DEMO'],
   guardrail: 'Estimación pedagógica, no sustituye al docente.',
 };

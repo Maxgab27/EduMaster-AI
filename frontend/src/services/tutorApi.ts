@@ -10,7 +10,7 @@ const WELCOME: TutorMessageData = {
   sender: 'tutor',
   text: 'Hola. Soy el tutor DEMO de EduMaster.ai. Respondo con reglas trazables y señalo fuentes, sin inventar datos institucionales.',
   createdAt: '2026-11-22T00:00:00Z',
-  confidence: 0.99,
+  confidence: null,
   sources: ['Guardrails DEMO'],
   guardrail: 'Estimación pedagógica, no sustituye al docente.',
 };
@@ -39,7 +39,7 @@ function matchRule(text: string): Rule {
   }
   if (/certificado|folio|qr|nota oficial|calificaci[oó]n/.test(value)) {
     return {
-      text: 'La nota oficial no la emite el modelo: el docente revisa la evidencia y firma. El certificado usa folio único, hash verificable y un QR que apunta al endpoint público de verificación.',
+      text: 'La nota oficial no la emite el modelo: el docente revisa la evidencia y firma. El certificado usa folio único y hash verificable; el QR es ilustrativo porque aún no existe endpoint público de verificación.',
       confidence: 0.93,
       sources: ['Documento §4.10', 'Política human-in-the-loop'],
     };
@@ -58,8 +58,25 @@ function matchRule(text: string): Rule {
   };
 }
 
+const WELCOME_IDS = new Set(['tm-demo-welcome', 'tm-local-welcome']);
+
+/**
+ * Las conversaciones guardadas antes de esta versión traen un `confidence: 0.99`
+ * inventado en el saludo. Se limpia al leer para no mostrar una métrica falsa.
+ */
+function sanitizeWelcome(messages: TutorMessageData[]): TutorMessageData[] {
+  return messages.map(message =>
+    WELCOME_IDS.has(message.id) && message.confidence !== null
+      ? { ...message, confidence: null }
+      : message,
+  );
+}
+
 function readConversations(): Record<string, TutorMessageData[]> {
-  return readSlice<Record<string, TutorMessageData[]>>(CONVERSATIONS_KEY, {});
+  const store = readSlice<Record<string, TutorMessageData[]>>(CONVERSATIONS_KEY, {});
+  return Object.fromEntries(
+    Object.entries(store).map(([id, messages]) => [id, sanitizeWelcome(messages ?? [])]),
+  );
 }
 
 function newId(): string {

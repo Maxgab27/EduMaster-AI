@@ -116,7 +116,7 @@ export const AITutorView: React.FC<AITutorViewProps> = ({ theme = 'monochrome' }
                         <span className={`font-mono flex items-center gap-1 font-bold ${
                           isLight ? 'text-emerald-700' : 'text-emerald-400'
                         }`}>
-                          <ShieldCheck className="w-3 h-3" /> Confianza: {(message.confidence * 100).toFixed(0)}%
+                          <ShieldCheck className="w-3 h-3" /> Peso regla DEMO: {(message.confidence * 100).toFixed(0)}%
                         </span>
                       )}
                       {message.sources && message.sources.length > 0 && (

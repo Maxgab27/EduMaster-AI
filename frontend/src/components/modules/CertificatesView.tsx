@@ -356,7 +356,11 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
               <div className="truncate">Hash SHA-256: {selectedCert.hash}</div>
               <div>Emisión: {formatDate(selectedCert.issuedAt)}</div>
               <div>Nota Oficial: <span className="text-emerald-600 font-bold">{selectedCert.grade}</span></div>
-              <div className="truncate">URL: {selectedCert.verificationUrl}</div>
+              <div className="truncate">
+                {isDemoMode()
+                  ? 'Verificación: DEMO local · sin endpoint público'
+                  : `URL: ${selectedCert.verificationUrl}`}
+              </div>
             </div>
 
             <button

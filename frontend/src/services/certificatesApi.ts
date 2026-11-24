@@ -11,7 +11,7 @@ const DEMO_CERTIFICATES: CertificateRecord[] = [
     grade: '19.4 / 20 (Sobresaliente)',
     hash: '9f83ab412c98d4e7b89f2a01',
     status: 'Emitido',
-    verificationUrl: 'http://127.0.0.1:8000/api/v1/certificates/verify/EDU-2026-98124',
+    verificationUrl: 'demo://verify/EDU-2026-98124',
   },
   {
     id: 'cert-2',
@@ -22,7 +22,7 @@ const DEMO_CERTIFICATES: CertificateRecord[] = [
     grade: '19.8 / 20 (Sobresaliente)',
     hash: '3e41ba980c55f11a88cb7402',
     status: 'Emitido',
-    verificationUrl: 'http://127.0.0.1:8000/api/v1/certificates/verify/EDU-2026-98125',
+    verificationUrl: 'demo://verify/EDU-2026-98125',
   },
   {
     id: 'cert-3',
@@ -33,11 +33,15 @@ const DEMO_CERTIFICATES: CertificateRecord[] = [
     grade: '18.2 / 20 (Notable)',
     hash: '6a11cd980f77e23b99ef8803',
     status: 'Emitido',
-    verificationUrl: 'http://127.0.0.1:8000/api/v1/certificates/verify/EDU-2026-98126',
+    verificationUrl: 'demo://verify/EDU-2026-98126',
   },
 ];
 
-/** QR ilustrativo y determinista para DEMO local; no es scannable. */
+/**
+ * QR ilustrativo y determinista para DEMO local; no es scannable.
+ * El esquema `demo://` es un identificador, no una URL enrutable: aún no existe
+ * endpoint público de verificación en el backend activo.
+ */
 function demoQrSvg(value: string): string {
   let seed = 2166136261;
   for (let i = 0; i < value.length; i += 1) {
@@ -57,7 +61,7 @@ function demoQrSvg(value: string): string {
 }
 
 function withDemoQr(cert: CertificateRecord): CertificateRecord {
-  return { ...cert, qrSvg: cert.qrSvg ?? demoQrSvg(cert.verificationUrl) };
+  return { ...cert, qrSvg: cert.qrSvg ?? demoQrSvg(cert.folio) };
 }
 
 export function listCertificates(signal?: AbortSignal) {

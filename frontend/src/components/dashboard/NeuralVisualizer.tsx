@@ -152,11 +152,11 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
                   : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'
               }`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${isMono ? 'bg-white' : isLight ? 'bg-amber-600' : 'bg-amber-400'}`} />
-                DEMO · SINCRONIZACIÓN SIMULADA
+                DEMO · ANIMACIÓN ILUSTRATIVA
               </span>
             </div>
             <p className="text-[11px] opacity-60 m-0">
-              Red Neuronal Multitarea PyTorch • Fusión Temporal GRU
+              Arquitectura ilustrativa · motor DEMO en NumPy (sin PyTorch)
             </p>
           </div>
         </div>
@@ -174,10 +174,10 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
                     ? 'bg-edumaster-blue/20 border-edumaster-blue text-edumaster-cyan shadow-glowBlue'
                     : 'bg-edumaster-violet/25 border-edumaster-violet text-purple-300 shadow-glowViolet')
             }`}
-            title="Alternar entre propagación de inferencia y retropropagación de gradientes"
+            title="Solo animación: no ejecuta inferencia ni entrenamiento"
           >
             <Zap className="w-3.5 h-3.5" />
-            <span>{mode === 'inferencia' ? 'Inferencia (Forward)' : 'Entrenamiento (Backward)'}</span>
+            <span>{mode === 'inferencia' ? 'Propagación (animada)' : 'Retropropagación (animada)'}</span>
           </button>
 
           <div className={`flex items-center p-0.5 rounded-lg border ${

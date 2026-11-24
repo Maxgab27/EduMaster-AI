@@ -271,7 +271,7 @@ export const AIRecommendationsCard: React.FC<AIRecommendationsCardProps> = ({ th
               <div className={`flex items-center justify-between p-2.5 rounded-xl border text-xs ${
                 isLight ? 'bg-slate-50 border-slate-200' : isMono ? 'bg-[#12141A] border-[#2A2F3D]' : 'bg-black/40 border-white/10'
               }`}>
-                <span className="opacity-60">Nivel de Confianza:</span>
+                <span className="opacity-60">Peso heurística DEMO:</span>
                 <span className="font-mono font-black tabular-numbers">
                   {(selectedRec.confidence * 100).toFixed(1)}%
                 </span>
