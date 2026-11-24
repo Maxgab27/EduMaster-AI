@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>EduMaster.ai - Mejoras Implementadas y Puntos de Mejoría</title>
+<style>
+        @page {
+            size: A4;
+            margin: 18mm 15mm 18mm 15mm;
+            @bottom-right {
+                content: "Página " counter(page);
+                font-family: 'Segoe UI', Arial, sans-serif;
+                font-size: 8pt;
+                color: #64748b;
+                font-weight: 600;
+            }
+            @bottom-left {
+                content: "EDUMASTER.AI | MEJORAS IMPLEMENTADAS Y PUNTOS DE MEJORÍA · KEVIN";
+                font-family: 'Segoe UI', Arial, sans-serif;
+                font-size: 8pt;
+                color: #64748b;
+                font-weight: 700;
+                letter-spacing: 0.5px;
+            }
+        }
+
+        @page:first {
+            margin: 0;
+            @bottom-right { content: normal; }
+            @bottom-left { content: normal; }
+        }
+
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+            color: #0f172a;
+            line-height: 1.5;
+            font-size: 9pt;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Cover Page */
+        .cover-page {
+            page-break-after: always;
+            background: linear-gradient(135deg, #020813 0%, #06152B 45%, #0A2540 100%);
+            color: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 55px 50px;
+            position: relative;
+        }
+
+        .cover-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 20px;
+        }
+
+        .cover-brand {
+            font-size: 20pt;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cover-badge {
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid #0284c7;
+            color: #38bdf8;
+            font-size: 8pt;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cover-title-container {
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .cover-subtitle {
+            font-size: 11pt;
+            color: #38bdf8;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .cover-title {
+            font-size: 26pt;
+            font-weight: 900;
+            line-height: 1.15;
+            margin: 0 0 16px 0;
+            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-desc {
+            font-size: 10.5pt;
+            color: #94a3b8;
+            max-width: 620px;
+            line-height: 1.6;
+        }
+
+        .cover-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 18px 22px;
+            border-radius: 14px;
+        }
+
+        .cover-meta-item strong {
+            display: block;
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #38bdf8;
+            margin-bottom: 3px;
+        }
+
+        .cover-meta-item span {
+            font-size: 9.5pt;
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .cover-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding-top: 16px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 8pt;
+            color: #64748b;
+        }
+
+        /* Content Styling */
+        .page {
+            page-break-after: always;
+            padding-top: 5px;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        h1, h2, h3, h4 {
+            color: #0A1F3D;
+            font-weight: 800;
+            margin-top: 0;
+        }
+
+        h1 {
+            font-size: 16pt;
+            border-bottom: 2px solid #0284c7;
+            padding-bottom: 6px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        h1 .section-tag {
+            font-size: 8pt;
+            font-weight: 700;
+            color: #0284c7;
+            background: #e0f2fe;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h2 {
+            font-size: 12pt;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            color: #0f172a;
+            border-left: 3.5px solid #0284c7;
+            padding-left: 8px;
+        }
+
+        h3 {
+            font-size: 10pt;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            color: #1e293b;
+        }
+
+        p {
+            margin-top: 0;
+            margin-bottom: 8px;
+            color: #334155;
+            text-align: justify;
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .kpi-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 10px 12px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #0284c7;
+        }
+
+        .kpi-card.emerald::before { background: #059669; }
+        .kpi-card.purple::before { background: #7c3aed; }
+        .kpi-card.amber::before { background: #d97706; }
+
+        .kpi-num {
+            font-size: 15pt;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.1;
+            margin-bottom: 2px;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .kpi-title {
+            font-size: 7.5pt;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-sub {
+            font-size: 7.5pt;
+            color: #059669;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* Feature Detailed Box */
+        .feature-box {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            page-break-inside: avoid;
+        }
+
+        .feature-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .feature-title {
+            font-size: 10pt;
+            font-weight: 800;
+            color: #0A1F3D;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feature-badge {
+            font-size: 7.5pt;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-cyan { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .badge-emerald { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .badge-amber { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+        .badge-purple { background: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr 1.1fr;
+            gap: 10px;
+            font-size: 8.5pt;
+        }
+
+        .feature-col {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 8px 10px;
+        }
+
+        .feature-col-title {
+            font-size: 7.5pt;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .col-what { color: #0284c7; }
+        .col-why { color: #b45309; }
+        .col-utility { color: #15803d; }
+
+        .feature-col p {
+            font-size: 8.2pt;
+            line-height: 1.45;
+            color: #334155;
+            margin: 0;
+            text-align: left;
+        }
+
+        /* Matrix Table */
+        table.matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.2pt;
+            margin-bottom: 12px;
+            page-break-inside: avoid;
+        }
+
+        table.matrix-table th {
+            background: #0A1F3D;
+            color: #ffffff;
+            font-weight: 700;
+            text-align: left;
+            padding: 7px 9px;
+            border: 1px solid #0A1F3D;
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        table.matrix-table td {
+            padding: 7px 9px;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            vertical-align: top;
+        }
+
+        table.matrix-table tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        table.matrix-table strong {
+            color: #0f172a;
+        }
+
+        /* Callout Box */
+        .callout {
+            border-left: 4px solid #0284c7;
+            background: #f0f9ff;
+            padding: 10px 12px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 12px;
+            font-size: 8.5pt;
+            color: #0369a1;
+            page-break-inside: avoid;
+        }
+
+        .callout-title {
+            font-weight: 800;
+            font-size: 9pt;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .callout p {
+            margin: 0;
+            color: #0c4a6e;
+            font-size: 8.2pt;
+        }
+
+        .callout.amber {
+            border-left-color: #d97706;
+            background: #fffbeb;
+            color: #92400e;
+        }
+        .callout.amber p { color: #78350f; }
+
+        .callout.emerald {
+            border-left-color: #059669;
+            background: #ecfdf5;
+            color: #065f46;
+        }
+        .callout.emerald p { color: #064e3b; }
+
+        /* Sign-off Table */
+        .signoff-table {
+            width: 100%;
+            margin-top: 25px;
+            border-collapse: collapse;
+            page-break-inside: avoid;
+        }
+
+        .signoff-table td {
+            width: 50%;
+            padding: 15px 25px;
+            text-align: center;
+            vertical-align: top;
+        }
+
+        .sign-line {
+            border-top: 1.5px solid #64748b;
+            padding-top: 8px;
+            font-size: 8.5pt;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .sign-title {
+            font-size: 7.5pt;
+            color: #64748b;
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        .badge-pill {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 7pt;
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        .badge-green { background: #dcfce7; color: #166534; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-purple { background: #f3e8ff; color: #6b21a8; }
+    </style>
+        <style>
+            code {
+                font-family: 'Consolas', 'Courier New', monospace;
+                background: #f1f5f9;
+                border: 1px solid #e2e8f0;
+                border-radius: 3px;
+                padding: 0 3px;
+                font-size: 7.6pt;
+                color: #0f172a;
+            }
+            .matrix-table td code { white-space: nowrap; }
+            table.matrix-table { font-size: 7.7pt; margin-bottom: 9px; }
+            table.matrix-table th { padding: 5px 7px; }
+            table.matrix-table td { padding: 5px 7px; }
+            .callout { padding: 8px 10px; margin-bottom: 9px; }
+            .kpi-grid { margin-bottom: 10px; }
+            h2 { margin-top: 12px; }
+        </style>
+
+</head>
+
+<body>
+
+    <!-- PORTADA -->
+    <div class="cover-page">
+        <div class="cover-top">
+            <div class="cover-brand">
+                <span>🎓 EduMaster.ai</span>
+                <span style="font-size: 11pt; font-weight: 400; opacity: 0.7;">Plataforma de Aprendizaje · SENATI</span>
+            </div>
+            <div class="cover-badge">INFORME ACADÉMICO • v1.0 • DEMO</div>
+        </div>
+
+        <div class="cover-title-container">
+            <div class="cover-subtitle">MEJORAS IMPLEMENTADAS · EVIDENCIA · PUNTOS DE MEJORÍA</div>
+            <h1 class="cover-title">Informe de Mejoras Implementadas y Puntos de Mejoría Pendientes</h1>
+            <p class="cover-desc">
+                Documento elaborado por Kevin que consolida las mejoras de vista móvil, comprobante de certificados
+                y preparación del QR para un despliegue público. Presenta evidencia verificable y una hoja de ruta
+                de mejoría continua para el proyecto EduMaster.ai.
+            </p>
+        </div>
+
+        <div class="cover-meta-grid">
+            <div class="cover-meta-item">
+                <strong>Autor de las mejoras</strong>
+                <span>Kevin (@sanhuezazetakevin)</span>
+            </div>
+            <div class="cover-meta-item">
+                <strong>Institución & Carrera</strong>
+                <span>SENATI • 4.º semestre • Ing. de Software con IA</span>
+            </div>
+            <div class="cover-meta-item">
+                <strong>Repositorio del proyecto</strong>
+                <span>https://github.com/Maxgab27/EduMaster-AI</span>
+            </div>
+            <div class="cover-meta-item">
+                <strong>Métricas de validación</strong>
+                <span>Lint 0 • Build OK • Smoke 34/34 • 0 errores de consola</span>
+            </div>
+        </div>
+
+        <div class="cover-footer">
+            <span>© 2026 EduMaster.ai — Documento académico DEMO con datos sintéticos.</span>
+            <span>Elaborado por Kevin · 24 de noviembre de 2026</span>
+        </div>
+    </div>
+
+    <!-- PÁGINA 1: RESUMEN Y MATRIZ DE MEJORAS IMPLEMENTADAS -->
+    <div class="page">
+        <h1>
+            <span>1. Resumen Ejecutivo y Mejoras Implementadas</span>
+            <span class="section-tag">Auditoría Global</span>
+        </h1>
+
+        <p>
+            Este informe documenta las intervenciones realizadas sobre el proyecto <strong>EduMaster.ai</strong>
+            durante la entrega correspondiente al 24 de noviembre de 2026. El objetivo fue doble: que la interfaz
+            fuera realmente usable en el celular ZTE Axon 50 5G y que el QR de certificados dejara de ser un
+            adorno para convertirse en un enlace verificable, tanto en la Wi-Fi local como en un futuro
+            despliegue público. Todo se realizó conservando la etiqueta <strong>DEMO</strong> y la advertencia
+            de que los certificados son sintéticos y no oficiales.
+        </p>
+
+        <div class="kpi-grid">
+            <div class="kpi-card emerald">
+                <div class="kpi-num">390 px</div>
+                <div class="kpi-title">Vista móvil validada</div>
+                <div class="kpi-sub">Sin desbordamiento horizontal</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-num">34/34</div>
+                <div class="kpi-title">Smoke test del backend</div>
+                <div class="kpi-sub">6 rutas originales intactas</div>
+            </div>
+            <div class="kpi-card purple">
+                <div class="kpi-num">QR real</div>
+                <div class="kpi-title">Verificación por HTTP</div>
+                <div class="kpi-sub">Hash SHA-256 en SQLite</div>
+            </div>
+            <div class="kpi-card amber">
+                <div class="kpi-num">0</div>
+                <div class="kpi-title">Errores de consola</div>
+                <div class="kpi-sub">Lint y build sin fallos</div>
+            </div>
+        </div>
+
+        <h2>1.1 Matriz de mejoras implementadas</h2>
+        <table class="matrix-table">
+            <thead>
+                <tr>
+                    <th style="width: 22%;">Componente / Módulo</th>
+                    <th style="width: 31%;">¿Qué se añadió o modificó?</th>
+                    <th style="width: 23%;">¿Por qué se hizo?</th>
+                    <th style="width: 24%;">Utilidad y beneficio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>App.tsx · Sidebar.tsx · Topbar.tsx</strong><br><span class="badge-pill badge-blue">Responsive</span></td>
+                    <td>Sidebar como drawer con botón hamburger, overlay y cierre al elegir una sección; topbar simplificada.</td>
+                    <td>En una pantalla de 390 px la columna lateral fija ocupaba casi toda la vista.</td>
+                    <td>Navegación con una mano y acceso rápido a Certificados desde el celular.</td>
+                </tr>
+                <tr>
+                    <td><strong>CertificatesView.tsx (modal)</strong><br><span class="badge-pill badge-purple">QR</span></td>
+                    <td>Modal con <code>max-h-[92dvh]</code>, scroll interno, QR de 128 px y URL con <code>break-all</code>.</td>
+                    <td>El modal se salía de la pantalla y el texto largo provocaba desplazamiento horizontal.</td>
+                    <td>Ver folio, hash y URL sin hacer zoom ni perder el botón de acción.</td>
+                </tr>
+                <tr>
+                    <td><strong>CertificateReceiptView</strong><br><span class="badge-pill badge-green">Comprobante</span></td>
+                    <td>Ruta <code>?receipt=&lt;folio&gt;</code> con botones “Volver” y “Guardar como PDF”.</td>
+                    <td>Los navegadores móviles bloquean <code>window.open</code> y las descargas automáticas.</td>
+                    <td>El comprobante llega al celular como una página normal, lista para imprimir o guardar.</td>
+                </tr>
+                <tr>
+                    <td><strong>certificatesApi.ts</strong><br><span class="badge-pill badge-blue">QR público</span></td>
+                    <td>QR PNG que codifica <code>?verify=&lt;folio&gt;</code>; usa <code>VITE_PUBLIC_ORIGIN</code> en local y <code>location.origin</code> en Railway.</td>
+                    <td>Un QR con JSON o con <code>127.0.0.1</code> no abre nada útil desde el celular.</td>
+                    <td>Al escanear se abre la verificación real en la misma dirección que ve el usuario.</td>
+                </tr>
+                <tr>
+                    <td><strong>apiClient.ts · backend/main.py</strong><br><span class="badge-pill badge-green">CORS</span></td>
+                    <td>Rewrite de API solo para hosts IP privados y CORS para LAN, Vercel y <code>*.railway.app</code>.</td>
+                    <td>La API quedaba inalcanzable desde otro dispositivo y fallaba al publicar.</td>
+                    <td>Verificación funcional en Wi-Fi y preparada para el enlace público.</td>
+                </tr>
+                <tr>
+                    <td><strong>Endpoint verify + auditoría</strong><br><span class="badge-pill badge-purple">Backend</span></td>
+                    <td>Hash SHA-256 canónico contrastado en SQLite y eventos <code>certificate.verify</code> / <code>certificate.receipt_open</code>.</td>
+                    <td>La verificación anterior no comprobaba el contenido contra una fuente real.</td>
+                    <td>Trazabilidad de cada escaneo y del comprobante abierto, sin secretos involucrados.</td>
+                </tr>
+                <tr>
+                    <td><strong>README.md · RAILWAY.md · FUNCIONALIDADES_Y_MEJORAS.md</strong><br><span class="badge-pill badge-green">Documentación</span></td>
+                    <td>Guía corta de Wi-Fi, guía de publicación y actualización del inventario con la sección §9.</td>
+                    <td>Los pasos para probar y publicar no estaban centralizados.</td>
+                    <td>Otro integrante puede repetir la prueba sin depender de explicaciones verbales.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="callout emerald">
+            <div class="callout-title">Criterio rector: “Lo escaneable y lo imprimible manda”</div>
+            <p>
+                Cada decisión se evaluó desde el celular real: si el QR no abre, si el modal no cabe o si el
+                comprobante no se puede guardar, la mejora no está terminada. Por eso se prefirió una ruta real
+                de la SPA antes que ventanas emergentes o descargas forzadas.
+            </p>
+        </div>
+    </div>
+
+    <!-- PÁGINA 2: EVIDENCIA -->
+    <div class="page">
+        <h1>
+            <span>2. Evidencia Verificable de las Mejoras</span>
+            <span class="section-tag">Pruebas</span>
+        </h1>
+
+        <p>
+            Las mejoras no quedaron solo en el código: se ejecutaron pruebas automáticas y manuales sobre el
+            navegador y sobre el backend activo. La tabla siguiente resume el comando o acción, el resultado
+            observado y lo que demuestra cada evidencia.
+        </p>
+
+        <table class="matrix-table">
+            <thead>
+                <tr>
+                    <th style="width: 28%;">Prueba / Comando</th>
+                    <th style="width: 38%;">Resultado observado</th>
+                    <th style="width: 34%;">Qué demuestra</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>npm.cmd run lint</code></td>
+                    <td>Oxlint terminó sin hallazgos.</td>
+                    <td>El código respeta las reglas del proyecto.</td>
+                </tr>
+                <tr>
+                    <td><code>npm.cmd run build</code></td>
+                    <td><code>tsc -b</code> y Vite compilaron 2195 módulos; único aviso: chunk de 578 kB.</td>
+                    <td>TypeScript y el empaquetado están correctos; el tamaño se registra como mejora pendiente.</td>
+                </tr>
+                <tr>
+                    <td><code>python backend/tests/test_smoke.py</code></td>
+                    <td><strong>34/34 PASS</strong>. Se conservan las 6 rutas originales y se expone <code>/compat</code>.</td>
+                    <td>El contrato previo no se rompió al añadir certificados.</td>
+                </tr>
+                <tr>
+                    <td>Decodificación del QR con OpenCV</td>
+                    <td><code>http://192.168.18.36:5173/?verify=EDU-2026-98124</code></td>
+                    <td>El PNG generado contiene la URL correcta, no un JSON ilegible.</td>
+                </tr>
+                <tr>
+                    <td>Navegador a 390 px</td>
+                    <td><code>scrollWidth = 390</code>; drawer pasa de −288 px a 0 px; QR de 128 px; 0 errores de consola.</td>
+                    <td>La vista móvil es usable y no hay desbordamiento.</td>
+                </tr>
+                <tr>
+                    <td>Flujo del comprobante</td>
+                    <td><code>?receipt=EDU-2026-98124</code> mostró QR, hash <code>6f5f33d8…</code>, “Volver” y “Guardar como PDF”.</td>
+                    <td>El celular recibe el comprobante sin popup ni descarga bloqueada.</td>
+                </tr>
+                <tr>
+                    <td>CORS simulado</td>
+                    <td><code>Access-Control-Allow-Origin</code> para la IP Wi-Fi y para <code>*.up.railway.app</code>; sin header para <code>example.com</code>.</td>
+                    <td>El backend admite el celular local y el futuro dominio público sin abrir CORS a cualquiera.</td>
+                </tr>
+                <tr>
+                    <td>Build sin <code>.env.local</code></td>
+                    <td>El bundle no contiene <code>192.168.18.36</code> y usa <code>location.origin</code>.</td>
+                    <td>En Railway el QR tomará automáticamente la URL pública del frontend.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>2.1 Trazabilidad registrada</h2>
+        <p>
+            Durante las pruebas se observaron eventos de auditoría <code>certificate.verify</code> y
+            <code>certificate.receipt_open</code> en el endpoint <code>/api/v1/compat/audit/logs</code>.
+            La cabecera <code>X-Actor</code> sigue siendo opcional: cuando no se envía, el sistema no finge
+            una identidad. Esto se menciona de forma explícita porque forma parte de los puntos de mejoría.
+        </p>
+
+        <div class="callout">
+            <div class="callout-title">Commit de cierre de esta entrega</div>
+            <p><code>1d17191 feat: improve mobile view and prepare public QR for Railway</code></p>
+        </div>
+    </div>
+
+    <!-- PÁGINA 3: PUNTOS DE MEJORÍA -->
+    <div class="page">
+        <h1>
+            <span>3. Puntos de Mejoría Pendientes</span>
+            <span class="section-tag">Hoja de ruta</span>
+        </h1>
+
+        <p>
+            Las mejoras implementadas resuelven el problema inmediato del celular y del QR, pero el proyecto
+            aún tiene deudas conscientes. La siguiente tabla las prioriza con un criterio académico: primero lo
+            que habilita el uso real fuera de la Wi-Fi, después lo que da identidad y seguridad, y finalmente
+            lo que mejora calidad y mantenimiento.
+        </p>
+
+        <table class="matrix-table">
+            <thead>
+                <tr>
+                    <th style="width: 8%;">ID</th>
+                    <th style="width: 30%;">Mejoría propuesta</th>
+                    <th style="width: 10%;">Prioridad</th>
+                    <th style="width: 24%;">Impacto esperado</th>
+                    <th style="width: 28%;">Paso sugerido</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>M-01</td>
+                    <td><strong>Publicar backend y frontend en Railway</strong></td>
+                    <td><span class="badge-pill badge-blue">P1</span></td>
+                    <td>El QR funciona fuera de la Wi-Fi y puede compartirse por WhatsApp o correo.</td>
+                    <td>Definir <code>VITE_CORE_API_BASE_URL</code> con la URL real; dejar <code>VITE_PUBLIC_ORIGIN</code> sin definir.</td>
+                </tr>
+                <tr>
+                    <td>M-02</td>
+                    <td><strong>Supabase + OIDC + RLS</strong></td>
+                    <td><span class="badge-pill badge-blue">P1</span></td>
+                    <td>Identidad real, permisos por rol y datos autorizados en lugar de <code>localStorage</code>.</td>
+                    <td>Diseñar el contrato de usuario y configurar proveedor; sin compartir secretos en el repo.</td>
+                </tr>
+                <tr>
+                    <td>M-03</td>
+                    <td><strong>Dividir el bundle mayor a 500 kB</strong></td>
+                    <td><span class="badge-pill badge-blue">P1</span></td>
+                    <td>Carga más rápida en celulares con datos móviles.</td>
+                    <td>Aplicar <code>import()</code> dinámico en módulos pesados y revisar <code>codeSplitting</code>.</td>
+                </tr>
+                <tr>
+                    <td>M-04</td>
+                    <td><strong>Pruebas E2E del flujo QR</strong></td>
+                    <td><span class="badge-pill badge-purple">P2</span></td>
+                    <td>Evita que una futura mejora rompa escaneo, verificación o comprobante.</td>
+                    <td>Automatizar con Playwright: escanear → verificar → abrir comprobante → guardar PDF.</td>
+                </tr>
+                <tr>
+                    <td>M-05</td>
+                    <td><strong>Accesibilidad del drawer</strong></td>
+                    <td><span class="badge-pill badge-purple">P2</span></td>
+                    <td>Navegación por teclado y lector de pantalla.</td>
+                    <td>Añadir <code>aria-expanded</code>, cierre con <code>Escape</code> y manejo de foco.</td>
+                </tr>
+                <tr>
+                    <td>M-06</td>
+                    <td><strong>Estados offline y de error claros</strong></td>
+                    <td><span class="badge-pill badge-purple">P2</span></td>
+                    <td>El usuario entiende por qué no aparece el comprobante si la API falla.</td>
+                    <td>Diferenciar “folio no encontrado” de “sin conexión con la API”.</td>
+                </tr>
+                <tr>
+                    <td>M-07</td>
+                    <td><strong>Actor autenticado en auditoría</strong></td>
+                    <td><span class="badge-pill badge-green">P3</span></td>
+                    <td>Trazabilidad con identidad verificable en cada evento.</td>
+                    <td>Sustituir <code>X-Actor</code> opcional por el usuario de la sesión OIDC.</td>
+                </tr>
+                <tr>
+                    <td>M-08</td>
+                    <td><strong>Métricas medidas, no constantes</strong></td>
+                    <td><span class="badge-pill badge-green">P3</span></td>
+                    <td>Evita presentar <code>0.94</code>, PR-AUC <code>0.914</code> o Brier <code>0.082</code> como resultados reales.</td>
+                    <td>Calcular métricas desde el dataset sintético y mostrarlas con su procedencia.</td>
+                </tr>
+                <tr>
+                    <td>M-09</td>
+                    <td><strong>Capacitación y material impreso</strong></td>
+                    <td><span class="badge-pill badge-green">P3</span></td>
+                    <td>Otros integrantes pueden reproducir la prueba sin ayuda.</td>
+                    <td>Convertir <code>RAILWAY.md</code> en una guía de una página con capturas del flujo móvil.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="callout amber">
+            <div class="callout-title">Prioridad inmediata</div>
+            <p>
+                M-01 depende de las URLs y la cuenta de Railway del usuario; M-02 depende de una decisión de
+                contrato y de credenciales. Ninguno de los dos se ejecutó en esta entrega y no se compartió
+                ningún secreto.
+            </p>
+        </div>
+    </div>
+
+    <!-- PÁGINA 4: VALOR, LÍMITES Y CIERRE -->
+    <div class="page">
+        <h1>
+            <span>4. Valor por Perfil y Límites Honestos</span>
+            <span class="section-tag">Cierre</span>
+        </h1>
+
+        <table class="matrix-table">
+            <thead>
+                <tr>
+                    <th style="width: 20%;">Perfil</th>
+                    <th style="width: 42%;">Mejoría que recibe</th>
+                    <th style="width: 38%;">Situación de uso</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Estudiante</strong></td>
+                    <td>Menú lateral accesible y comprobante de certificado en pantalla.</td>
+                    <td>Puede abrir el QR desde su celular y guardar el comprobante sin instalar nada.</td>
+                </tr>
+                <tr>
+                    <td><strong>Docente</strong></td>
+                    <td>Verificación por folio con hash y fecha visible.</td>
+                    <td>Revisa un certificado DEMO sin depender de una captura de pantalla.</td>
+                </tr>
+                <tr>
+                    <td><strong>Administrador</strong></td>
+                    <td>CORS controlado y ruta de publicación documentada.</td>
+                    <td>Cuenta con una guía corta para publicar sin exponer secretos.</td>
+                </tr>
+                <tr>
+                    <td><strong>QA / Desarrollador</strong></td>
+                    <td>Smoke 34/34, evidencia de QR decodificado y puntos de mejoría priorizados.</td>
+                    <td>Tiene criterios objetivos para aceptar o rechazar la siguiente entrega.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="callout amber">
+            <div class="callout-title">Límites honestos de esta entrega</div>
+            <p>
+                Los datos, certificados y comprobantes son <strong>DEMO</strong> y sintéticos; no equivalen a un
+                documento oficial. <code>127.0.0.1</code> en un celular apunta al propio celular, por eso el QR
+                local usa la IP de la PC. Si cambia la red, debe actualizarse <code>VITE_PUBLIC_ORIGIN</code>.
+                Supabase/OIDC siguen pendientes y las métricas de confianza mostradas en la interfaz son
+                constantes ilustrativas, no mediciones.
+            </p>
+        </div>
+
+        <h2>4.1 Conclusión</h2>
+        <p>
+            Las mejoras quedan validadas en el entorno local y listas para el siguiente paso: la publicación
+            con URLs reales. El valor concreto de esta entrega es que el celular ya no es un obstáculo para
+            probar el proyecto y que el QR dejó de ser decorativo. Los puntos M-01 a M-09 son deudas
+            explícitas, no sorpresas ocultas, y están priorizadas para continuar el trabajo en el aula.
+        </p>
+
+        <table class="signoff-table">
+            <tr>
+                <td>
+                    <div class="sign-line">
+                        Kevin<br>
+                        Autor de las mejoras de vista móvil, QR y comprobante
+                    </div>
+                    <div class="sign-title">SENATI · 4.º semestre · Ingeniería de Software con IA</div>
+                </td>
+                <td>
+                    <div class="sign-line">
+                        Validación académica<br>
+                        Entrega DEMO con evidencia verificable
+                    </div>
+                    <div class="sign-title">Pendiente: publicación pública y autenticación real</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</body>
+</html>
