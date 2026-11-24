@@ -14,7 +14,7 @@ import { AnalyticsView } from './components/modules/AnalyticsView';
 import { AITutorView } from './components/modules/AITutorView';
 import { CommunityView } from './components/modules/CommunityView';
 import { AssessmentsView } from './components/modules/AssessmentsView';
-import { CertificatesView } from './components/modules/CertificatesView';
+import { CertificatesView, CertificateReceiptView } from './components/modules/CertificatesView';
 import { NeuralInspectorView } from './components/modules/NeuralInspectorView';
 import { SettingsView } from './components/modules/SettingsView';
 import { StudentDashboard } from './components/student/StudentDashboard';
@@ -60,6 +60,10 @@ export const App: React.FC = () => {
   const [verifyFolio] = useState<string | null>(
     () => new URLSearchParams(window.location.search).get('verify'),
   );
+  // ?receipt=<folio> abre una página de comprobante de una sola hoja en el celular.
+  const [receiptFolio] = useState<string | null>(
+    () => new URLSearchParams(window.location.search).get('receipt'),
+  );
   const [activeTab, setActiveTab] = useState<NavTab>(verifyFolio ? 'certificates' : 'dashboard');
   // Fase 4: rehidratamos el rol DEMO guardado para que X-Role sobreviva a recargas.
   const [user, setUser] = useState<UserProfile>(() => {
@@ -80,6 +84,7 @@ export const App: React.FC = () => {
   const [dashboardReloadKey, setDashboardReloadKey] = useState(0);
   const [isCmdPaletteOpen, setIsCmdPaletteOpen] = useState(false);
   const [isAITutorDrawerOpen, setIsAITutorDrawerOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   
   // Theme state: defaults to 'monochrome' (Blanco y Negro / Charcoal)
   const [theme, setTheme] = useState<ThemeMode>(() => {
@@ -136,6 +141,11 @@ export const App: React.FC = () => {
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
 
+  // El comprobante es una página independiente: el celular la abre sin popup.
+  if (receiptFolio) {
+    return <CertificateReceiptView folio={receiptFolio} theme={theme} />;
+  }
+
   return (
     <div 
       data-theme={theme}
@@ -143,13 +153,25 @@ export const App: React.FC = () => {
         isLight ? 'text-slate-900' : 'text-slate-100'
       }`}
     >
-      {/* Sidebar Navigation */}
+      {/* Sidebar Navigation: drawer en celular, columna fija en escritorio */}
+      {isMobileNavOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 z-40 md:hidden"
+          onClick={() => setIsMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
       <Sidebar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={tab => {
+          setActiveTab(tab);
+          setIsMobileNavOpen(false);
+        }}
         onlineCount={user.onlineCount}
         role={user.role}
         theme={theme}
+        mobileOpen={isMobileNavOpen}
+        onClose={() => setIsMobileNavOpen(false)}
       />
 
       {/* Main Content Area */}
@@ -162,9 +184,10 @@ export const App: React.FC = () => {
           onThemeChange={handleThemeChange}
           onOpenCommandPalette={() => setIsCmdPaletteOpen(true)}
           onOpenAITutor={() => setIsAITutorDrawerOpen(true)}
+          onOpenMobileNav={() => setIsMobileNavOpen(true)}
         />
 
-        <main className="flex-1 p-6 space-y-6 max-w-[1600px] w-full mx-auto">
+        <main className="flex-1 p-4 sm:p-6 space-y-5 sm:space-y-6 max-w-[1600px] w-full mx-auto">
           {/* Transparency / Demo Notice Banner */}
           {activeTab === 'dashboard' && (
             <div className={`p-3 rounded-xl border flex items-center justify-between text-xs transition-colors ${

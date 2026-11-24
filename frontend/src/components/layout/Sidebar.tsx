@@ -12,7 +12,8 @@ import {
   BrainCircuit, 
   Sparkles,
   Cpu,
-  ShieldCheck
+  ShieldCheck,
+  X
 } from 'lucide-react';
 import { NavTab, ThemeMode, UserRole } from '../../types';
 import { canViewTab } from '../../auth/permissions';
@@ -23,6 +24,8 @@ interface SidebarProps {
   onlineCount: number;
   role: UserRole;
   theme?: ThemeMode;
+  mobileOpen?: boolean;
+  onClose?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
@@ -30,7 +33,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onTabChange, 
   onlineCount,
   role,
-  theme = 'monochrome'
+  theme = 'monochrome',
+  mobileOpen = false,
+  onClose,
 }) => {
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
@@ -50,14 +55,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className={`w-64 border-r flex flex-col justify-between shrink-0 select-none h-screen sticky top-0 overflow-y-auto z-40 transition-colors ${
-      isMono ? 'bg-[#151820] border-[#2A2F3D] text-gray-100' : isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-[#06152B]/95 border-edumaster-cardBorder text-slate-100'
+    <aside className={`fixed inset-y-0 left-0 w-72 flex flex-col justify-between shrink-0 select-none h-screen overflow-y-auto z-50 transition-all duration-200 md:sticky md:top-0 md:z-40 md:w-64 ${
+      mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
+    } ${
+      isMono ? 'bg-[#151820] border-r border-[#2A2F3D] text-gray-100' : isLight ? 'bg-white border-r border-slate-200 text-slate-900' : 'bg-[#06152B]/95 border-r border-edumaster-cardBorder text-slate-100'
     }`}>
       {/* Brand Header */}
       <div>
-        <div className={`p-5 flex items-center gap-3 border-b ${
+        <div className={`p-5 flex items-center gap-3 border-b relative ${
           isMono ? 'border-[#2A2F3D]' : isLight ? 'border-slate-200' : 'border-edumaster-cardBorder/70'
         }`}>
+          <button
+            onClick={onClose}
+            aria-label="Cerrar menú"
+            className={`absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center md:hidden ${
+              isLight ? 'bg-slate-100 text-slate-700 hover:bg-slate-200' : 'bg-white/10 text-white hover:bg-white/20'
+            }`}
+          >
+            <X className="w-4 h-4" />
+          </button>
           <div className={`w-10 h-10 rounded-xl p-0.5 flex items-center justify-center ${
             isMono ? 'bg-[#202532] border border-[#3B4254] shadow-sm' : isLight ? 'bg-slate-100 border border-slate-300' : 'bg-gradient-to-br from-edumaster-blue to-edumaster-violet shadow-glowBlue'
           }`}>

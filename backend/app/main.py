@@ -51,6 +51,8 @@ app.add_middleware(
     # para probar el QR de certificados desde un celular en la misma Wi-Fi.
     allow_origin_regex=(
         r"(https://.*\.vercel\.app|"
+        r"https://.*\.railway\.app|"
+        r"https://.*\.up\.railway\.app|"
         r"http://(localhost|127\.0\.0\.1|"
         r"192\.168\.\d{1,3}\.\d{1,3}|"
         r"10\.\d{1,3}\.\d{1,3}\.\d{1,3}|"

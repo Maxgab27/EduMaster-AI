@@ -326,7 +326,7 @@ VITE_PUBLIC_ORIGIN=http://192.168.18.36:5173
 ```
 Reinicia el frontend. `VITE_API_BASE_URL` se deja vacío: el resto de la app sigue con el adaptador DEMO local y solo el núcleo usa HTTP real. `VITE_PUBLIC_ORIGIN` es la IP Wi-Fi de la PC; cámbiala si la red asigna otra. En Windows, usa `npm.cmd` en lugar de `npm`. `start_project.bat` levanta ambos servicios en `0.0.0.0` con esta configuración.
 
-Para probar desde el celular ZTE en la misma Wi-Fi: abre `http://192.168.18.36:5173` en la PC, entra a **Certificados**, pulsa **Ver QR / Folio** y escanea con la cámara. El QR codifica esa IP, no `127.0.0.1`, y la verificación llama a `http://192.168.18.36:8000`.
+Para probar desde el celular ZTE en la misma Wi-Fi: abre `http://192.168.18.36:5173` en la PC, entra a **Certificados**, pulsa **Ver QR / Folio** y escanea con la cámara. El QR codifica esa IP, no `127.0.0.1`, y la verificación llama a `http://192.168.18.36:8000`. En el celular, el menú lateral se abre con el botón hamburger y el modal del QR ofrece **“Abrir comprobante (celular)”**, que muestra una página simple con **“Guardar como PDF”**. Para un despliegue público en Railway, sigue la guía corta de `RAILWAY.md`: sin `VITE_PUBLIC_ORIGIN`, el QR usa automáticamente la URL pública del frontend.
 
 ---
 

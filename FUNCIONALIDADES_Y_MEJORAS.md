@@ -2,7 +2,7 @@
 
 **Prueba realizada:** navegación real en Chromium sobre `http://127.0.0.1:5173` y sobre la IP Wi-Fi `http://192.168.18.36:5173`, con backend activo en `http://127.0.0.1:8000` y en `http://192.168.18.36:8000`.
 **Fecha:** 2026-11-23 (inventario) · 2026-11-24 (núcleo real por HTTP).
-**Resultado general:** 11 módulos abiertos, interacciones ejecutadas, **0 errores de consola**. El resto de la UI opera en modo **DEMO** con `localStorage`; el **núcleo** (riesgo de abandono, SpeedGrader, firma y auditoría) ya llama por HTTP real al backend activo. Ver §7. El QR de certificados también es escaneable y verifica por HTTP. Ver §8.
+**Resultado general:** 11 módulos abiertos, interacciones ejecutadas, **0 errores de consola**. El resto de la UI opera en modo **DEMO** con `localStorage`; el **núcleo** (riesgo de abandono, SpeedGrader, firma y auditoría) ya llama por HTTP real al backend activo. Ver §7. El QR de certificados es escaneable, verifica por HTTP y abre un comprobante de una sola página en el celular. Ver §8. La vista tiene un drawer lateral y controles reducidos en móvil; el despliegue público en Railway está preparado. Ver §9.
 
 ---
 
@@ -16,7 +16,7 @@
 | **Análisis** | Series semanales de progreso, actividad por semana, dominio por competencia, filtros por materia y botón “Exportar CSV”. | Gráficos y tabla renderizan con datos sintéticos. No se observó cambio visible al pulsar “Exportar CSV” (podría descargar un archivo). | Verificar la descarga real del CSV; añadir fecha de corte y fuente en el archivo exportado. | P1 |
 | **IA Tutor** | Respuestas por reglas, con confianza y fuentes; conversación persistida. | Pregunta “¿Cómo se calcula el riesgo de abandono?” → respuesta con `Documento §9.5`, confianza 86% y guardrail. | El saludo muestra “Confianza: 99%” sin base. Cambiar a “reglas DEMO”. Hacer clicables las fuentes y añadir preguntas sugeridas. | P0 |
 | **Evaluaciones / SpeedGrader** | Comparador nota oficial vs estimación IA, 3 entregas, SpeedGrader con rúbrica de 4 criterios, borrador asistido, firma docente obligatoria. | Abrí SpeedGrader, ajusté rúbrica, escribí nombre del docente y firmé: pendientes pasaron de **3 a 2**, apareció “Ver / Editar” y se registró `submissions.graded` con actor “Dr. Alejandro Morales”. | Enviar `X-Actor` del rol seleccionado al backend al firmar (el endpoint ya lo acepta desde la mejora anterior). Mostrar el `audit_log_id` devuelto. Sin eso la firma es solo local. | P0 |
-| **Certificados** | 3 certificados sintéticos con folio, hash, fecha y nota; QR PNG escaneable que codifica `http://192.168.18.36:5173/?verify=<folio>` (IP Wi-Fi de la PC) y verificación SHA-256 contra la API activa. | OpenCV decodificó el QR a esa URL exacta; al abrirla desde la IP se habilitó “Certificados”, apareció “Folio válido · EDU-2026-98124” con hash `6f5f33d8…` y se registró `certificate.verify` en auditoría, con 0 errores de consola. | Ya es escaneable desde el celular en la misma Wi-Fi; fuera de ella hace falta desplegar. | P1 |
+| **Certificados** | 3 certificados sintéticos con folio, hash, fecha y nota; QR PNG escaneable que codifica `http://192.168.18.36:5173/?verify=<folio>` (IP Wi-Fi de la PC) y verificación SHA-256 contra la API activa. El botón “Abrir comprobante (celular)” lleva a `?receipt=<folio>`. | OpenCV decodificó el QR a esa URL exacta; al abrirla desde la IP se habilitó “Certificados”, apareció “Folio válido · EDU-2026-98124” con hash `6f5f33d8…` y se registró `certificate.verify`. El botón de comprobante abrió la página simple con QR, datos y “Guardar como PDF”; 0 errores de consola. | Ya es escaneable en la misma Wi-Fi y el comprobante llega al celular sin popup ni descarga bloqueada. Para internet falta publicar en Railway. | P1 |
 | **Redes Neuronales** | Inspector con pestañas Arquitectura / Evaluación / Gobernanza, función de pérdida multitarea y metadatos del artefacto. | Texto: “Implementación DEMO en Python puro, sin PyTorch”, versión `0.1.0-demo`, épocas 7. | Conectar la pestaña Evaluación con `api/ml/artifacts/evaluation.json` (ya existe) para mostrar baselines reales del dataset sintético. | P1 |
 | **Gobierno & Ley 29733** | Pestañas Ley/ARCO, Registro de Auditoría y Telemetría MLOps; exportar informe ANPD; bandeja ARCO con 3 solicitudes. | “Marcar atendida” cambió el estado a **Atendida** y generó `arco.request.resolved`. El registro de auditoría mostró **5 eventos** con correlation ID. | Los eventos son de `localStorage`. Enviarlos también al backend cuando haya API. Añadir filtros y exportación CSV de auditoría. El toggle de RLS ya dice “informativo”, mantenerlo así. | P1 |
 | **Comunidad** | Hilos, mensajes y moderación; botón “Nuevo hilo”. | “Nuevo hilo” abre el formulario “Crear hilo”. No hay hilos sembrados: la vista dice “Selecciona un hilo…”. | Sembrar 2–3 hilos DEMO para que la pantalla no se vea vacía en la sustentación. | P2 |
@@ -47,7 +47,7 @@
 
 1. **P0 (antes de sustentar):** corregir la URL de verificación (hoy es real, ver §8); bajar el “99%” del tutor; desactivar el “Forward 1x” del dashboard; enviar `X-Actor` al firmar. Los cuatro ya están aplicados (ver §5, §7 y §8).
 2. **P1 (si hay un día):** conectar Evaluación y Gobierno al backend; sembrar hilos de Comunidad; verificar exportación CSV.
-3. **P2 (Fase 5):** Supabase + OIDC, RLS real, despliegue del frontend para QR externo, persistencia de rutas y cursos. El QR escaneable ya está aplicado (§8).
+3. **P2 (Fase 5):** Supabase + OIDC, RLS real, persistencia de rutas y cursos. El QR escaneable y la configuración para QR público ya están aplicados (§8 y §9); falta ejecutar el despliegue con las URLs reales.
 
 ## 5. Estado real de los arreglos P0 (2026-11-23)
 
@@ -58,7 +58,7 @@
 | “Inferencia (Forward)” / “PyTorch • GRU” | **Aplicado** | El visualizador dice “DEMO · ANIMACIÓN ILUSTRATIVA”, “motor DEMO en NumPy (sin PyTorch)” y “Propagación (animada)”. |
 | Enviar `X-Actor` al firmar | **Aplicado** | El frontend llama a `/api/v1/compat/submissions/{id}/grade`, el header `X-Actor` llega al backend y la respuesta confirma `actor_source=header`, hash SHA-256 e `audit_log_id`. Ver §7. |
 
-Verificación tras los cambios: `npm.cmd run lint` sin errores, `npm.cmd run build` correcto, navegador con **0 errores de consola**, smoke test del backend **34/34** (las 6 rutas originales siguen intactas y se añadió el contrato `/compat`) y QR decodificado con OpenCV cuya URL abrió la verificación real.
+Verificación tras los cambios: `npm.cmd run lint` sin errores, `npm.cmd run build` correcto, navegador con **0 errores de consola**, smoke test del backend **34/34** (las 6 rutas originales siguen intactas y se añadió el contrato `/compat`), QR decodificado con OpenCV cuya URL abrió la verificación real, drawer probado a 390 px y comprobante abierto por la ruta `?receipt=`. Ver §9.
 
 ## 6. Frase para la sustentación
 
@@ -97,6 +97,26 @@ Antes el QR era un patrón SVG decorativo sin patrones de localización ni codif
 | Hash | Payload canónico `folio/student/course/issuedAt/grade` con SHA-256; el backend compara con `hmac.compare_digest`. | Mensaje: “DEMO · folio y hash SHA-256 coinciden en la API; no es un certificado oficial.” |
 | Auditoría | Evento `certificate.verify` con folio, `valid` y `correlation_id`. | Visible en `/api/v1/compat/audit/logs`; se añadió deduplicación para que un escaneo genere una sola verificación. |
 
-**Cómo escanearlo con el ZTE Axon 50 5G:** los servicios escuchan en `0.0.0.0` (Vite 5173 y Uvicorn 8000), `VITE_PUBLIC_ORIGIN=http://192.168.18.36:5173` fija la IP del QR y `getCoreBaseUrl()` cambia `127.0.0.1` por el host de la página, así que la API se llama en `http://192.168.18.36:8000`. El backend admite orígenes LAN por CORS. En la PC abre `http://192.168.18.36:5173`, entra a Certificados, pulsa “Ver QR / Folio” y escanea con la cámara del celular conectado a la misma Wi‑Fi.
+**Cómo escanearlo con el ZTE Axon 50 5G:** los servicios escuchan en `0.0.0.0` (Vite 5173 y Uvicorn 8000), `VITE_PUBLIC_ORIGIN=http://192.168.18.36:5173` fija la IP del QR y `getCoreBaseUrl()` cambia `127.0.0.1` por el host de la página solo cuando ese host es una IP privada, así que la API se llama en `http://192.168.18.36:8000`. El backend admite orígenes LAN por CORS. En la PC abre `http://192.168.18.36:5173`, entra a Certificados, pulsa “Ver QR / Folio” y escanea con la cámara del celular conectado a la misma Wi‑Fi.
 
-**Límites honestos:** `127.0.0.1` en el celular significaría el propio celular; por eso el QR usa la IP de la PC. Si cambia la red, actualiza `VITE_PUBLIC_ORIGIN` con el nuevo IPv4 (`ipconfig`). Fuera de la Wi‑Fi hace falta desplegar. Los 3 registros son sintéticos, SQLite es local y el mensaje de verificación dice explícitamente que **no es un certificado oficial**. Si falta la API, el fallback calcula el mismo hash con Web Crypto, pero el QR sigue siendo escaneable y la UI lo rotula como verificación DEMO local.
+**Comprobante en el celular:** el modal del QR incluye **“Abrir comprobante (celular)”**. En lugar de depender de `window.open` o de una descarga (los dos suelen bloquearse en móvil), navega a `?receipt=<folio>`, una página de la misma SPA con folio, estudiante, curso, fecha, nota, hash, QR y el botón **“Guardar como PDF”** (`window.print()`). **“Volver”** regresa a la verificación. El evento `certificate.receipt_open` queda en auditoría.
+
+**Límites honestos:** `127.0.0.1` en el celular significaría el propio celular; por eso el QR usa la IP de la PC. Si cambia la red, actualiza `VITE_PUBLIC_ORIGIN` con el nuevo IPv4 (`ipconfig`). Fuera de la Wi‑Fi hace falta desplegar (§9). Los 3 registros son sintéticos, SQLite es local y el mensaje de verificación dice explícitamente que **no es un certificado oficial**. Si falta la API, el fallback calcula el mismo hash con Web Crypto, pero el QR sigue siendo escaneable y la UI lo rotula como verificación DEMO local.
+
+---
+
+## 9. Vista móvil y preparación para Railway (2026-11-24)
+
+| Mejora | Implementación | Evidencia |
+|---|---|---|
+| Drawer lateral | `Sidebar.tsx` pasa a ser un panel `fixed` con `translate-x` en celular; `App.tsx` controla `isMobileNavOpen` y un overlay; `Topbar.tsx` añade el botón hamburger. En escritorio (`md:`) conserva la columna fija original. | A 390 px el sidebar queda fuera de pantalla (`-288px`), el hamburger aparece, el overlay se abre y el panel entra a `0px`; al elegir “Certificados” el drawer se cierra. |
+| Topbar reducida | Filtros globales, badge de conexión y controles secundarios se ocultan en móvil; el encabezado usa `px-4` y el main `p-4 sm:p-6`. | En el iframe de 390 px no hay desbordamiento horizontal: `scrollWidth = 390` y `clientWidth = 390`. |
+| Modal del QR | `max-h-[92dvh]`, `overflow-y-auto`, QR de 128 px en celular y 144 px desde `sm:`, URL con `break-all`. | Se abrió el modal en 390 px: alto máximo 776 px, scroll interno, botón “Abrir comprobante (celular)” visible y 0 errores de consola. |
+| Corrección de texto largo | `min-w-0` y `break-words` en el aviso de verificación. | Antes `scrollWidth=470`; después `scrollWidth=390`. |
+| QR en Railway | Sin `VITE_PUBLIC_ORIGIN`, `certificatesApi.ts` usa `window.location.origin`. Con `VITE_CORE_API_BASE_URL=https://<backend>.up.railway.app`, `getCoreBaseUrl()` ya no reescribe ese host. | Compilación sin `.env.local`: no aparece `192.168.18.36` en el bundle y sí `location.origin`. |
+| CORS público | `main.py` acepta `*.vercel.app`, `*.railway.app`, `*.up.railway.app` y orígenes LAN por regex; `PUBLIC_FRONTEND_ORIGIN` añade un origen extra sin tocar secretos. | Origin simulado `https://edumaster-frontend-production.up.railway.app` → `Access-Control-Allow-Origin` igual al origin. Origen no permitido (`https://example.com`) → sin header CORS. |
+| Comprobante sin popup | Ruta `?receipt=<folio>` renderiza `CertificateReceiptView`. | Desde el modal se navegó a `?receipt=EDU-2026-98124` y apareció “Certificado de finalización” con QR, hash y “Guardar como PDF”. |
+
+**Flujo más simple en Railway:** publicar backend y frontend, definir solo `VITE_CORE_API_BASE_URL` apuntando al backend y dejar `VITE_PUBLIC_ORIGIN` sin definir. El QR codificará `https://<frontend>.up.railway.app/?verify=<folio>`; al escanearlo se abre la verificación, y el botón del modal muestra el comprobante en pantalla. La guía operativa está en `RAILWAY.md`.
+
+**Límites honestos:** no se hizo el despliegue real porque requiere la cuenta y las URLs del usuario. Supabase/OIDC siguen pendientes y no se compartieron secretos. Los certificados y el comprobante mantienen la etiqueta `DEMO` y advierten que no son oficiales.

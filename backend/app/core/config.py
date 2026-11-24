@@ -38,6 +38,10 @@ class Settings(BaseSettings):
         "http://127.0.0.1:4173",
         "https://*.vercel.app",
         "https://edumaster-ai.vercel.app"
+    ] + [
+        origin.strip()
+        for origin in os.getenv("PUBLIC_FRONTEND_ORIGIN", "").split(",")
+        if origin.strip()
     ]
 
     @property

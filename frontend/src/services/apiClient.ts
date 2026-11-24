@@ -20,11 +20,13 @@ export function getCoreBaseUrl(): string | null {
   const raw = import.meta.env.VITE_CORE_API_BASE_URL;
   if (typeof raw !== 'string' || !raw.trim()) return null;
   const url = new URL(raw.trim());
-  // Si la página se abre desde otra IP (por ejemplo el celular en la misma
-  // Wi-Fi), 127.0.0.1 ya no es la PC: se sustituye por el host de la página.
+  // Solo reescribimos en escenarios LAN: la página se abre desde la IP privada
+  // de la PC (celular en la misma Wi-Fi) y la API sigue configurada en loopback.
+  // En Railway/Vercel se respeta la URL pública configurada en el entorno.
   const loopback = ['127.0.0.1', 'localhost', '::1'];
   const pageHost = typeof window !== 'undefined' ? window.location.hostname : '';
-  if (loopback.includes(url.hostname) && pageHost && !loopback.includes(pageHost)) {
+  const privateLan = /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(pageHost);
+  if (loopback.includes(url.hostname) && privateLan) {
     url.hostname = pageHost;
   }
   return url.toString().replace(/\/$/, '');

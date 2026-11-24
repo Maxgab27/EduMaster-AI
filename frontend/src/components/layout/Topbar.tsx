@@ -11,7 +11,8 @@ import {
   Sun,
   Moon,
   Palette,
-  Bot
+  Bot,
+  Menu
 } from 'lucide-react';
 import { ApiMeta, AppNotification, NotificationPreferences, ThemeMode, UserProfile, UserRole } from '../../types';
 import { LiveConnectionBadge } from '../common/LiveConnectionBadge';
@@ -32,6 +33,7 @@ interface TopbarProps {
   onThemeChange: (theme: ThemeMode) => void;
   onOpenCommandPalette: () => void;
   onOpenAITutor: () => void;
+  onOpenMobileNav: () => void;
 }
 
 export const Topbar: React.FC<TopbarProps> = ({
@@ -41,7 +43,8 @@ export const Topbar: React.FC<TopbarProps> = ({
   theme,
   onThemeChange,
   onOpenCommandPalette,
-  onOpenAITutor
+  onOpenAITutor,
+  onOpenMobileNav,
 }) => {
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -136,11 +139,20 @@ export const Topbar: React.FC<TopbarProps> = ({
   };
 
   return (
-    <header className={`h-16 border-b px-6 flex items-center justify-between sticky top-0 z-30 transition-colors backdrop-blur-xl ${
+    <header className={`h-16 border-b px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 transition-colors backdrop-blur-xl ${
       isMono ? 'bg-[#151820]/95 border-[#2A2F3D] text-gray-100' : isLight ? 'bg-white/95 border-slate-200 text-slate-900' : 'bg-[#06152B]/95 border-edumaster-cardBorder text-slate-100'
     }`}>
       {/* Slogan & Breadcrumb */}
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-2 sm:gap-5 min-w-0">
+        <button
+          onClick={onOpenMobileNav}
+          aria-label="Abrir menú de navegación"
+          className={`md:hidden w-9 h-9 shrink-0 rounded-xl border flex items-center justify-center ${
+            isMono ? 'bg-[#1E222C] border-[#2A2F3D] text-white' : isLight ? 'bg-slate-100 border-slate-200 text-slate-800' : 'bg-[#0A1F3D] border-edumaster-cardBorder text-white'
+          }`}
+        >
+          <Menu className="w-4 h-4" />
+        </button>
         <div className="hidden lg:flex items-center gap-2 text-xs font-black tracking-widest uppercase opacity-85">
           <span>Aprende</span>
           <span className="opacity-40">•</span>
@@ -149,8 +161,8 @@ export const Topbar: React.FC<TopbarProps> = ({
           <span>Destaca</span>
         </div>
 
-        {/* Global Filter Trigger Dropdown */}
-        <div className="relative">
+        {/* Global Filter Trigger Dropdown (se oculta en celular) */}
+        <div className="relative hidden sm:block">
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-colors ${
@@ -218,7 +230,7 @@ export const Topbar: React.FC<TopbarProps> = ({
 
         {/* Badge honesto: los datos siguen siendo DEMO, con o sin API configurada */}
         <div
-          className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border ${
+          className={`hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border ${
             isLight 
               ? 'bg-amber-100 border-amber-300 text-amber-800'
               : isMono 
@@ -234,7 +246,9 @@ export const Topbar: React.FC<TopbarProps> = ({
         </div>
 
         {/* Realtime connection state badge (offline in this demo) */}
-        <LiveConnectionBadge theme={theme} />
+        <div className="hidden lg:block">
+          <LiveConnectionBadge theme={theme} />
+        </div>
       </div>
 
       {/* Right Controls: Command Palette, AI Tutor, Theme Switcher, Score, Notifications, Profile */}
@@ -301,7 +315,7 @@ export const Topbar: React.FC<TopbarProps> = ({
         </button>
 
         {/* Puntuación Global */}
-        <div className={`flex items-center gap-2.5 px-3 py-1.5 rounded-2xl border shadow-sm ${
+        <div className={`hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-2xl border shadow-sm ${
           isMono ? 'bg-[#1E222C] border-[#2A2F3D]' : isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#0A1F3D] border-edumaster-cardBorder'
         }`}>
           <div className="relative w-7 h-7 flex items-center justify-center">

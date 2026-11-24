@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   RefreshCw,
+  ArrowLeft,
 } from 'lucide-react';
 import type { ApiMeta, CertificateRecord, CertificateVerification, ThemeMode } from '../../types';
 import { isDemoMode } from '../../services/apiClient';
@@ -94,7 +95,7 @@ export const CertificatesView: React.FC<CertificatesViewProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialVerifyFolio]);
 
-  const handleDownload = async (cert: CertificateRecord) => {
+  const createReceiptUrl = (cert: CertificateRecord): string => {
     const qr = cert.qrDataUrl ?? null;
     const html = `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Certificado ${cert.folio}</title>
 <style>body{font-family:system-ui,sans-serif;max-width:760px;margin:48px auto;padding:0 24px;color:#0f172a}
@@ -119,8 +120,11 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
 <footer>Comprobante generado desde ${meta?.source === 'api' ? 'la API /api/v1' : 'el adaptador DEMO local'}. Correlation ID: ${meta?.correlationId ?? 'local'}. No equivale a un certificado oficial institucional.</footer>
 </body></html>`;
 
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
+    return URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+  };
+
+  const handleDownload = async (cert: CertificateRecord) => {
+    const url = createReceiptUrl(cert);
     const anchor = document.createElement('a');
     anchor.href = url;
     anchor.download = `certificado-${cert.folio}.html`;
@@ -135,11 +139,27 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
     });
   };
 
+  /**
+   * En celular una ruta real de la SPA es más confiable que window.open o un
+   * blob: no hay ventanas emergentes ni descargas bloqueadas.
+   */
+  const handleOpenReceipt = async (cert: CertificateRecord) => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('verify');
+    url.searchParams.set('receipt', cert.folio);
+    setNotice(`Comprobante de ${cert.folio} abierto. Usa “Volver” para regresar.`);
+    await writeAudit({
+      action: 'certificate.receipt_open',
+      detail: { folio: cert.folio, hash: cert.hash },
+    });
+    window.location.assign(url.toString());
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl font-black flex items-center gap-2 m-0">
+          <h1 className="text-lg sm:text-xl font-black flex items-center gap-2 m-0">
             <Award className={`w-5 h-5 ${isLight ? 'text-emerald-600' : isMono ? 'text-zinc-200' : 'text-emerald-400'}`} />
             Emisión y Verificación Pública de Certificados
           </h1>
@@ -174,7 +194,7 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
           isLight ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
         }`}>
           <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <span>{notice}</span>
+          <span className="min-w-0 break-words">{notice}</span>
         </div>
       )}
 
@@ -219,13 +239,13 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
             : isLight ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
         }`}>
           {verification.valid ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertTriangle className="w-4 h-4 shrink-0" />}
-          <div className="space-y-1">
-            <p className="font-bold m-0">
+          <div className="space-y-1 min-w-0">
+            <p className="font-bold m-0 break-words">
               {verification.valid ? 'Folio válido' : 'Folio no válido o no encontrado'} · {verification.folio}
             </p>
-            <p className="m-0 opacity-90">{verification.message}</p>
+            <p className="m-0 opacity-90 break-words">{verification.message}</p>
             {verification.valid && (
-              <p className="m-0 font-mono text-[11px] opacity-80">
+              <p className="m-0 font-mono text-[11px] opacity-80 break-words">
                 {verification.student} · {verification.course} · hash {verification.hash}
               </p>
             )}
@@ -325,7 +345,7 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
 
       {selectedCert && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in">
-          <div className={`border rounded-2xl max-w-md w-full p-6 shadow-2xl relative ${
+          <div className={`border rounded-2xl max-w-md w-full p-5 sm:p-6 shadow-2xl relative max-h-[92dvh] overflow-y-auto ${
             isLight
               ? 'bg-white border-slate-300 text-slate-900'
               : isMono
@@ -352,9 +372,9 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
             <div className="flex justify-center my-4">
               <div className="p-3 bg-white rounded-xl shadow-inner border border-slate-200">
                 {selectedCert.qrDataUrl ? (
-                  <img src={selectedCert.qrDataUrl} alt={`QR de ${selectedCert.folio}`} className="w-36 h-36" />
+                  <img src={selectedCert.qrDataUrl} alt={`QR de ${selectedCert.folio}`} className="w-32 h-32 sm:w-36 sm:h-36" />
                 ) : (
-                  <QrCode className="w-36 h-36 text-slate-900" />
+                  <QrCode className="w-32 h-32 sm:w-36 sm:h-36 text-slate-900" />
                 )}
               </div>
             </div>
@@ -370,7 +390,7 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
               <div className="truncate">Hash SHA-256: {selectedCert.hash}</div>
               <div>Emisión: {formatDate(selectedCert.issuedAt)}</div>
               <div>Nota Oficial: <span className="text-emerald-600 font-bold">{selectedCert.grade}</span></div>
-              <div className="truncate" title={selectedCert.verificationUrl}>
+              <div className="break-all" title={selectedCert.verificationUrl}>
                 URL: {selectedCert.verificationUrl}
               </div>
             </div>
@@ -389,6 +409,15 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
               Verificar este folio
             </button>
             <button
+              onClick={() => void handleOpenReceipt(selectedCert)}
+              className={`w-full py-2.5 rounded-xl text-xs font-bold transition-colors mb-2 flex items-center justify-center gap-1.5 ${
+                isLight ? 'bg-slate-100 text-slate-800 hover:bg-slate-200 border border-slate-300' : isMono ? 'bg-[#202532] text-zinc-100 hover:bg-[#2A3040] border border-[#3B4254]' : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
+              }`}
+            >
+              <Download className="w-3.5 h-3.5" />
+              Abrir comprobante (celular)
+            </button>
+            <button
               onClick={() => setSelectedCert(null)}
               className={`w-full py-2 rounded-xl text-xs font-bold border transition-colors ${
                 isLight ? 'border-slate-300 text-slate-700 hover:bg-slate-100' : 'border-white/15 text-slate-300 hover:bg-white/5'
@@ -399,6 +428,115 @@ ${qr ? `<img class="qr" src="${qr}" alt="QR de verificación">` : ''}
           </div>
         </div>
       )}
+    </div>
+  );
+};
+
+interface CertificateReceiptViewProps {
+  folio: string;
+  theme?: ThemeMode;
+}
+
+/**
+ * Comprobante de una sola página, servido por la misma SPA en ?receipt=<folio>.
+ * Evita ventanas emergentes y blobs: en el celular funciona como una página web
+ * normal y se puede guardar como PDF con el botón del navegador o el de imprimir.
+ */
+export const CertificateReceiptView: React.FC<CertificateReceiptViewProps> = ({
+  folio,
+  theme = 'monochrome',
+}) => {
+  const [cert, setCert] = useState<CertificateRecord | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    listCertificates(controller.signal)
+      .then(response => {
+        const found = response.data.find(item => item.folio === folio.trim().toUpperCase()) ?? null;
+        setCert(found);
+      })
+      .catch(err => {
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setError(err instanceof Error ? err.message : 'No se pudo cargar el comprobante');
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [folio]);
+
+  const goBack = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('receipt');
+    window.location.assign(url.toString());
+  };
+
+  if (loading) {
+    return (
+      <div data-theme={theme} className="min-h-screen flex items-center justify-center bg-edumaster-ambient text-sm">
+        Preparando comprobante...
+      </div>
+    );
+  }
+
+  if (!cert) {
+    return (
+      <div data-theme={theme} className="min-h-screen flex flex-col items-center justify-center gap-4 bg-edumaster-ambient p-6 text-center">
+        <p className="text-sm text-rose-300 m-0">{error ?? `No se encontró el folio ${folio}.`}</p>
+        <button onClick={goBack} className="px-4 py-2 rounded-xl border border-white/20 text-xs font-bold">
+          Volver a la aplicación
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div data-theme={theme} className="min-h-screen bg-edumaster-ambient p-4 sm:p-8 flex flex-col items-center gap-4">
+      <div className="w-full max-w-2xl flex gap-2 print:hidden">
+        <button
+          onClick={goBack}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/20 text-xs font-bold hover:bg-white/10"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Volver
+        </button>
+        <button
+          onClick={() => window.print()}
+          className="px-3 py-2 rounded-xl bg-white text-slate-900 text-xs font-bold hover:bg-slate-200"
+        >
+          Guardar como PDF
+        </button>
+      </div>
+
+      <article className="w-full max-w-2xl bg-white text-slate-900 rounded-2xl shadow-2xl p-6 sm:p-10">
+        <div className="flex flex-col sm:flex-row justify-between gap-4 border-b border-slate-200 pb-5">
+          <div>
+            <p className="m-0 font-mono text-[10px] tracking-[0.18em] uppercase text-teal-700">
+              DEMO · registro sintético
+            </p>
+            <h1 className="text-2xl sm:text-3xl font-black m-0 mt-1">Certificado de finalización</h1>
+            <p className="m-0 text-xs text-slate-500 mt-1">Folio {cert.folio} · {cert.status}</p>
+          </div>
+          {cert.qrDataUrl && (
+            <img src={cert.qrDataUrl} alt={`QR de ${cert.folio}`} className="w-24 h-24 self-center" />
+          )}
+        </div>
+
+        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 mt-6 text-sm">
+          <div><dt className="text-slate-500 text-xs">Estudiante</dt><dd className="font-bold m-0">{cert.student}</dd></div>
+          <div><dt className="text-slate-500 text-xs">Curso</dt><dd className="font-bold m-0">{cert.course}</dd></div>
+          <div><dt className="text-slate-500 text-xs">Fecha de emisión</dt><dd className="font-bold m-0">{formatDate(cert.issuedAt)}</dd></div>
+          <div><dt className="text-slate-500 text-xs">Calificación</dt><dd className="font-bold m-0 text-teal-700">{cert.grade}</dd></div>
+        </dl>
+
+        <div className="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs break-all">
+          <p className="m-0 font-mono">Hash SHA-256: {cert.hash}</p>
+          <p className="m-0 font-mono mt-1">Verificación: {cert.verificationUrl}</p>
+        </div>
+        <p className="text-[11px] text-slate-500 mt-5 mb-0">
+          Documento de demostración académica SENATI 4.º semestre. Los datos son sintéticos y no equivalen a un certificado oficial.
+        </p>
+      </article>
     </div>
   );
 };
