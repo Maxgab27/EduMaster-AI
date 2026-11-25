@@ -84,6 +84,13 @@ El proyecto se encuentra en un estado funcional avanzado **como frontend base/de
 - Para escanearlo con un celular en la **misma Wi-Fi**: `frontend/.env.local` define `VITE_PUBLIC_ORIGIN=http://192.168.18.36:5173`, Vite y Uvicorn escuchan en `0.0.0.0`, y el cliente HTTP reemplaza `127.0.0.1` por el host de la página. Así el QR y la API apuntan a la PC, no al celular. Si cambia la red, actualiza la IP con `ipconfig`.
 - Límite honesto: la publicación en Internet la ejecuta el usuario siguiendo `RAILWAY.md`; no se realizó desde esta sesión. Los registros son sintéticos y el propio mensaje advierte que **no es un certificado oficial**. Ver `FUNCIONALIDADES_Y_MEJORAS.md` §8.
 
+### 2.5 Chat DEMO de Comunidad (2026-11-24)
+
+- La vista **Comunidad** funciona como chat creíble en modo DEMO: hilos sembrados, avatares por rol, tiempo relativo, separadores por día, búsqueda de hilos y mensajes, envío con `Enter` (`Shift+Enter` para salto), responder citando, editar, borrar, likes y moderación local.
+- Las respuestas automáticas son **reglas etiquetadas** `DEMO · SIMULADO`, con indicador de escritura y un interruptor para desactivarlas; **no son IA ni llegan a un servidor**.
+- Todo se guarda en `localStorage` (`edumaster_demo_v1`) con auditoría `community.message.posted/edited/deleted/moderated/simulated`. Cada navegador tiene su propia copia: no hay sincronización entre usuarios ni tiempo real, y se borra al limpiar datos del navegador.
+- Verificado con `npm run lint` y `npm run build` sin `.env.local`: envío, respuesta simulada, cita, edición, borrado, búsqueda y persistencia tras recargar, con **0 errores de consola**.
+
 | Componente / Módulo | Estado | Avance / Descripción Técnica |
 | :--- | :---: | :--- |
 | **Arquitectura de Frontend** | `100% Completo` | React 19 + TypeScript + Vite + Tailwind CSS. Arquitectura modular por componentes y vistas. |

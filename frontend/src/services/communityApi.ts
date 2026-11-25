@@ -13,6 +13,10 @@ export interface NewCommunityMessage {
   text: string;
   author: string;
   role: string;
+  replyToId?: string;
+  replyToAuthor?: string;
+  replyToText?: string;
+  simulated?: boolean;
 }
 
 export type ModerationAction = 'hide' | 'show' | 'flag';
@@ -97,6 +101,22 @@ function nextId(prefix: string): string {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
+/** Mantiene el contador y la actividad del hilo coherentes con sus mensajes. */
+function touchThread(threadId: string, messageDelta = 0): void {
+  writeSlice(
+    THREADS_KEY,
+    threads().map(thread =>
+      thread.id === threadId
+        ? {
+            ...thread,
+            messageCount: Math.max(0, thread.messageCount + messageDelta),
+            lastActivity: new Date().toISOString(),
+          }
+        : thread,
+    ),
+  );
+}
+
 export function listThreads(signal?: AbortSignal) {
   return requestWithDemo<CommunityThread[]>('/api/v1/community/threads', { signal }, () => threads());
 }
@@ -114,7 +134,7 @@ export function createThread(payload: NewCommunityThread, signal?: AbortSignal) 
         pinned: false,
         createdAt: now,
         lastActivity: now,
-        messageCount: 0,
+        messageCount: 1,
       };
       writeSlice(THREADS_KEY, [record, ...threads()]);
       saveMessages([
@@ -159,7 +179,36 @@ export function postMessage(threadId: string, payload: NewCommunityMessage, sign
         hidden: false,
       };
       saveMessages([...messages(), record]);
+      touchThread(threadId, 1);
       return record;
+    },
+  );
+}
+
+export function editMessage(messageId: string, text: string, signal?: AbortSignal) {
+  return requestWithDemo<CommunityMessage>(
+    `/api/v1/community/messages/${encodeURIComponent(messageId)}`,
+    { method: 'PATCH', body: JSON.stringify({ text }), signal },
+    () => {
+      const current = messages().find(item => item.id === messageId);
+      if (!current) throw new Error('Mensaje no encontrado en el store DEMO');
+      const updated: CommunityMessage = { ...current, text, edited: true };
+      saveMessages(messages().map(item => (item.id === messageId ? updated : item)));
+      return updated;
+    },
+  );
+}
+
+export function deleteMessage(messageId: string, signal?: AbortSignal) {
+  return requestWithDemo<{ id: string }>(
+    `/api/v1/community/messages/${encodeURIComponent(messageId)}`,
+    { method: 'DELETE', signal },
+    () => {
+      const current = messages().find(item => item.id === messageId);
+      if (!current) throw new Error('Mensaje no encontrado en el store DEMO');
+      saveMessages(messages().filter(item => item.id !== messageId));
+      touchThread(current.threadId, -1);
+      return { id: messageId };
     },
   );
 }
@@ -195,3 +244,12 @@ export function likeMessage(messageId: string, signal?: AbortSignal) {
     },
   );
 }
+
+/** Participantes y respuestas sintéticas para la simulación del chat DEMO. */
+export const DEMO_REPLY_AUTHORS = ['Ana Torres', 'Luis Paredes', 'Marta Ruiz'];
+export const DEMO_REPLIES = [
+  'Buena observación. En el dataset DEMO este cambio se registró como mejora formativa, no como nota oficial.',
+  'Te respondo con datos sintéticos: conviene comparar contra el baseline antes de sacar una conclusión.',
+  'Anotado para la próxima sesión. La firma docente sigue siendo la autoridad final; la IA solo sugiere.',
+  'Interesante. Podemos probarlo en el Sandbox y dejar el resultado en la auditoría como evento DEMO.',
+];

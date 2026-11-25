@@ -451,6 +451,12 @@ export interface CommunityMessage {
   likes: number;
   moderated: boolean;
   hidden: boolean;
+  /** Campos opcionales del chat DEMO: respuesta citada, edición y simulación. */
+  replyToId?: string;
+  replyToAuthor?: string;
+  replyToText?: string;
+  edited?: boolean;
+  simulated?: boolean;
 }
 
 export interface TutorMessageData {
