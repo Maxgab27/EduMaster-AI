@@ -51,12 +51,17 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ theme = 'monochrom
 
   const handleExport = async () => {
     if (!progress || !skills) return;
+    const cutoff = new Date().toISOString();
+    const source = progress.label || meta?.source || 'demo';
+    const correlation = meta?.correlationId || 'local';
+    const context = [cohort, cutoff, source, correlation];
     const rows = [
-      ['seccion', 'campo', 'valor'],
-      ...progress.series.map(point => ['progreso', point.label, percent(point.completion)]),
-      ...progress.series.map(point => ['progreso_activos', point.label, String(point.activeStudents)]),
-      ...progress.series.map(point => ['evaluaciones', point.label, String(point.assessments)]),
-      ...skills.skills.map(skill => ['dominio', skill.skill, percent(skill.level)]),
+      ['seccion', 'campo', 'valor', 'cohorte', 'fecha_corte_utc', 'fuente', 'correlation_id'],
+      ['metadata', 'exportacion', 'CSV DEMO · datos sintéticos', ...context],
+      ...progress.series.map(point => ['progreso', point.label, percent(point.completion), ...context]),
+      ...progress.series.map(point => ['progreso_activos', point.label, String(point.activeStudents), ...context]),
+      ...progress.series.map(point => ['evaluaciones', point.label, String(point.assessments), ...context]),
+      ...skills.skills.map(skill => ['dominio', skill.skill, percent(skill.level), ...context]),
     ];
     const csv = rows.map(row => row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8' });
@@ -68,7 +73,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ theme = 'monochrom
     anchor.click();
     anchor.remove();
     URL.revokeObjectURL(url);
-    setNotice(`CSV generado con ${rows.length - 1} filas. Correlation ID ${meta?.correlationId.slice(0, 14) ?? 'local'}.`);
+    setNotice(`CSV generado con ${rows.length - 2} filas de datos · cohorte ${cohort} · corte ${cutoff.slice(0, 10)} · fuente ${source.slice(0, 14)}… · ID ${correlation.slice(0, 14)}.`);
     await writeAudit({
       action: 'analytics.export_csv',
       detail: { cohort, rows: rows.length - 1 },

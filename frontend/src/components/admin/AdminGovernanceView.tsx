@@ -39,6 +39,19 @@ function detailTarget(detail: Record<string, unknown>): string {
     .join(' · ');
 }
 
+function auditStatus(log: ApiAuditLog): 'success' | 'flagged' | 'denied' {
+  if (log.status) return log.status;
+  if (/fail|denied|error/i.test(log.action)) return 'denied';
+  if (/flag|moderat/i.test(log.action)) return 'flagged';
+  return 'success';
+}
+
+function auditIp(log: ApiAuditLog): string {
+  if (log.ip_address) return log.ip_address;
+  const fromDetail = log.detail?.ip_address ?? log.detail?.ip;
+  return typeof fromDetail === 'string' ? fromDetail : '—';
+}
+
 export const AdminGovernanceView: React.FC<AdminGovernanceViewProps> = ({
   theme = 'monochrome',
   role = 'admin',
@@ -52,6 +65,7 @@ export const AdminGovernanceView: React.FC<AdminGovernanceViewProps> = ({
   );
   const [searchLog, setSearchLog] = useState('');
   const [filterAction, setFilterAction] = useState('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'success' | 'flagged' | 'denied'>('all');
   const [circuitBreakerTriggered, setCircuitBreakerTriggered] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -61,6 +75,7 @@ export const AdminGovernanceView: React.FC<AdminGovernanceViewProps> = ({
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
   const canControlMlops = can(role, 'mlops:control');
+  const canReadAudit = can(role, 'governance:view') || can(role, 'audit:read');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -87,6 +102,7 @@ export const AdminGovernanceView: React.FC<AdminGovernanceViewProps> = ({
   );
 
   const filteredLogs = auditLogs.filter(log => {
+    if (filterStatus !== 'all' && auditStatus(log) !== filterStatus) return false;
     const needle = searchLog.toLowerCase().trim();
     if (!needle) return true;
     return (
@@ -100,6 +116,39 @@ export const AdminGovernanceView: React.FC<AdminGovernanceViewProps> = ({
   const showNotice = (message: string) => {
     setNotice(message);
     setTimeout(() => setNotice(null), 5000);
+  };
+
+  const handleExportAuditCsv = () => {
+    if (!canReadAudit) return;
+    const rows = [
+      ['timestamp_utc', 'actor', 'role', 'accion', 'estado', 'ip', 'correlation_id', 'detalle'],
+      ...filteredLogs.map(log => [
+        log.timestamp,
+        log.actor,
+        log.role ?? '—',
+        log.action,
+        auditStatus(log),
+        auditIp(log),
+        log.correlation_id,
+        JSON.stringify(log.detail ?? {}),
+      ]),
+    ];
+    const csv = rows
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const url = URL.createObjectURL(new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8' }));
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `auditoria-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    showNotice(`CSV de auditoría generado con ${filteredLogs.length} eventos (filtros incluidos). Datos DEMO.`);
+    void writeAudit({
+      action: 'audit.export_csv',
+      detail: { rows: filteredLogs.length, action: filterAction, status: filterStatus },
+    });
   };
 
   const handleToggleCircuitBreaker = async () => {
@@ -324,6 +373,29 @@ export const AdminGovernanceView: React.FC<AdminGovernanceViewProps> = ({
                     <option key={action} value={action}>{action}</option>
                   ))}
                 </select>
+                <select
+                  aria-label="Filtrar auditoría por estado"
+                  value={filterStatus}
+                  onChange={event => setFilterStatus(event.target.value as typeof filterStatus)}
+                  className={`px-3 py-1.5 rounded-xl border text-xs focus:outline-none ${
+                    isLight ? 'bg-white border-slate-200 text-slate-800' : isMono ? 'bg-[#202532] border-[#3B4254] text-zinc-200' : 'bg-[#0A1F3D] border-edumaster-cardBorder text-slate-200'
+                  }`}
+                >
+                  <option value="all">Todos los estados</option>
+                  <option value="success">Success</option>
+                  <option value="flagged">Flagged</option>
+                  <option value="denied">Denied</option>
+                </select>
+                {canReadAudit && (
+                  <button
+                    onClick={handleExportAuditCsv}
+                    className={`p-2 rounded-xl border ${isLight ? 'bg-white border-slate-200 text-slate-700' : 'bg-white/5 border-white/10 text-slate-300'}`}
+                    title="Exportar eventos filtrados a CSV"
+                    aria-label="Exportar auditoría a CSV"
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setLoading(true);
@@ -357,22 +429,25 @@ export const AdminGovernanceView: React.FC<AdminGovernanceViewProps> = ({
                   {filteredLogs.map(log => (
                     <tr key={log.id} className="hover:bg-black/5">
                       <td className="py-3 font-mono opacity-80 whitespace-nowrap">{log.timestamp}</td>
-                      <td className="py-3 font-bold">{log.actor}</td>
+                      <td className="py-3 font-bold">
+                        {log.actor}
+                        {log.role && <span className={`block text-[9px] font-mono font-normal ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>{log.role}</span>}
+                      </td>
                       <td className="py-3 font-mono">
                         <span className="px-2 py-0.5 rounded bg-black/10 border border-inherit text-[10px] font-bold">{log.action}</span>
                       </td>
                       <td className="py-3 opacity-90 max-w-xs truncate">{detailTarget(log.detail)}</td>
-                      <td className="py-3 font-mono opacity-70">—</td>
+                      <td className="py-3 font-mono opacity-70">{auditIp(log)}</td>
                       <td className="py-3 font-mono text-[10px] opacity-60">{log.correlation_id}</td>
                       <td className="py-3">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          /fail|denied|error/i.test(log.action)
+                          auditStatus(log) === 'denied'
                             ? 'bg-rose-500/20 text-rose-400'
-                            : /flag|moderat/i.test(log.action)
+                            : auditStatus(log) === 'flagged'
                             ? 'bg-amber-500/20 text-amber-400'
                             : 'bg-emerald-500/20 text-emerald-400'
                         }`}>
-                          {/fail|denied|error/i.test(log.action) ? 'DENIED' : /flag|moderat/i.test(log.action) ? 'FLAGGED' : 'SUCCESS'}
+                          {auditStatus(log).toUpperCase()}
                         </span>
                       </td>
                     </tr>

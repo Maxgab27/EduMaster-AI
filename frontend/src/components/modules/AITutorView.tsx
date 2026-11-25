@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Bot, Send, User, ShieldCheck, RotateCcw } from 'lucide-react';
 import type { ThemeMode } from '../../types';
 import { useTutor } from '../../hooks/useTutor';
-import { tutorSourceLabel } from '../../services/tutorApi';
+import { TUTOR_SUGGESTIONS, tutorSourceLabel } from '../../services/tutorApi';
 
 interface AITutorViewProps {
   theme?: ThemeMode;
@@ -26,6 +26,12 @@ export const AITutorView: React.FC<AITutorViewProps> = ({ theme = 'monochrome' }
   const isLight = theme === 'light';
   const { messages, meta, sending, error, send, reset } = useTutor();
   const [inputVal, setInputVal] = useState('');
+  const [sourceNote, setSourceNote] = useState<string | null>(null);
+
+  const handleSourceClick = (source: string) => {
+    setSourceNote(`Referencia DEMO: ${source}. No abre un documento externo.`);
+    setInputVal(`¿Qué indica ${source}?`);
+  };
 
   const handleSend = (event: React.FormEvent) => {
     event.preventDefault();
@@ -123,15 +129,21 @@ export const AITutorView: React.FC<AITutorViewProps> = ({ theme = 'monochrome' }
                         <div className={`flex items-center gap-1.5 ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>
                           <span>Fuentes:</span>
                           {message.sources.map(source => (
-                            <span key={source} className={`px-1.5 py-0.5 rounded border font-mono ${
-                              isLight
-                                ? 'bg-slate-100 border-slate-200 text-slate-800'
-                                : isMono
-                                ? 'bg-[#242A38] border-[#3B4254] text-zinc-200'
-                                : 'bg-[#06152B] text-edumaster-cyan border-edumaster-cardBorder'
-                            }`}>
+                            <button
+                              key={source}
+                              type="button"
+                              onClick={() => handleSourceClick(source)}
+                              title="Preparar pregunta sobre esta fuente DEMO"
+                              className={`px-1.5 py-0.5 rounded border font-mono hover:underline ${
+                                isLight
+                                  ? 'bg-slate-100 border-slate-200 text-slate-800'
+                                  : isMono
+                                  ? 'bg-[#242A38] border-[#3B4254] text-zinc-200'
+                                  : 'bg-[#06152B] text-edumaster-cyan border-edumaster-cardBorder'
+                              }`}
+                            >
                               {source}
-                            </span>
+                            </button>
                           ))}
                         </div>
                       )}
@@ -144,6 +156,29 @@ export const AITutorView: React.FC<AITutorViewProps> = ({ theme = 'monochrome' }
               </div>
             </div>
           ))}
+        </div>
+
+        <div className={`px-4 py-3 border-t ${
+          isLight ? 'bg-slate-50 border-slate-200' : isMono ? 'bg-[#1C202B] border-[#2A2F3D]' : 'bg-[#0A1F3D] border-edumaster-cardBorder'
+        }`}>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`text-[10px] font-bold ${isLight ? 'text-slate-600' : 'text-slate-300'}`}>Preguntas sugeridas:</span>
+            {TUTOR_SUGGESTIONS.map(suggestion => (
+              <button
+                key={suggestion}
+                type="button"
+                onClick={() => { setInputVal(suggestion); setSourceNote(null); }}
+                className={`px-2 py-1 rounded-lg border text-[10px] ${
+                  isLight ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-100' : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
+                }`}
+              >
+                {suggestion}
+              </button>
+            ))}
+          </div>
+          {sourceNote && (
+            <p className={`text-[10px] mt-2 m-0 ${isLight ? 'text-blue-700' : 'text-blue-300'}`}>{sourceNote}</p>
+          )}
         </div>
 
         <form onSubmit={handleSend} className={`p-3 border-t flex gap-2 ${

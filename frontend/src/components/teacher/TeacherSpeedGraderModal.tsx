@@ -9,6 +9,7 @@ import {
   Save,
 } from 'lucide-react';
 import type { ApiSubmission, ThemeMode } from '../../types';
+import { getDemoActor } from '../../services/apiClient';
 
 interface TeacherSpeedGraderModalProps {
   submission: ApiSubmission | null;
@@ -74,8 +75,9 @@ const TeacherSpeedGraderModalContent: React.FC<ContentProps> = ({
       .toFixed(1),
   );
 
+  const demoActor = getDemoActor();
   const canSign = signedBy.trim().length >= 2
-    && feedback.trim().length >= 3
+    && feedback.trim().length >= 5
     && totalScore <= maxTotal
     && !saving;
 
@@ -106,7 +108,7 @@ const TeacherSpeedGraderModalContent: React.FC<ContentProps> = ({
   };
 
   const handleFeedbackOnly = async () => {
-    if (!onFeedbackSaved || !signedBy.trim() || feedback.trim().length < 3 || saving) return;
+    if (!onFeedbackSaved || !signedBy.trim() || feedback.trim().length < 5 || saving) return;
     setSaving(true);
     setError(null);
     try {
@@ -350,7 +352,7 @@ const TeacherSpeedGraderModalContent: React.FC<ContentProps> = ({
               {onFeedbackSaved && (
                 <button
                   onClick={() => void handleFeedbackOnly()}
-                  disabled={saving || signedBy.trim().length < 2 || feedback.trim().length < 3}
+                  disabled={saving || signedBy.trim().length < 2 || feedback.trim().length < 5}
                   className={`w-full py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 border transition-colors disabled:opacity-40 ${
                     isLight ? 'border-slate-300 text-slate-700 hover:bg-slate-100' : 'border-white/15 text-slate-300 hover:bg-white/10'
                   }`}
@@ -358,9 +360,13 @@ const TeacherSpeedGraderModalContent: React.FC<ContentProps> = ({
                   <Save className="w-3.5 h-3.5" /> Guardar feedback sin publicar nota
                 </button>
               )}
-              <p className="text-[10px] text-center opacity-60 m-0">
-                Acción auditada con correlationId. DEMO: sin publicación en actas institucionales.
-              </p>
+              <div className={`p-2 rounded-xl border text-[10px] space-y-0.5 ${isLight ? 'bg-slate-50 border-slate-200 text-slate-600' : 'bg-white/5 border-white/10 text-slate-300'}`}>
+                <p className="m-0 font-mono">X-Actor enviado: {demoActor.name} · {demoActor.role}</p>
+                {submission.signatureHash && <p className="m-0 font-mono">SHA-256: {submission.signatureHash.slice(0, 16)}…</p>}
+                {submission.auditLogId && <p className="m-0 font-mono">audit_log_id: {submission.auditLogId}</p>}
+                {submission.actorSource && <p className="m-0 font-mono">actor_source: {submission.actorSource}</p>}
+                <p className="m-0 opacity-70">Acción auditada con correlationId. DEMO: sin publicación en actas institucionales.</p>
+              </div>
             </div>
           </div>
         </div>

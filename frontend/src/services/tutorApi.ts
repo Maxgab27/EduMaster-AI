@@ -15,6 +15,14 @@ const WELCOME: TutorMessageData = {
   guardrail: 'Estimación pedagógica, no sustituye al docente.',
 };
 
+/** Preguntas de ejemplo enlazadas a las reglas disponibles en modo DEMO. */
+export const TUTOR_SUGGESTIONS: string[] = [
+  '¿Cómo se calcula el riesgo de abandono?',
+  '¿Cómo se pondera la función de pérdida?',
+  '¿Quién emite la nota oficial de un certificado?',
+  '¿Cómo funciona la moderación en Comunidad?',
+];
+
 interface Rule {
   text: string;
   confidence: number;

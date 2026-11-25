@@ -20,7 +20,18 @@ import {
 } from '../../services/assessmentsApi';
 import { listAtRiskStudents } from '../../services/riskApi';
 import { writeAudit } from '../../services/auditSink';
+import { getDemoActor } from '../../services/apiClient';
 import { TeacherSpeedGraderModal } from './TeacherSpeedGraderModal';
+
+interface SignatureReceipt {
+  submissionId: string;
+  signedBy: string;
+  signatureHash?: string;
+  auditLogId?: string;
+  actorSource?: string;
+  source: string;
+  correlationId: string;
+}
 
 interface TeacherDashboardProps {
   theme?: ThemeMode;
@@ -44,6 +55,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
   const [activeSubmission, setActiveSubmission] = useState<ApiSubmission | null>(null);
   const [isSpeedGraderOpen, setIsSpeedGraderOpen] = useState(false);
   const [actionNotice, setActionNotice] = useState<string | null>(null);
+  const [lastSignature, setLastSignature] = useState<SignatureReceipt | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
   const isMono = theme === 'monochrome';
@@ -108,9 +120,21 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
         signedBy,
       },
     });
+    const actor = getDemoActor();
     const hash = response.data.signatureHash ? ` · SHA-256 ${response.data.signatureHash.slice(0, 12)}…` : '';
+    const auditRef = response.data.auditLogId ? ` · audit_log_id ${response.data.auditLogId.slice(0, 14)}…` : '';
+    const actorRef = response.data.actorSource ? ` · actor_source ${response.data.actorSource}` : ` · X-Actor ${actor.name} (${actor.role}, sin verificar)`;
+    setLastSignature({
+      submissionId,
+      signedBy: response.data.signedBy ?? signedBy,
+      signatureHash: response.data.signatureHash,
+      auditLogId: response.data.auditLogId,
+      actorSource: response.data.actorSource,
+      source: response.meta.source,
+      correlationId: response.meta.correlationId,
+    });
     setActionNotice(
-      `✓ Nota ${officialScore}/${response.data.rubricScores.reduce((sum, row) => sum + row.maxPts, 0)} firmada por ${signedBy} y registrada en ${response.meta.source.toUpperCase()}${hash}. Sin publicación en actas reales.`,
+      `✓ Nota ${officialScore}/${response.data.rubricScores.reduce((sum, row) => sum + row.maxPts, 0)} firmada por ${signedBy} y registrada en ${response.meta.source.toUpperCase()}${hash}${auditRef}${actorRef}. Sin publicación en actas reales.`,
     );
   };
 
@@ -215,6 +239,25 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
           <span className="font-mono text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded shrink-0">
             Human-in-the-loop
           </span>
+        </div>
+      )}
+
+      {lastSignature && (
+        <div className={`p-3 rounded-2xl border text-[11px] space-y-1 ${
+          isLight ? 'bg-white border-slate-200 text-slate-700' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-200' : 'glass-panel border-edumaster-cardBorder text-slate-200'
+        }`}>
+          <div className="flex items-center gap-2 font-bold">
+            <Award className="w-4 h-4 text-emerald-400" /> Comprobante de firma · {lastSignature.submissionId}
+          </div>
+          <div className="font-mono flex flex-wrap gap-x-4 gap-y-1 opacity-90">
+            <span>fuente: {lastSignature.source.toUpperCase()}</span>
+            <span>firmado por: {lastSignature.signedBy}</span>
+            <span>correlation_id: {lastSignature.correlationId}</span>
+            <span>SHA-256: {lastSignature.signatureHash ? `${lastSignature.signatureHash.slice(0, 18)}…` : 'no disponible en DEMO local'}</span>
+            <span>audit_log_id: {lastSignature.auditLogId ?? 'no disponible en DEMO local'}</span>
+            <span>actor_source: {lastSignature.actorSource ?? 'body_unverified (DEMO)'}</span>
+          </div>
+          <p className="m-0 opacity-70">El backend solo devuelve hash, audit_log_id y actor_source cuando la firma va por API real; en DEMO local se muestran como no disponibles.</p>
         </div>
       )}
 

@@ -92,15 +92,23 @@ El proyecto se encuentra en un estado funcional avanzado **como frontend base/de
 - Todo se guarda en `localStorage` (`edumaster_demo_v1`) con auditoría `community.message.posted/edited/deleted/moderated/simulated`. Cada navegador tiene su propia copia: no hay sincronización entre usuarios ni tiempo real, y se borra al limpiar datos del navegador.
 - Verificado con `npm run lint` y `npm run build` sin `.env.local`: envío, respuesta simulada, cita, edición, borrado, búsqueda y persistencia tras recargar, con **0 errores de consola**.
 
+### 2.6 Notificaciones, Tutor IA, firma y CSV (2026-11-25)
+
+- **Notificaciones DEMO:** la campanita deriva eventos de `edumaster_demo_v1.auditLogs` (por ejemplo, `community.message.posted` y `submissions.graded`), con filtros **Todas / Sin leer**, botón **Marcar todas**, tiempo relativo y actor. `notificationReadAllAt` guarda el corte de lectura; en la prueba el badge pasó a `0 sin leer`, el estado persistió tras recargar y hubo **0 errores de consola**.
+- **Tutor IA:** añade `Preguntas sugeridas` y fuentes clicables en la vista completa y en el drawer. Al pulsar una fuente se prepara una pregunta y se muestra `Referencia DEMO: …; no abre un documento externo`. La confianza aparece como **Peso regla DEMO** (por ejemplo `86%`), no como precisión medida; las respuestas siguen siendo reglas trazables, no LLM.
+- **SpeedGrader con firma:** el modal muestra el `X-Actor` que envía el cliente (`localStorage.edumaster_demo_user`), exige firma y feedback de al menos 5 caracteres, y el dashboard muestra un **comprobante de firma** con fuente, firmante, `correlation_id` y los campos devueltos por la API real (`SHA-256`, `audit_log_id`, `actor_source`). En DEMO local aparecen como `no disponible en DEMO local` / `body_unverified (DEMO)`: no son actas oficiales.
+- **Auditoría y CSV:** Gobierno filtra por estado y exporta `auditoria-YYYY-MM-DD.csv` con timestamp, actor, rol real, acción, estado, IP disponible, correlación y detalle. Análisis exporta `analitica-<cohorte>-YYYY-MM-DD.csv` con cohorte, fecha de corte UTC, fuente DEMO y correlation ID. Ambos CSV usan BOM UTF-8; las descargas se verificaron en navegador y generaron `audit.export_csv` y `analytics.export_csv` en la auditoría local.
+- Límite común: `localStorage` es por navegador, no hay backend de notificaciones ni mensajería real, y los CSV contienen datos sintéticos etiquetados `DEMO`. Con `VITE_CORE_API_BASE_URL` apuntando al backend sí se visualizan los campos reales de la firma; sin esa variable el frontend permanece en modo local.
+
 | Componente / Módulo | Estado | Avance / Descripción Técnica |
 | :--- | :---: | :--- |
 | **Arquitectura de Frontend** | `100% Completo` | React 19 + TypeScript + Vite + Tailwind CSS. Arquitectura modular por componentes y vistas. |
 | **Visualizador Neuronal** | `100% Completo` | Canvas SVG interactivo con simulación de flujo de activaciones forward/backward, capas densas y multi-head. Lienzo limpio y despejado. |
 | **Mapa Global de Progreso** | `100% Completo` | Siluetas vectoriales precisas de continentes (Norteamérica, Sudamérica, Europa, África, Asia, Oceanía), coordenadas estables de alta precisión y sin animaciones parpadeantes. |
 | **Panel y Gráfica Donut** | `100% Completo` | Componente compacto con proporción optimizada para eliminar desperdicio de espacio vertical en dashboard. |
-| **SpeedGrader Docente** | `100% Completo` | Modal con divisor de pantalla (código del estudiante + rúbrica oficial), ajuste de puntajes, sugerencias asistidas por IA y cumplimiento estricto de React Rules of Hooks. |
+| **SpeedGrader Docente** | `100% Completo` | Modal con divisor de pantalla (código del estudiante + rúbrica oficial), ajuste de puntajes, sugerencias asistidas, firma con `X-Actor`, validación de feedback y comprobante con hash / `audit_log_id` / `actor_source` cuando responde la API. |
 | **Sandbox de Código** | `100% Completo` | Entorno de desarrollo para estudiantes en Python con ejecución simulada, feedback inmediato y guardrails de seguridad. |
-| **Gobernanza & ARCO** | `100% Completo` | Registro inmutable de auditoría (`audit_logs`), trazabilidad de inferencias y flujo de atención de solicitudes ARCO (Ley 29733). |
+| **Gobernanza & ARCO** | `100% Completo` | Registro de auditoría (`audit_logs`) con filtro por estado y exportación CSV, trazabilidad de inferencias y flujo de atención ARCO (Ley 29733). |
 | **Soporte Multi-Tema** | `100% Completo` | Compatibilidad total con 3 modos visuales: **Monochrome / Grafito**, **Cyber Blue** y **Light Minimalista** (con contraste validado WCAG AAA). |
 | **Auditoría de Calidad** | `100% Completo` | `oxlint` pasando con 0 errores y compilación `tsc -b && vite build` ejecutada con éxito en 1.57s. |
 | **Documentación Ejecutiva** | `100% Completo` | Generador de informe técnico-estratégico en PDF/HTML (`generate_report.py`) con diagramas arquitecturales. |
@@ -244,7 +252,7 @@ Entregable Final/
 - Diseñado para optimizar el flujo de revisión docente sin delegar decisiones finales al algoritmo.
 - Divisor visual 55% / 45%: código Python entregado a la izquierda y rúbrica oficial a la derecha.
 - Botón **"Sugerir borrador con IA"** que redacta feedback formativo preliminar que el docente debe validar o modificar.
-- Firma digital del docente registrada en `audit_logs` garantizando la autoría humana de la nota.
+- Firma digital del docente registrada en `audit_logs` garantizando la autoría humana de la nota. El modal muestra el `X-Actor` enviado y requiere feedback de al menos 5 caracteres; el dashboard conserva un comprobante con `correlation_id`, hash, `audit_log_id` y `actor_source` solo cuando provienen de la API real. En DEMO local esos tres últimos campos se muestran como no disponibles y la nota no se publica en actas oficiales.
 
 ### 5.3. Mapa Global de Progreso Geográfico
 - Visualización de la distribución de estudiantes en los 5 continentes.
@@ -257,7 +265,7 @@ Entregable Final/
   - **Rectificación:** Corrección de atributos erróneos de usuario.
   - **Cancelación / Olvido:** Anonimización irreversible de información personal identificable (PII).
   - **Oposición:** Desactivación de recomendaciones automáticas basadas en IA.
-- Trazabilidad total de logs inmutables con usuario, rol, acción, dirección IP y timestamp UTC.
+- Trazabilidad de logs con usuario, rol real, acción, dirección IP disponible y timestamp UTC; el registro admite búsqueda, filtro por estado y exportación CSV de los eventos filtrados.
 
 ### 5.5. Soporte Multi-Tema y Accesibilidad
 El sistema cuenta con un selector de temas en la barra superior con tres variantes totalmente probadas:

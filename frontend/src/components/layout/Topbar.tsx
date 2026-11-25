@@ -20,10 +20,21 @@ import { isDemoMode } from '../../services/apiClient';
 import {
   getNotificationPreferences,
   listNotifications,
+  markAllNotificationsRead,
   markNotificationRead,
   updateNotificationPreferences,
 } from '../../services/notificationsApi';
 import { writeAudit } from '../../services/auditSink';
+
+function notificationTime(value: string): string {
+  const date = new Date(value);
+  const delta = Date.now() - date.getTime();
+  if (!Number.isFinite(delta)) return value;
+  if (delta < 60_000) return 'ahora';
+  if (delta < 3_600_000) return `hace ${Math.floor(delta / 60_000)} min`;
+  if (delta < 86_400_000) return `hace ${Math.floor(delta / 3_600_000)} h`;
+  return date.toLocaleDateString('es-PE', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+}
 
 interface TopbarProps {
   user: UserProfile;
@@ -59,10 +70,16 @@ export const Topbar: React.FC<TopbarProps> = ({
   const [notificationMeta, setNotificationMeta] = useState<ApiMeta | null>(null);
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [notificationsError, setNotificationsError] = useState<string | null>(null);
+  const [notificationFilter, setNotificationFilter] = useState<'all' | 'unread'>('all');
 
   const unreadCount = useMemo(
     () => notifications.filter(item => !item.read).length,
     [notifications],
+  );
+
+  const visibleNotifications = useMemo(
+    () => notificationFilter === 'unread' ? notifications.filter(item => !item.read) : notifications,
+    [notifications, notificationFilter],
   );
 
   useEffect(() => {
@@ -99,6 +116,23 @@ export const Topbar: React.FC<TopbarProps> = ({
       });
     } catch (err) {
       setNotificationsError(err instanceof Error ? err.message : 'No se pudo marcar como leída');
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      const response = await markAllNotificationsRead();
+      setNotifications(response.data);
+      setNotificationMeta(response.meta);
+      setNotificationFilter('all');
+      await writeAudit({
+        action: 'notification.read_changed',
+        correlationId: response.meta.correlationId,
+        onlyDemo: true,
+        detail: { all: true, read: true },
+      });
+    } catch (err) {
+      setNotificationsError(err instanceof Error ? err.message : 'No se pudieron marcar todas como leídas');
     }
   };
 
@@ -383,12 +417,39 @@ export const Topbar: React.FC<TopbarProps> = ({
                 </span>
               </div>
 
+              <div className="flex items-center gap-1.5 mt-2">
+                {(['all', 'unread'] as const).map(filter => (
+                  <button
+                    key={filter}
+                    onClick={() => setNotificationFilter(filter)}
+                    aria-pressed={notificationFilter === filter}
+                    className={`px-2 py-0.5 rounded-lg border text-[10px] font-bold ${
+                      notificationFilter === filter
+                        ? isLight ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-zinc-950 border-white'
+                        : isLight ? 'bg-white border-slate-200 text-slate-600' : 'bg-white/5 border-white/10 text-slate-400'
+                    }`}
+                  >
+                    {filter === 'all' ? `Todas (${notifications.length})` : `Sin leer (${unreadCount})`}
+                  </button>
+                ))}
+                {unreadCount > 0 && (
+                  <button
+                    onClick={() => void handleMarkAllRead()}
+                    className={`ml-auto text-[10px] font-bold underline ${
+                      isLight ? 'text-slate-700' : 'text-slate-300'
+                    }`}
+                  >
+                    Marcar todas
+                  </button>
+                )}
+              </div>
+
               {notificationsError && (
-                <p className={`text-[10px] mb-2 ${isLight ? 'text-rose-700' : 'text-rose-300'}`}>{notificationsError}</p>
+                <p className={`text-[10px] mt-2 mb-2 ${isLight ? 'text-rose-700' : 'text-rose-300'}`}>{notificationsError}</p>
               )}
 
-              <div className="space-y-2 text-xs max-h-72 overflow-y-auto">
-                {notifications.map(notification => (
+              <div className="space-y-2 text-xs max-h-72 overflow-y-auto mt-2">
+                {visibleNotifications.map(notification => (
                   <div
                     key={notification.id}
                     className={`p-2.5 rounded-xl border ${
@@ -408,7 +469,7 @@ export const Topbar: React.FC<TopbarProps> = ({
                     <span className="opacity-60 text-[11px] block mt-0.5">{notification.message}</span>
                     <div className="flex items-center justify-between gap-2 mt-1.5">
                       <span className={`text-[9px] font-mono opacity-50 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-                        {notification.createdAt.slice(0, 10)}
+                        {notificationTime(notification.createdAt)} · {notification.actor}
                       </span>
                       {!notification.read && (
                         <button
@@ -423,8 +484,10 @@ export const Topbar: React.FC<TopbarProps> = ({
                     </div>
                   </div>
                 ))}
-                {notifications.length === 0 && !notificationsError && (
-                  <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Sin notificaciones.</p>
+                {visibleNotifications.length === 0 && !notificationsError && (
+                  <p className={`text-[11px] ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+                    {notificationFilter === 'unread' ? 'No quedan notificaciones sin leer.' : 'Sin notificaciones.'}
+                  </p>
                 )}
               </div>
 
