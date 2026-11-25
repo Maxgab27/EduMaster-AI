@@ -111,6 +111,17 @@ function badgeClass(role: string, isLight: boolean): string {
   return `${base} ${isLight ? 'bg-slate-100 border-slate-200 text-slate-600' : 'bg-white/5 border-white/10 text-slate-400'}`;
 }
 
+/** Participantes disponibles para simular una conversación dentro del chat DEMO. */
+const DEMO_CHAT_USERS: Array<{ name: string; role: UserRole }> = [
+  { name: 'Dra. López', role: 'admin' },
+  { name: 'Dr. Alejandro Morales', role: 'docente' },
+  { name: 'Ana Torres', role: 'docente' },
+  { name: 'Sofia Ramírez Vargas', role: 'estudiante' },
+  { name: 'Luis Paredes', role: 'estudiante' },
+  { name: 'Ing. Carlos Mendoza', role: 'mle' },
+  { name: 'Marta Ruiz', role: 'mle' },
+];
+
 export const CommunityView: React.FC<CommunityViewProps> = ({
   theme = 'monochrome',
   role = 'estudiante',
@@ -135,13 +146,16 @@ export const CommunityView: React.FC<CommunityViewProps> = ({
   const [editingText, setEditingText] = useState('');
   const [autoReply, setAutoReply] = useState(true);
   const [typing, setTyping] = useState(false);
+  const [chatUser, setChatUser] = useState<{ name: string; role: UserRole } | null>(null);
   const feedRef = useRef<HTMLDivElement | null>(null);
   const replyTimer = useRef<number | null>(null);
 
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
-  const canModerate = can(role, 'governance:view') || role === 'docente' || role === 'mle';
-  const canCreate = can(role, 'community:view');
+  const activeActor = chatUser?.name ?? actor;
+  const activeRole = chatUser?.role ?? role;
+  const canModerate = can(activeRole, 'governance:view') || activeRole === 'docente' || activeRole === 'mle';
+  const canCreate = can(activeRole, 'community:view');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -255,8 +269,8 @@ export const CommunityView: React.FC<CommunityViewProps> = ({
     try {
       const response = await postMessage(threadId, {
         text,
-        author: actor,
-        role,
+        author: activeActor,
+        role: activeRole,
         ...(replyTo
           ? {
               replyToId: replyTo.id,
@@ -356,7 +370,7 @@ export const CommunityView: React.FC<CommunityViewProps> = ({
     event.preventDefault();
     if (!newThread.name.trim() || !newThread.title.trim() || !newThread.description.trim()) return;
     try {
-      const response = await createThread({ ...newThread, author: actor });
+      const response = await createThread({ ...newThread, author: activeActor });
       setThreads(prev => [response.data, ...prev]);
       selectThread(response.data.id);
       setShowCreate(false);
@@ -399,6 +413,13 @@ export const CommunityView: React.FC<CommunityViewProps> = ({
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          <span className={`text-[10px] font-bold px-2 py-1 rounded border ${
+            chatUser
+              ? isLight ? 'bg-blue-50 border-blue-300 text-blue-800' : 'bg-blue-500/10 border-blue-500/30 text-blue-300'
+              : isLight ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+          }`} title="Usuario que escribe en este chat; no cambia tu rol global">
+            {chatUser ? 'SIMULANDO' : 'ACTUAL'}: {activeActor} · {activeRole}
+          </span>
           <span className={`text-[10px] font-mono px-2 py-1 rounded border ${
             isLight ? 'bg-slate-100 border-slate-200 text-slate-600' : 'bg-white/5 border-white/10 text-slate-400'
           }`}>
@@ -543,7 +564,7 @@ export const CommunityView: React.FC<CommunityViewProps> = ({
                 {filteredMessages.map((message, index) => {
                   const label = dayLabel(message.createdAt);
                   const previous = index > 0 ? dayLabel(filteredMessages[index - 1].createdAt) : null;
-                  const isOwn = message.author === actor;
+                  const isOwn = message.author === activeActor;
                   const quoted = message.replyToId
                     ? messages.find(item => item.id === message.replyToId)
                     : null;
@@ -699,6 +720,41 @@ export const CommunityView: React.FC<CommunityViewProps> = ({
                     </button>
                   </div>
                 )}
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <label className={`text-[10px] font-bold ${isLight ? 'text-slate-600' : 'text-slate-300'}`} htmlFor="community-chat-user">
+                    Escribir como
+                  </label>
+                  <select
+                    id="community-chat-user"
+                    aria-label="Usuario DEMO activo"
+                    value={activeActor}
+                    onChange={event => {
+                      const found = DEMO_CHAT_USERS.find(item => item.name === event.target.value);
+                      setChatUser(found ?? null);
+                    }}
+                    className={`px-2 py-1 rounded-lg border text-[10px] ${isLight ? 'bg-white border-slate-300 text-slate-700' : isMono ? 'bg-[#12141A] border-[#2A2F3D] text-zinc-200' : 'bg-[#06152B] border-edumaster-cardBorder text-slate-200'}`}
+                  >
+                    {DEMO_CHAT_USERS.map(item => (
+                      <option key={item.name} value={item.name}>{item.name} · {item.role}</option>
+                    ))}
+                    {!DEMO_CHAT_USERS.some(item => item.name === activeActor) && (
+                      <option value={activeActor}>{activeActor} · {activeRole} (rol global)</option>
+                    )}
+                  </select>
+                  {chatUser && (
+                    <button
+                      type="button"
+                      onClick={() => setChatUser(null)}
+                      className={`px-2 py-1 rounded-lg border text-[10px] font-bold ${isLight ? 'bg-slate-100 border-slate-300 text-slate-700' : 'bg-white/5 border-white/10 text-slate-300'}`}
+                      title="Volver al usuario del rol global"
+                    >
+                      Usar mi rol global
+                    </button>
+                  )}
+                  <span className={`text-[10px] ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Cambia solo el autor dentro del chat; no es autenticación.
+                  </span>
+                </div>
                 <div className="flex gap-2 items-end">
                   <textarea
                     aria-label="Mensaje"
