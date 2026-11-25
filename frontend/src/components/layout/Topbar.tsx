@@ -71,6 +71,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [notificationsError, setNotificationsError] = useState<string | null>(null);
   const [notificationFilter, setNotificationFilter] = useState<'all' | 'unread'>('all');
+  const [prefsNotice, setPrefsNotice] = useState(false);
 
   const unreadCount = useMemo(
     () => notifications.filter(item => !item.read).length,
@@ -142,6 +143,7 @@ export const Topbar: React.FC<TopbarProps> = ({
     try {
       const response = await updateNotificationPreferences(updated);
       setPreferences(response.data);
+      setPrefsNotice(true);
       await writeAudit({
         action: 'notification.preferences_updated',
         correlationId: response.meta.correlationId,
@@ -271,7 +273,7 @@ export const Topbar: React.FC<TopbarProps> = ({
 
         {/* Badge honesto: los datos siguen siendo DEMO, con o sin API configurada */}
         <div
-          className={`hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border ${
+          className={`hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border ${
             isLight 
               ? 'bg-amber-100 border-amber-300 text-amber-800'
               : isMono 
@@ -279,11 +281,11 @@ export const Topbar: React.FC<TopbarProps> = ({
               : 'bg-amber-500/15 border-amber-500/40 text-amber-300'
           }`}
           title={isDemoMode()
-            ? 'Sin VITE_API_BASE_URL: se usan adaptadores DEMO locales'
+            ? 'Sin VITE_API_BASE_URL: adaptadores locales; sin WebSocket/SSE y sin autenticación real'
             : 'API /api/v1 conectada; los datos siguen siendo sintéticos y NO son evidencia pedagógica'}
         >
           <Database className="w-3 h-3" />
-          <span>{isDemoMode() ? 'DATASET DEMO · SIN API' : 'API /api/v1 · DATOS DEMO'}</span>
+          <span>{isDemoMode() ? 'DATOS LOCALES DEMO · SIN API /api/v1' : 'API /api/v1 · DATOS DEMO'}</span>
         </div>
 
         {/* Realtime connection state badge (offline in this demo) */}
@@ -507,6 +509,11 @@ export const Topbar: React.FC<TopbarProps> = ({
                   >
                     {preferences.inApp ? 'Activadas' : 'Desactivadas'}
                   </button>
+                  {prefsNotice && (
+                    <p className="text-[9px] m-0 text-emerald-400 col-span-2">
+                      Guardado en este navegador · DEMO
+                    </p>
+                  )}
                 </div>
               )}
             </div>

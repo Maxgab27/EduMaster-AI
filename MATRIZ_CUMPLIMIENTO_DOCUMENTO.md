@@ -26,8 +26,8 @@ Fuentes:
 | 6 | Transactional Outbox + Redis Streams + Celery | ❌ | `REDIS_URL` existe solo en `config.py`, `.env.example` y requirements; sin implementar |
 | 7 | PyTorch real (`torch.nn`) entrenado | ❌ | `pytorch_engine.py` usa fallback a NumPy; no hay modelo `.pt` |
 | 8 | MLflow + DVC + S3 | ❌ | No existe en el repo |
-| 9 | Métricas rotuladas `DEMO` (transparencia activa) | ✅ | Badge `DATASET DEMO · SIN API`, `PR-AUC (demo) 0.914 — métrica simulada` |
-| 10 | Prohibido simular actividad algorítmica; mostrar "Sin conexión" | ◐ | Está rotulado como demo, pero el visualizador sigue animando pulsos "Forward 1x" |
+| 9 | Métricas rotuladas `DEMO` (transparencia activa) | ✅ | Badge `DATOS LOCALES DEMO · SIN API /api/v1`, `PR-AUC (demo) 0.914 — métrica simulada` |
+| 10 | Prohibido simular actividad algorítmica; mostrar "Sin conexión" | ◐ | El visualizador dice `DEMO · ANIMACIÓN ILUSTRATIVA` y `Propagación (animada)`; sigue siendo una animación, no inferencia |
 | 11 | Non-goals: sin biometría, sin emociones, sin reentrenamiento automático | ✅ | No existe ninguna de esas funciones |
 | 12 | Human-in-the-loop: el docente firma la nota | ◐ | UI de SpeedGrader sí; backend acepta `teacher_id="docente-sin-autenticar"` del body |
 | 13 | RBAC/ABAC en backend | ◐ | Existe en `api/` (headers X-Role/X-Actor, modo demo), pero ese backend no está activo; el activo no tiene auth |
@@ -40,10 +40,10 @@ Fuentes:
 | 20 | KPIs desde vistas materializadas + nav protegida por JWT | ❌ | KPIs de `mockData.ts`; roles solo en frontend |
 | 21 | Cambiar "Ingresos" por horas efectivas | ✅ | UI muestra `HORAS DE APRENDIZAJE` |
 | 22 | SSE/WebSocket + ciclo de actualización en 6 etapas | ❌ | UI dice `SINCRONIZACIÓN SIMULADA`; no hay WS/SSE en backend |
-| 23 | SOPs completos (matrícula, recomendación, certificados QR) | ◐ | Módulos visibles; QR ilustrativo, no escaneable (`certificatesApi.ts`) |
-| 24 | DoD: pruebas unitarias/E2E, CI/CD, OWASP, canary, RPO/RTO | ❌ | Solo lint + build + smoke test (no versionado) |
+| 23 | SOPs completos (matrícula, recomendación, certificados QR) | ◐ | Módulos visibles; QR PNG escaneable y verificación HTTP DEMO; matrícula y recomendación siguen locales |
+| 24 | DoD: pruebas unitarias/E2E, CI/CD, OWASP, canary, RPO/RTO | ◐ | 7 pruebas E2E versionadas con Playwright, lint, build y smoke test; falta CI/CD, OWASP, canary, RPO/RTO |
 
-**Resultado:** 5 cumplidos · 7 parciales · 12 no cumplidos (de 24 requisitos).
+**Resultado:** 5 cumplidos · 8 parciales · 11 no cumplidos (de 24 requisitos).
 
 ---
 

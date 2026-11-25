@@ -100,6 +100,6 @@ El código ya soporta dos formatos:
 
 - Es una demostración académica SENATI: datos sintéticos, certificados no oficiales, sin autenticación real. `X-Actor` es opcional y no prueba identidad.
 - `confidence=0.94`, `calibrated_brier_score=0.082` y `PR-AUC=0.914` son constantes de la DEMO, no métricas medidas en Railway.
-- Supabase/OIDC y las pruebas E2E con Playwright siguen pendientes; no se compartieron credenciales.
+- Supabase/OIDC siguen pendientes; las 7 pruebas E2E con Playwright ya están versionadas y se ejecutan con `npm.cmd run test:e2e`. No se compartieron credenciales.
 - `railway.json` es “Config as Code” y Railway lo marca como obsoleto a partir del **2026-12-01**; hoy sigue funcionando. La alternativa futura es `.railway/railway.ts` o configurar todo desde el dashboard. No se migró ahora para no tocar lo ya validado.
 - Si quieres que actualice esta guía con tus dominios definitivos, pásamelos después del despliegue y reemplazo los marcadores.

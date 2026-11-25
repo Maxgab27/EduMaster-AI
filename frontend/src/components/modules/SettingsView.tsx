@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Settings, Shield, Building2, Save, CheckCircle2, Palette, Moon, Sun, Check,
-  AlertCircle, Loader2, BellRing,
+  AlertCircle, Loader2, BellRing, Download, Upload, Database,
 } from 'lucide-react';
 import { can } from '../../auth/permissions';
 import { isDemoMode } from '../../services/apiClient';
 import { writeAudit } from '../../services/auditSink';
+import { exportDemoData, importDemoData } from '../../services/demoStore';
 import {
   getSettings,
   getSettingsPreferences,
@@ -55,6 +56,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [saving, setSaving] = useState(false);
   const [savedNotice, setSavedNotice] = useState(false);
   const [prefsNotice, setPrefsNotice] = useState(false);
+  const [dataNotice, setDataNotice] = useState<string | null>(null);
+  const [dataError, setDataError] = useState<string | null>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   const isMono = currentTheme === 'monochrome';
   const canEdit = can(role, 'settings:edit');
@@ -146,6 +150,54 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     }
   };
 
+  const handleExportData = async () => {
+    setDataError(null);
+    try {
+      const json = exportDemoData();
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `edumaster-demo-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+      setDataNotice(`Respaldo DEMO descargado (${json.length} caracteres). Incluye tema, actor y notas.`);
+      await writeAudit({
+        action: 'demo.export_data',
+        detail: { bytes: blob.size },
+        onlyDemo: true,
+      });
+    } catch (err) {
+      setDataError(err instanceof Error ? err.message : 'No se pudo exportar el respaldo DEMO');
+    }
+  };
+
+  const handleImportData = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setDataError(null);
+    setDataNotice(null);
+    try {
+      const result = importDemoData(await file.text());
+      if (!result.ok) {
+        setDataError(result.error);
+        return;
+      }
+      setDataNotice(`Datos DEMO importados: ${result.keys} claves. Recarga para aplicarlos en todos los módulos.`);
+      await writeAudit({
+        action: 'demo.import_data',
+        detail: { keys: result.keys, file: file.name },
+        onlyDemo: true,
+      });
+    } catch (err) {
+      setDataError(err instanceof Error ? err.message : 'No se pudo importar el respaldo DEMO');
+    } finally {
+      event.target.value = '';
+    }
+  };
+
   const themeOptions: {
     id: ThemeMode;
     title: string;
@@ -218,7 +270,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             ? 'border-amber-500/40 bg-amber-500/10 text-amber-400'
             : 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400'
         }`}>
-          {demoMode ? 'DEMO · sin conexión' : 'API · /api/v1'}
+          {demoMode ? 'DEMO · sin API /api/v1 · datos locales' : 'API · /api/v1'}
           {meta ? ` · ${meta.correlationId.slice(0, 12)}` : ''}
         </span>
       </div>
@@ -527,6 +579,58 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               )}
             </div>
           </div>
+        )}
+      </div>
+
+      {/* Respaldo local: permite no perder el progreso al limpiar el navegador */}
+      <div className="glass-panel p-5 border rounded-2xl space-y-3">
+        <h3 className="text-sm font-bold flex items-center gap-2 m-0">
+          <Database className="w-4 h-4 opacity-80" />
+          Respaldo de datos DEMO
+        </h3>
+        <p className="text-[11px] opacity-70 m-0">
+          Exporta el estado local (auditoría, chat, notificaciones, ruta, tema y actor) e impórtalo en otro navegador.
+          No contiene datos institucionales ni secretos. Los CSV y los certificados siguen siendo sintéticos.
+        </p>
+        <input
+          ref={importInputRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          aria-label="Archivo de respaldo DEMO"
+          onChange={event => void handleImportData(event)}
+        />
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => void handleExportData()}
+            className="px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20"
+          >
+            <Download className="w-3.5 h-3.5" /> Exportar datos DEMO
+          </button>
+          <button
+            onClick={() => importInputRef.current?.click()}
+            className="px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+          >
+            <Upload className="w-3.5 h-3.5" /> Importar datos DEMO
+          </button>
+          {dataNotice && (
+            <button
+              onClick={() => window.location.reload()}
+              className="px-3 py-2 rounded-xl text-xs font-bold border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10"
+            >
+              Recargar ahora
+            </button>
+          )}
+        </div>
+        {dataNotice && (
+          <p className="text-[11px] text-emerald-400 flex items-center gap-1 m-0">
+            <CheckCircle2 className="w-3.5 h-3.5" /> {dataNotice}
+          </p>
+        )}
+        {dataError && (
+          <p className="text-[11px] text-rose-400 flex items-center gap-1 m-0">
+            <AlertCircle className="w-3.5 h-3.5" /> {dataError}
+          </p>
         )}
       </div>
     </div>

@@ -84,7 +84,9 @@ export function getSettingsPreferences(signal?: AbortSignal) {
   return requestWithDemo<SettingsPreferences>(
     '/api/v1/settings/preferences',
     { signal },
-    () => readSlice<SettingsPreferences>(PREFS_KEY, DEFAULT_PREFS),
+    () => readSlice<SettingsPreferences | null>(PREFS_KEY, null)
+      ?? readSlice<SettingsPreferences | null>('notificationPreferences', null)
+      ?? DEFAULT_PREFS,
   );
 }
 
@@ -96,7 +98,9 @@ export function updateSettingsPreferences(
     '/api/v1/settings/preferences',
     { method: 'PUT', body: JSON.stringify(payload), signal },
     () => {
+      // Misma clave que usa la campanita: evitar preferencias contradictorias.
       writeSlice(PREFS_KEY, payload);
+      writeSlice('notificationPreferences', payload);
       return payload;
     },
   );

@@ -100,6 +100,14 @@ El proyecto se encuentra en un estado funcional avanzado **como frontend base/de
 - **Auditoría y CSV:** Gobierno filtra por estado y exporta `auditoria-YYYY-MM-DD.csv` con timestamp, actor, rol real, acción, estado, IP disponible, correlación y detalle. Análisis exporta `analitica-<cohorte>-YYYY-MM-DD.csv` con cohorte, fecha de corte UTC, fuente DEMO y correlation ID. Ambos CSV usan BOM UTF-8; las descargas se verificaron en navegador y generaron `audit.export_csv` y `analytics.export_csv` en la auditoría local.
 - Límite común: `localStorage` es por navegador, no hay backend de notificaciones ni mensajería real, y los CSV contienen datos sintéticos etiquetados `DEMO`. Con `VITE_CORE_API_BASE_URL` apuntando al backend sí se visualizan los campos reales de la firma; sin esa variable el frontend permanece en modo local.
 
+### 2.7 Respaldo, preferencias y pruebas E2E (2026-11-25)
+
+- **Preferencias compartidas:** `notificationsApi.ts` y `settingsApi.ts` ahora leen y escriben las dos claves (`notificationPreferences` y `settingsPreferences`). Cambiar “Notificaciones en la app” desde la campanita se refleja en Configuración y aparece un aviso **Guardado en este navegador · DEMO**.
+- **Respaldo DEMO:** `demoStore.ts` exporta `edumaster-demo-<fecha>.json` con el store versionado y las claves auxiliares (tema, actor, conversación del tutor y notas). La importación valida el tipo, la versión y claves permitidas antes de escribir; desde Configuración se descarga, se importa y se ofrece **Recargar ahora**. No contiene secretos ni datos institucionales.
+- **Estado honesto sin API:** el badge de la barra superior dice **DATOS LOCALES DEMO · SIN API /api/v1** y Configuración dice **DEMO · sin API /api/v1 · datos locales**. No afirma que haya WebSocket/SSE ni autenticación real.
+- **Pruebas E2E:** se añadió `@playwright/test`, `playwright.config.ts`, `tests/demo-flows.spec.ts` y el script `npm.cmd run test:e2e`. Las 7 pruebas cubren notificaciones, preferencias, respaldo, Comunidad, Tutor IA, SpeedGrader y CSV, con **7/7** y 0 errores de consola.
+- Límite: Playwright automatiza los mismos flujos DEMO ya revisados a mano; no sustituye a Supabase/OIDC, CI/CD ni a pruebas de seguridad. El respaldo depende de que el usuario guarde el JSON fuera del navegador.
+
 | Componente / Módulo | Estado | Avance / Descripción Técnica |
 | :--- | :---: | :--- |
 | **Arquitectura de Frontend** | `100% Completo` | React 19 + TypeScript + Vite + Tailwind CSS. Arquitectura modular por componentes y vistas. |
@@ -110,7 +118,7 @@ El proyecto se encuentra en un estado funcional avanzado **como frontend base/de
 | **Sandbox de Código** | `100% Completo` | Entorno de desarrollo para estudiantes en Python con ejecución simulada, feedback inmediato y guardrails de seguridad. |
 | **Gobernanza & ARCO** | `100% Completo` | Registro de auditoría (`audit_logs`) con filtro por estado y exportación CSV, trazabilidad de inferencias y flujo de atención ARCO (Ley 29733). |
 | **Soporte Multi-Tema** | `100% Completo` | Compatibilidad total con 3 modos visuales: **Monochrome / Grafito**, **Cyber Blue** y **Light Minimalista** (con contraste validado WCAG AAA). |
-| **Auditoría de Calidad** | `100% Completo` | `oxlint` pasando con 0 errores y compilación `tsc -b && vite build` ejecutada con éxito en 1.57s. |
+| **Auditoría de Calidad** | `100% Completo` | `oxlint` sin hallazgos, `tsc -b && vite build` correcto, smoke test 34/34 y 7 pruebas E2E con Playwright (7/7). |
 | **Documentación Ejecutiva** | `100% Completo` | Generador de informe técnico-estratégico en PDF/HTML (`generate_report.py`) con diagramas arquitecturales. |
 
 ---
@@ -377,13 +385,23 @@ npm run preview
 ```
 *Permite validar localmente la compilación de producción en el puerto `http://localhost:4173/`.*
 
-### 4. Smoke test del backend activo
+### 4. Pruebas E2E con Playwright
+
+```powershell
+cd frontend
+npm.cmd exec playwright install chromium
+npm.cmd run test:e2e
+```
+
+*`playwright.config.ts` levanta Vite en `127.0.0.1:5174` sin variables locales y ejecuta 7 flujos: notificaciones, preferencias compartidas, respaldo DEMO, Comunidad, Tutor IA, SpeedGrader y CSV. Resultado observado: **7/7 en 28.3 s**, con 0 errores de consola.*
+
+### 5. Smoke test del backend activo
 ```bash
 python backend/tests/test_smoke.py
 ```
 *Resultado observado: 34/34. Conserva las 6 rutas originales y valida el contrato `/compat`, incluidos los endpoints de certificados.*
 
-### 5. Servidor estático local (simula el servicio web de Railway)
+### 6. Servidor estático local (simula el servicio web de Railway)
 
 ```powershell
 cd frontend

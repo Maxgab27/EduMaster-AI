@@ -134,7 +134,9 @@ export function getNotificationPreferences(signal?: AbortSignal) {
   return requestWithDemo<NotificationPreferences>(
     '/api/v1/notification-preferences',
     { signal },
-    () => readSlice<NotificationPreferences>(PREFS_KEY, DEMO_PREFS),
+    () => readSlice<NotificationPreferences | null>(PREFS_KEY, null)
+      ?? readSlice<NotificationPreferences | null>('settingsPreferences', null)
+      ?? DEMO_PREFS,
   );
 }
 
@@ -143,7 +145,9 @@ export function updateNotificationPreferences(payload: NotificationPreferences, 
     '/api/v1/notification-preferences',
     { method: 'PUT', body: JSON.stringify(payload), signal },
     () => {
+      // Unifica las dos pantallas: Topbar y Configuración comparten preferencias.
       writeSlice(PREFS_KEY, payload);
+      writeSlice('settingsPreferences', payload);
       return payload;
     },
   );
