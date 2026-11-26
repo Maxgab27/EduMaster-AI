@@ -231,6 +231,7 @@ EduMaster-AI/
 | `6268dc3` | Topbar ordenada, badge de estado unificado y fondo horizontal. |
 | `4152ed3` | Mapa mundial ampliado y centrado, pulsos alineados e inspector de nodos restaurado. |
 | `dc05770` | Visualizador neuronal con más espacio y partículas alineadas a las curvas de sinapsis. |
+| `ebb34ec` | Actividad reciente con cola fija de 5 eventos y descarte de los más antiguos. |
 
 ### 5.1 Tandas de trabajo
 
@@ -479,6 +480,7 @@ El archivo se descarga como `edumaster-demo-YYYY-MM-DD.json`. No contiene secret
 - Gráfica de avance y mapa global en línea de contorno.
 - Visualizador neuronal animado, rotulado `DEMO · ANIMACIÓN ILUSTRATIVA`.
 - Tarjeta de recomendaciones con correlación visible.
+- Actividad reciente con cola fija de 5 eventos: los nuevos entran arriba y los antiguos se descartan.
 
 ### 9.2 Cursos y Rutas de aprendizaje
 
