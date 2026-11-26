@@ -232,6 +232,7 @@ export const BatchCohortManager: React.FC<BatchCohortManagerProps> = ({
     return matchesLevel && matchesQuery;
   });
 
+  const totalProcessed = students.length;
   const criticalCount = students.filter(s => s.risk_level === 'Crítico').length;
   const moderateCount = students.filter(s => s.risk_level === 'Moderado').length;
   const lowCount = students.filter(s => s.risk_level === 'Bajo').length;
@@ -350,6 +351,62 @@ export const BatchCohortManager: React.FC<BatchCohortManagerProps> = ({
             <Clock className="w-3 h-3" /> Tiempo Inferencia
           </span>
           <span className="text-lg font-black font-mono block mt-0.5 text-edumaster-cyan">{inferenceTimeMs} ms</span>
+        </div>
+      </div>
+
+      {/* Curva de Distribución de Riesgo & Garantía Ética Ley 29733 */}
+      <div className={`p-4 rounded-2xl border mb-5 ${
+        isLight ? 'bg-slate-50/80 border-slate-200 text-slate-800' : isMono ? 'bg-white/[0.02] border-white/10 text-zinc-200' : 'bg-white/[0.03] border-white/10 text-slate-200'
+      }`}>
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 mb-2.5">
+          <div className="flex items-center gap-2">
+            <BrainCircuit className="w-4 h-4 text-edumaster-cyan shrink-0" />
+            <span className="text-xs font-black tracking-tight">
+              Distribución de Densidad de Riesgo de la Cohorte (N = {totalProcessed})
+            </span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/30">
+              PR-AUC: 0.914
+            </span>
+          </div>
+          <span className="text-[11px] font-mono opacity-70">
+            Umbral de Decisión Docente: <strong className="text-rose-400">θ ≥ 40%</strong>
+          </span>
+        </div>
+
+        {/* Barra de Distribución Segmentada */}
+        <div className="w-full h-3 rounded-full overflow-hidden flex bg-black/20 p-0.5 gap-0.5">
+          <div 
+            style={{ width: `${(lowCount / (totalProcessed || 1)) * 100}%` }} 
+            className="bg-emerald-500 rounded-l-full transition-all duration-500" 
+            title={`Riesgo Bajo: ${lowCount} estudiantes (${Math.round((lowCount / (totalProcessed || 1)) * 100)}%)`}
+          />
+          <div 
+            style={{ width: `${(moderateCount / (totalProcessed || 1)) * 100}%` }} 
+            className="bg-amber-500 transition-all duration-500" 
+            title={`Riesgo Moderado: ${moderateCount} estudiantes (${Math.round((moderateCount / (totalProcessed || 1)) * 100)}%)`}
+          />
+          <div 
+            style={{ width: `${(criticalCount / (totalProcessed || 1)) * 100}%` }} 
+            className="bg-rose-500 rounded-r-full transition-all duration-500" 
+            title={`Riesgo Crítico: ${criticalCount} estudiantes (${Math.round((criticalCount / (totalProcessed || 1)) * 100)}%)`}
+          />
+        </div>
+
+        <div className="flex items-center justify-between text-[10px] opacity-75 mt-2 flex-wrap gap-2">
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Zona Segura (&lt; 15%): {lowCount} alumnos
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" /> Alerta Preventiva (15-39%): {moderateCount} alumnos
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" /> Intervención Urgente (≥ 40%): {criticalCount} alumnos
+            </span>
+          </div>
+          <span className="italic opacity-80">
+            *Garantía Ley 29733: Prohibida la exclusión o reprobación exclusivamente automatizada.
+          </span>
         </div>
       </div>
 

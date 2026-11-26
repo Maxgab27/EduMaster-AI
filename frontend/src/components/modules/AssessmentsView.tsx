@@ -1,18 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { CheckSquare, ShieldAlert, RefreshCw, AlertCircle } from 'lucide-react';
-import type { ApiAssessment, ApiMeta, ApiSubmission, ThemeMode, UserRole } from '../../types';
-import { listAssessments, listSubmissions } from '../../services/assessmentsApi';
+import { CheckSquare, ShieldAlert, RefreshCw, AlertCircle, CheckCircle2, ArrowRight } from 'lucide-react';
+import type { ApiAssessment, ApiMeta, ApiSubmission, ThemeMode, UserRole, NavTab } from '../../types';
+import { listAssessments, listSubmissions, gradeSubmission, addSubmissionFeedback } from '../../services/assessmentsApi';
+import { TeacherSpeedGraderModal } from '../teacher/TeacherSpeedGraderModal';
+import { getDemoActor } from '../../services/apiClient';
 
 interface AssessmentsViewProps {
   theme?: ThemeMode;
   role?: UserRole;
+  onNavigateTab?: (tab: NavTab) => void;
+}
+
+interface SignatureReceipt {
+  submissionId: string;
+  signedBy: string;
+  signatureHash?: string;
+  auditLogId?: string;
+  actorSource?: string;
+  source: string;
+  correlationId: string;
 }
 
 function score(value: number | null | undefined): string {
   return value === null || value === undefined ? '—' : value.toFixed(1);
 }
 
-export const AssessmentsView: React.FC<AssessmentsViewProps> = ({ theme = 'monochrome', role = 'estudiante' }) => {
+export const AssessmentsView: React.FC<AssessmentsViewProps> = ({ 
+  theme = 'monochrome', 
+  role = 'estudiante',
+  onNavigateTab 
+}) => {
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
   const canGrade = role !== 'estudiante';
@@ -23,6 +40,68 @@ export const AssessmentsView: React.FC<AssessmentsViewProps> = ({ theme = 'monoc
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+
+  // SpeedGrader modal state
+  const [activeSubmission, setActiveSubmission] = useState<ApiSubmission | null>(null);
+  const [isSpeedGraderOpen, setIsSpeedGraderOpen] = useState(false);
+  const [lastSignature, setLastSignature] = useState<SignatureReceipt | null>(null);
+  const [actionNotice, setActionNotice] = useState<string | null>(null);
+
+  const handleOpenSpeedGrader = (sub: ApiSubmission) => {
+    setActiveSubmission(sub);
+    setIsSpeedGraderOpen(true);
+    setActionNotice(null);
+  };
+
+  const handleGradeConfirmed = async (
+    submissionId: string,
+    officialScore: number,
+    feedback: string,
+    signedBy: string,
+  ) => {
+    setActionNotice(null);
+    try {
+      const response = await gradeSubmission(submissionId, { officialScore, feedback, signedBy });
+      setSubmissions(prev =>
+        prev.map(sub =>
+          sub.id === submissionId
+            ? {
+                ...sub,
+                officialScore: response.data.officialScore,
+                status: 'graded' as const,
+                signedBy: response.data.signedBy,
+                feedback: feedback || sub.feedback,
+              }
+            : sub,
+        ),
+      );
+      setLastSignature({
+        submissionId,
+        signedBy: response.data.signedBy || signedBy,
+        signatureHash: response.data.signatureHash ?? undefined,
+        auditLogId: response.data.auditLogId ?? undefined,
+        actorSource: response.data.actorSource ?? undefined,
+        source: response.meta.source,
+        correlationId: response.meta.correlationId,
+      });
+      setActionNotice(
+        `Entrega ${submissionId} firmada por ${response.data.signedBy || signedBy}. Hash SHA-256 inmutable registrado.`,
+      );
+    } catch (err) {
+      setActionNotice(err instanceof Error ? err.message : 'Error al confirmar calificación');
+    }
+  };
+
+  const handleFeedbackSaved = async (submissionId: string, feedback: string) => {
+    try {
+      await addSubmissionFeedback(submissionId, { feedback, signedBy: getDemoActor().name });
+      setSubmissions(prev =>
+        prev.map(sub => (sub.id === submissionId ? { ...sub, feedback } : sub)),
+      );
+    } catch {
+      // Manejo silencioso en fallback
+    }
+  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -223,6 +302,21 @@ export const AssessmentsView: React.FC<AssessmentsViewProps> = ({ theme = 'monoc
                         {submission.officialScore === null ? 'Pendiente' : submission.officialScore.toFixed(1)}
                       </span>
                     </div>
+
+                    {canGrade && (
+                      <button
+                        onClick={() => handleOpenSpeedGrader(submission)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 shrink-0 ${
+                          submission.status === 'graded'
+                            ? isLight ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-white/10 hover:bg-white/20 text-slate-200'
+                            : isLight ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-500/20' : isMono ? 'bg-white text-zinc-950 font-black hover:bg-zinc-200' : 'bg-edumaster-blue hover:bg-edumaster-blue/80 text-white shadow-glowBlue'
+                        }`}
+                        title="Calificar con rúbrica interactiva y firma criptográfica SHA-256"
+                      >
+                        <CheckSquare className="w-3.5 h-3.5" />
+                        {submission.status === 'graded' ? 'Re-calificar' : 'Calificar (SpeedGrader)'}
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -230,7 +324,73 @@ export const AssessmentsView: React.FC<AssessmentsViewProps> = ({ theme = 'monoc
                 <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>No hay entregas registradas.</p>
               )}
             </div>
+
+            {/* Recibo Criptográfico de Última Firma Docente */}
+            {lastSignature && (
+              <div className={`mt-5 p-4 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-3 animate-in fade-in ${
+                isLight 
+                  ? 'bg-emerald-50 border-emerald-300 text-emerald-950 shadow-sm' 
+                  : isMono 
+                  ? 'bg-[#18261E] border-[#2A4835] text-emerald-200' 
+                  : 'bg-emerald-500/15 border-emerald-500/40 text-emerald-200 shadow-glowCyan'
+              }`}>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                    <span className="font-bold text-xs">
+                      Comprobante de Calificación Firmada (Human-in-the-Loop)
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                      Ley 29733 Auditada
+                    </span>
+                  </div>
+                  <p className="text-[11px] opacity-85 m-0 font-mono">
+                    ID Entrega: {lastSignature.submissionId} · Docente: {lastSignature.signedBy} · Fuente: {lastSignature.actorSource || 'header'}
+                  </p>
+                  {lastSignature.signatureHash && (
+                    <p className="text-[10px] font-mono opacity-80 m-0 break-all">
+                      Hash SHA-256: <strong className="text-emerald-400">{lastSignature.signatureHash}</strong>
+                    </p>
+                  )}
+                </div>
+
+                {onNavigateTab && (
+                  <button
+                    onClick={() => onNavigateTab('governance')}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 shrink-0 ${
+                      isLight 
+                        ? 'bg-white border-emerald-300 text-emerald-900 hover:bg-emerald-100' 
+                        : isMono 
+                        ? 'bg-white text-zinc-950 font-black border-white hover:bg-zinc-200' 
+                        : 'bg-emerald-500/20 border-emerald-500/50 text-white hover:bg-emerald-500/30'
+                    }`}
+                  >
+                    Ver en Registro de Auditoría
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            )}
+
+            {actionNotice && !lastSignature && (
+              <div className={`mt-4 p-3 rounded-xl border text-xs font-medium flex items-center gap-2 ${
+                isLight ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-blue-500/10 border-blue-500/30 text-blue-200'
+              }`}>
+                <CheckCircle2 className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                {actionNotice}
+              </div>
+            )}
           </div>
+
+          {/* Modal Interactivo de SpeedGrader */}
+          <TeacherSpeedGraderModal
+            isOpen={isSpeedGraderOpen}
+            submission={activeSubmission}
+            onClose={() => setIsSpeedGraderOpen(false)}
+            onGradeConfirmed={handleGradeConfirmed}
+            onFeedbackSaved={handleFeedbackSaved}
+            theme={theme}
+          />
         </>
       )}
     </div>

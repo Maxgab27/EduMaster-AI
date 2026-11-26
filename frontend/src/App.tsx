@@ -403,8 +403,10 @@ export const App: React.FC = () => {
             </div>
           )}
 
-          {/* Banner Interactivo del Caso de Uso (Paso 1, 2, 3 accesibles con 1 clic) */}
-          <UseCaseBanner theme={theme} onNavigateTab={setActiveTab} />
+          {/* Banner Interactivo del Caso de Uso (Paso 1, 2, 3 accesibles con 1 clic) - Oculto en modo estudiante */}
+          {user.role !== 'estudiante' && (
+            <UseCaseBanner theme={theme} onNavigateTab={setActiveTab} />
+          )}
 
           {/* Conditional Module Rendering */}
           {activeTab === 'dashboard' && (
@@ -492,7 +494,7 @@ export const App: React.FC = () => {
             {canViewTab(user.role, activeTab) && activeTab === 'courses' && <CoursesView theme={theme} role={user.role} />}
             {canViewTab(user.role, activeTab) && activeTab === 'analytics' && <AnalyticsView theme={theme} onNavigateTab={setActiveTab} />}
             {canViewTab(user.role, activeTab) && activeTab === 'ai-tutor' && <AITutorView theme={theme} />}
-            {canViewTab(user.role, activeTab) && activeTab === 'assessments' && <AssessmentsView theme={theme} role={user.role} />}
+            {canViewTab(user.role, activeTab) && activeTab === 'assessments' && <AssessmentsView theme={theme} role={user.role} onNavigateTab={setActiveTab} />}
             {canViewTab(user.role, activeTab) && activeTab === 'certificates' && (
               <CertificatesView theme={theme} initialVerifyFolio={verifyFolio ?? undefined} />
             )}
