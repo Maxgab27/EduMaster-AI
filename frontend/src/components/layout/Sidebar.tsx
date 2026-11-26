@@ -13,7 +13,8 @@ import {
   Sparkles,
   Cpu,
   ShieldCheck,
-  X
+  X,
+  LogOut
 } from 'lucide-react';
 import { NavTab, ThemeMode, UserRole } from '../../types';
 import { canViewTab } from '../../auth/permissions';
@@ -27,6 +28,7 @@ interface SidebarProps {
   mobileOpen?: boolean;
   isMobile?: boolean;
   onClose?: () => void;
+  onLogout?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
@@ -38,6 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   mobileOpen = false,
   isMobile = false,
   onClose,
+  onLogout,
 }) => {
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
@@ -213,6 +216,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </span>
           </div>
         </div>
+
+        {/* Portal Publico / Logout Button */}
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            className={`w-full py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-colors ${
+              isMono 
+                ? 'bg-[#181C26] border-[#2A3142] text-zinc-400 hover:text-zinc-100 hover:bg-[#202534]' 
+                : isLight 
+                ? 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100' 
+                : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
+            }`}
+            title="Cerrar sesión y volver al portal público"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Portal / Cerrar Sesión</span>
+          </button>
+        )}
       </div>
     </aside>
   );

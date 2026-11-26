@@ -10,6 +10,12 @@ function consoleErrors(page: Page): string[] {
   return errors;
 }
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('edumaster_authenticated', 'true');
+  });
+});
+
 test('notificaciones: filtrar, marcar todas y persistir', async ({ page }) => {
   const errors = consoleErrors(page);
   await page.goto('/');
@@ -157,4 +163,27 @@ test('CSV: descargas reales de auditoría y analítica', async ({ page }) => {
   expect(actions).toContain('audit.export_csv');
   expect(actions).toContain('analytics.export_csv');
   expect(errors).toEqual([]);
+});
+
+test('landing y login: navegar desde landing pública, ver perfiles demo y entrar al dashboard', async ({ page }) => {
+  // Simular usuario nuevo no autenticado
+  await page.addInitScript(() => {
+    localStorage.removeItem('edumaster_authenticated');
+  });
+  await page.goto('/?view=landing');
+
+  // Validar elementos principales de Landing Page
+  await expect(page.getByText('Detección Temprana de Deserción y Evaluación Inteligente')).toBeVisible();
+  await expect(page.getByText('Modelo Multi-Task Learning (MTL)')).toBeVisible();
+
+  // Clic en Iniciar Sesión para ir a la vista de login
+  await page.getByRole('button', { name: 'Iniciar Sesión', exact: true }).click();
+  await expect(page.getByText('Perfiles de Demostración Rápida')).toBeVisible();
+  await expect(page.getByText('Dr. Alejandro Morales')).toBeVisible();
+
+  // Seleccionar perfil y pulsar Ingresar
+  await page.getByRole('button', { name: /Ingresar como/ }).click();
+
+  // Validar que entramos exitosamente a la plataforma
+  await expect(page.getByText(/EduMaster/)).toBeVisible();
 });

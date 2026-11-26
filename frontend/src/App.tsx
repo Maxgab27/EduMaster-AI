@@ -77,8 +77,31 @@ const CommunityView = lazy(() =>
 const SettingsView = lazy(() =>
   import('./components/modules/SettingsView').then(module => ({ default: module.SettingsView })),
 );
+const LandingPageView = lazy(() =>
+  import('./components/public/LandingPageView').then(module => ({ default: module.LandingPageView })),
+);
+const LoginView = lazy(() =>
+  import('./components/public/LoginView').then(module => ({ default: module.LoginView })),
+);
+
+type AppViewMode = 'landing' | 'login' | 'app';
 
 export const App: React.FC = () => {
+  // Modo de visualización: landing (pública), login (autenticación demo) o app (plataforma).
+  const [viewMode, setViewMode] = useState<AppViewMode>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get('view');
+    if (viewParam === 'login') return 'login';
+    if (viewParam === 'app') return 'app';
+    if (viewParam === 'landing') return 'landing';
+    if (params.get('verify') || params.get('receipt')) return 'app';
+    try {
+      const savedAuth = localStorage.getItem('edumaster_authenticated');
+      if (savedAuth === 'true') return 'app';
+    } catch {}
+    return 'landing';
+  });
+
   // Un QR escaneado abre la SPA con ?verify=<folio> y debe llevar a verificación.
   const [verifyFolio] = useState<string | null>(
     () => new URLSearchParams(window.location.search).get('verify'),
@@ -223,12 +246,72 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleLogin = (role: UserRole, customName?: string) => {
+    setUser(prev => profileForRole(role, prev, customName));
+    try {
+      localStorage.setItem('edumaster_authenticated', 'true');
+    } catch {}
+    setViewMode('app');
+  };
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem('edumaster_authenticated');
+    } catch {}
+    setViewMode('landing');
+  };
+
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
 
   // El comprobante es una página independiente: el celular la abre sin popup.
   if (receiptFolio) {
     return <CertificateReceiptView folio={receiptFolio} theme={theme} />;
+  }
+
+  // Vista de Landing Page pública
+  if (viewMode === 'landing') {
+    return (
+      <Suspense fallback={
+        <div className={`min-h-screen flex items-center justify-center font-mono text-sm ${
+          isLight ? 'bg-slate-50 text-slate-600' : isMono ? 'bg-[#0E1117] text-zinc-400' : 'bg-[#030B18] text-blue-200'
+        }`}>
+          Cargando EduMaster.ai Enterprise...
+        </div>
+      }>
+        <LandingPageView
+          onLogin={() => setViewMode('login')}
+          onEnterApp={() => {
+            try {
+              localStorage.setItem('edumaster_authenticated', 'true');
+            } catch {}
+            setViewMode('app');
+          }}
+          theme={theme}
+          onThemeChange={handleThemeChange}
+        />
+      </Suspense>
+    );
+  }
+
+  // Vista de Login Demo
+  if (viewMode === 'login') {
+    return (
+      <Suspense fallback={
+        <div className={`min-h-screen flex items-center justify-center font-mono text-sm ${
+          isLight ? 'bg-slate-50 text-slate-600' : isMono ? 'bg-[#0E1117] text-zinc-400' : 'bg-[#030B18] text-blue-200'
+        }`}>
+          Cargando inicio de sesión...
+        </div>
+      }>
+        <LoginView
+          onLogin={handleLogin}
+          onBackToLanding={() => setViewMode('landing')}
+          theme={theme}
+          onThemeChange={handleThemeChange}
+        />
+      </Suspense>
+    );
   }
 
   return (
@@ -258,6 +341,7 @@ export const App: React.FC = () => {
         mobileOpen={isMobileNavOpen}
         isMobile={isMobileViewport}
         onClose={closeMobileNav}
+        onLogout={handleLogout}
       />
 
       {/* Main Content Area */}
@@ -273,6 +357,7 @@ export const App: React.FC = () => {
           onOpenMobileNav={() => setIsMobileNavOpen(true)}
           mobileNavOpen={isMobileNavOpen}
           menuButtonRef={menuButtonRef}
+          onLogout={handleLogout}
         />
 
         <main className="flex-1 p-4 sm:p-6 space-y-5 sm:space-y-6 max-w-[1600px] w-full mx-auto">

@@ -12,7 +12,8 @@ import {
   Moon,
   Palette,
   Bot,
-  Menu
+  Menu,
+  LogOut
 } from 'lucide-react';
 import { ApiMeta, AppNotification, NotificationPreferences, ThemeMode, UserProfile, UserRole } from '../../types';
 import { LiveConnectionBadge } from '../common/LiveConnectionBadge';
@@ -47,6 +48,7 @@ interface TopbarProps {
   onOpenMobileNav: () => void;
   mobileNavOpen: boolean;
   menuButtonRef?: React.Ref<HTMLButtonElement>;
+  onLogout?: () => void;
 }
 
 export const Topbar: React.FC<TopbarProps> = ({
@@ -60,6 +62,7 @@ export const Topbar: React.FC<TopbarProps> = ({
   onOpenMobileNav,
   mobileNavOpen,
   menuButtonRef,
+  onLogout,
 }) => {
   const [showRoleMenu, setShowRoleMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -572,9 +575,40 @@ export const Topbar: React.FC<TopbarProps> = ({
                   </button>
                 ))}
               </div>
+              {onLogout && (
+                <div className={`mt-1 pt-1 border-t ${isLight ? 'border-slate-200' : isMono ? 'border-[#2A2F3D]' : 'border-white/10'}`}>
+                  <button
+                    onClick={() => {
+                      setShowRoleMenu(false);
+                      onLogout();
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-left text-xs text-rose-400 hover:bg-rose-500/10 transition-colors font-semibold"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Cerrar Sesión (Ir a Landing)</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
+
+        {onLogout && (
+          <button
+            onClick={onLogout}
+            className={`p-2 rounded-2xl border transition-all flex items-center gap-1.5 text-xs font-semibold ${
+              isLight 
+                ? 'bg-slate-100 border-slate-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 text-slate-700' 
+                : isMono 
+                ? 'bg-[#1E222C] border-[#2A2F3D] hover:bg-rose-950/40 hover:text-rose-300 hover:border-rose-800/50 text-zinc-300' 
+                : 'bg-[#0A1F3D] border-edumaster-cardBorder hover:bg-rose-500/20 hover:text-rose-300 text-slate-200'
+            }`}
+            title="Cerrar Sesión y volver al portal"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="hidden xl:inline">Salir</span>
+          </button>
+        )}
       </div>
     </header>
   );
