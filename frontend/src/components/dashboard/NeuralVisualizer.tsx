@@ -82,8 +82,8 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
     setTimeout(() => setStimulatedNodeId(null), 1200);
   };
 
-  // Dimensiones compactas del lienzo SVG para empujarlo a la izquierda
-  const svgWidth = 560;
+  // Dimensiones amplias del lienzo SVG para dar respiro total y evitar recortes
+  const svgWidth = 740;
   const svgHeight = 340;
 
   // Theming colors
@@ -96,12 +96,12 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
     ? { input: '#0F172A', embedding: '#2563EB', analysis: '#475569', output: '#0F172A' }
     : { input: '#20C8F5', embedding: '#087FE5', analysis: '#8B4DFF', output: '#00BFA6' };
 
-  // Distribución horizontal de las 4 columnas
+  // Distribución horizontal amplia de las 4 columnas (con margen amplio a la izquierda y derecha para los textos)
   const columns = [
-    { key: 'input', label: 'ENTRADA', x: 80, color: colColors.input, nodes: neuralLayersNodes.input },
-    { key: 'embedding', label: 'LATENTE', x: 210, color: colColors.embedding, nodes: neuralLayersNodes.embedding },
-    { key: 'analysis', label: 'ANÁLISIS GRU', x: 340, color: colColors.analysis, nodes: neuralLayersNodes.analysis },
-    { key: 'output', label: 'SALIDA', x: 470, color: colColors.output, nodes: neuralLayersNodes.output },
+    { key: 'input', label: 'ENTRADA', x: 145, color: colColors.input, nodes: neuralLayersNodes.input },
+    { key: 'embedding', label: 'LATENTE', x: 295, color: colColors.embedding, nodes: neuralLayersNodes.embedding },
+    { key: 'analysis', label: 'ANÁLISIS GRU', x: 445, color: colColors.analysis, nodes: neuralLayersNodes.analysis },
+    { key: 'output', label: 'SALIDA', x: 595, color: colColors.output, nodes: neuralLayersNodes.output },
   ];
 
   const getNodeY = (index: number, count: number) => {
@@ -171,91 +171,142 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
     }
   }[activeLayer];
 
-  // Cálculo de las rutas EXACTAS de sinapsis para los pulsos luminosos 100% alineados
-  const getFlowingPaths = (): string[] => {
-    const paths: string[] = [];
+  // Función paramétrica exacta para calcular puntos a lo largo de una curva Bézier cúbica de sinapsis
+  const evalCubicBezier = (
+    x1: number, y1: number,
+    x2: number, y2: number,
+    t: number
+  ): { x: number; y: number } => {
+    const clampedT = Math.max(0, Math.min(1, t));
+    const xm = (x1 + x2) / 2;
+    const oneMinusT = 1 - clampedT;
+    
+    // x(t) para P0=(x1,y1), P1=(xm,y1), P2=(xm,y2), P3=(x2,y2)
+    const x = 
+      Math.pow(oneMinusT, 3) * x1 + 
+      3 * Math.pow(oneMinusT, 2) * clampedT * xm + 
+      3 * oneMinusT * Math.pow(clampedT, 2) * xm + 
+      Math.pow(clampedT, 3) * x2;
+      
+    // y(t) exacto
+    const y = 
+      Math.pow(oneMinusT, 2) * (1 + 2 * clampedT) * y1 + 
+      Math.pow(clampedT, 2) * (3 - 2 * clampedT) * y2;
+      
+    return { x, y };
+  };
+
+  interface SynapseSegment {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+    color?: string;
+    isPrimary?: boolean;
+  }
+
+  // Segmentos activos para los pulsos luminosos y partículas que viajan 100% sobre las curvas
+  const getActiveSegments = (): SynapseSegment[] => {
+    const segments: SynapseSegment[] = [];
     const activeId = hoveredNodeId || selectedNode?.id;
 
-    // Si hay un nodo seleccionado, generamos pulsos a lo largo de sus sinapsis activas exactas
+    // Si hay un nodo seleccionado, generamos sinapsis activas directas
     if (activeId) {
       if (activeId.startsWith('in-')) {
         const i = parseInt(activeId.split('-')[1]) - 1;
         columns[1].nodes.forEach((_, j) => {
-          const x1 = columns[0].x;
-          const y1 = getNodeY(i, columns[0].nodes.length);
-          const x2 = columns[1].x;
-          const y2 = getNodeY(j, columns[1].nodes.length);
-          paths.push(`M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`);
+          segments.push({
+            x1: columns[0].x,
+            y1: getNodeY(i, columns[0].nodes.length),
+            x2: columns[1].x,
+            y2: getNodeY(j, columns[1].nodes.length),
+            color: colColors.input,
+            isPrimary: true
+          });
         });
       } else if (activeId.startsWith('emb-')) {
         const j = parseInt(activeId.split('-')[1]) - 1;
-        // Hacia atrás
         columns[0].nodes.forEach((_, i) => {
-          const x1 = columns[0].x;
-          const y1 = getNodeY(i, columns[0].nodes.length);
-          const x2 = columns[1].x;
-          const y2 = getNodeY(j, columns[1].nodes.length);
-          paths.push(`M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`);
+          segments.push({
+            x1: columns[0].x,
+            y1: getNodeY(i, columns[0].nodes.length),
+            x2: columns[1].x,
+            y2: getNodeY(j, columns[1].nodes.length),
+            color: colColors.embedding,
+            isPrimary: true
+          });
         });
-        // Hacia adelante
         columns[2].nodes.forEach((_, k) => {
-          const x1 = columns[1].x;
-          const y1 = getNodeY(j, columns[1].nodes.length);
-          const x2 = columns[2].x;
-          const y2 = getNodeY(k, columns[2].nodes.length);
-          paths.push(`M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`);
+          segments.push({
+            x1: columns[1].x,
+            y1: getNodeY(j, columns[1].nodes.length),
+            x2: columns[2].x,
+            y2: getNodeY(k, columns[2].nodes.length),
+            color: colColors.embedding,
+            isPrimary: true
+          });
         });
       } else if (activeId.startsWith('an-')) {
         const j = parseInt(activeId.split('-')[1]) - 1;
         columns[1].nodes.forEach((_, i) => {
-          const x1 = columns[1].x;
-          const y1 = getNodeY(i, columns[1].nodes.length);
-          const x2 = columns[2].x;
-          const y2 = getNodeY(j, columns[2].nodes.length);
-          paths.push(`M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`);
+          segments.push({
+            x1: columns[1].x,
+            y1: getNodeY(i, columns[1].nodes.length),
+            x2: columns[2].x,
+            y2: getNodeY(j, columns[2].nodes.length),
+            color: colColors.analysis,
+            isPrimary: true
+          });
         });
         columns[3].nodes.forEach((_, k) => {
-          const x1 = columns[2].x;
-          const y1 = getNodeY(j, columns[2].nodes.length);
-          const x2 = columns[3].x;
-          const y2 = getNodeY(k, columns[3].nodes.length);
-          paths.push(`M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`);
+          segments.push({
+            x1: columns[2].x,
+            y1: getNodeY(j, columns[2].nodes.length),
+            x2: columns[3].x,
+            y2: getNodeY(k, columns[3].nodes.length),
+            color: colColors.analysis,
+            isPrimary: true
+          });
         });
       } else if (activeId.startsWith('out-')) {
         const j = parseInt(activeId.split('-')[1]) - 1;
         columns[2].nodes.forEach((_, i) => {
-          const x1 = columns[2].x;
-          const y1 = getNodeY(i, columns[2].nodes.length);
-          const x2 = columns[3].x;
-          const y2 = getNodeY(j, columns[3].nodes.length);
-          paths.push(`M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`);
+          segments.push({
+            x1: columns[2].x,
+            y1: getNodeY(i, columns[2].nodes.length),
+            x2: columns[3].x,
+            y2: getNodeY(j, columns[3].nodes.length),
+            color: colColors.output,
+            isPrimary: true
+          });
         });
       }
     }
 
-    // Si no hay nodo o para acompañar con flujo continuo, añadimos el flujo representativo
-    if (paths.length === 0) {
-      const transitions = [
-        { c1: 0, c2: 1, pairs: [[0, 0], [1, 2], [2, 1], [3, 3], [4, 5], [5, 4]] },
-        { c1: 1, c2: 2, pairs: [[0, 1], [1, 0], [2, 2], [3, 4], [4, 3], [5, 5]] },
-        { c1: 2, c2: 3, pairs: [[0, 0], [1, 1], [2, 3], [3, 2], [4, 5], [5, 4]] },
-      ];
+    // Flujo continuo representativo entre capas para vitalidad visual permanente
+    const ambientTransitions = [
+      { c1: 0, c2: 1, pairs: [[0, 0], [1, 2], [2, 1], [3, 3], [4, 5], [5, 4]] },
+      { c1: 1, c2: 2, pairs: [[0, 1], [1, 0], [2, 2], [3, 4], [4, 3], [5, 5]] },
+      { c1: 2, c2: 3, pairs: [[0, 0], [1, 1], [2, 3], [3, 2], [4, 5], [5, 4]] },
+    ];
 
-      transitions.forEach(tr => {
-        tr.pairs.forEach(([i, j]) => {
-          const x1 = columns[tr.c1].x;
-          const y1 = getNodeY(i, columns[tr.c1].nodes.length);
-          const x2 = columns[tr.c2].x;
-          const y2 = getNodeY(j, columns[tr.c2].nodes.length);
-          paths.push(`M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`);
+    ambientTransitions.forEach(tr => {
+      tr.pairs.forEach(([i, j]) => {
+        segments.push({
+          x1: columns[tr.c1].x,
+          y1: getNodeY(i, columns[tr.c1].nodes.length),
+          x2: columns[tr.c2].x,
+          y2: getNodeY(j, columns[tr.c2].nodes.length),
+          color: columns[tr.c1].color,
+          isPrimary: false
         });
       });
-    }
+    });
 
-    return paths;
+    return segments;
   };
 
-  const flowingPaths = getFlowingPaths();
+  const activeSegments = getActiveSegments();
 
   return (
     <div className="glass-panel relative flex flex-col h-full overflow-hidden border rounded-2xl shadow-panel">
@@ -475,23 +526,55 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
               })
             )}
 
-            {/* Pulsos Luminosos 100% ALINEADOS con el trayecto curvo exacto de las líneas */}
+            {/* Sinapsis activas destacadas con resplandor */}
+            {activeSegments.filter(s => s.isPrimary).map((seg, idx) => {
+              const xm = (seg.x1 + seg.x2) / 2;
+              return (
+                <path
+                  key={`active-syn-${idx}`}
+                  d={`M ${seg.x1} ${seg.y1} C ${xm} ${seg.y1}, ${xm} ${seg.y2}, ${seg.x2} ${seg.y2}`}
+                  stroke={seg.color || pulseColor}
+                  strokeWidth="2.2"
+                  strokeOpacity="0.85"
+                  fill="none"
+                  filter="url(#neon-glow)"
+                />
+              );
+            })}
+
+            {/* Partículas y esferas de animación que viajan 100% SOBRE LAS CURVAS EXACTAS */}
             {isPlaying && (
               <g>
-                {flowingPaths.map((pathD, idx) => (
-                  <path
-                    key={`flow-aligned-${idx}`}
-                    d={pathD}
-                    stroke={pulseColor}
-                    strokeWidth={isMono ? '2.2' : '2.6'}
-                    strokeDasharray="14 70"
-                    strokeDashoffset={-pulsePhase * 2}
-                    fill="none"
-                    strokeLinecap="round"
-                    opacity={isMono ? '0.95' : '0.92'}
-                    filter="url(#neon-glow)"
-                  />
-                ))}
+                {activeSegments.map((seg, idx) => {
+                  const p = (pulsePhase % 100) / 100;
+                  // Desfase armónico según índice para dispersar armónicamente los pulsos
+                  const offset = ((idx * 13) % 100) / 100;
+                  const rawT = (p + offset) % 1;
+                  const t = mode === 'entrenamiento' ? 1 - rawT : rawT;
+                  const pt = evalCubicBezier(seg.x1, seg.y1, seg.x2, seg.y2, t);
+
+                  return (
+                    <g key={`particle-${idx}`}>
+                      {/* Halo resplandeciente exterior sobre la curva */}
+                      <circle
+                        cx={pt.x}
+                        cy={pt.y}
+                        r={seg.isPrimary ? "5.5" : "4"}
+                        fill={seg.color || pulseColor}
+                        opacity={seg.isPrimary ? "0.65" : "0.35"}
+                        filter="url(#neon-glow)"
+                      />
+                      {/* Núcleo de luz central de la esfera */}
+                      <circle
+                        cx={pt.x}
+                        cy={pt.y}
+                        r={seg.isPrimary ? "2.6" : "2"}
+                        fill="#FFFFFF"
+                        opacity="0.95"
+                      />
+                    </g>
+                  );
+                })}
               </g>
             )}
 
@@ -511,18 +594,32 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
                     onMouseEnter={() => setHoveredNodeId(node.id)}
                     onMouseLeave={() => setHoveredNodeId(null)}
                   >
-                    {/* Anillo de Selección y Pulso de Estímulo */}
+                    {/* Anillo de Selección concéntrico y Pulso de Estímulo */}
                     {(isSelected || isHovered || isStimulated) && (
-                      <circle
-                        cx={col.x}
-                        cy={y}
-                        r={isStimulated ? "22" : "18"}
-                        fill="none"
-                        stroke={col.color}
-                        strokeWidth="2"
-                        strokeDasharray={isStimulated ? "none" : "4 4"}
-                        className={isStimulated ? "animate-ping" : "animate-spin"}
-                      />
+                      <g>
+                        <circle
+                          cx={col.x}
+                          cy={y}
+                          r={isStimulated ? "22" : "19"}
+                          fill="none"
+                          stroke={col.color}
+                          strokeWidth={isSelected ? "2" : "1.5"}
+                          strokeDasharray={isStimulated ? "none" : "3 3"}
+                          opacity={isSelected ? "0.9" : "0.6"}
+                          className={isStimulated ? "animate-ping" : "animate-pulse"}
+                        />
+                        {isSelected && (
+                          <circle
+                            cx={col.x}
+                            cy={y}
+                            r="15"
+                            fill="none"
+                            stroke="#FFFFFF"
+                            strokeWidth="1.2"
+                            opacity="0.85"
+                          />
+                        )}
+                      </g>
                     )}
 
                     {/* Carcasa Exterior del Nodo */}
@@ -593,13 +690,13 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
           </svg>
         </div>
 
-        {/* LADO DERECHO: Panel de Inspección del Nodo Seleccionado (Lo que salía al seleccionar un punto) */}
-        <div className={`w-full lg:w-[320px] xl:w-[340px] shrink-0 border-t lg:border-t-0 lg:border-l border-white/10 p-4.5 flex flex-col justify-between backdrop-blur-md transition-all ${
+        {/* LADO DERECHO: Panel de Inspección del Nodo Seleccionado */}
+        <div className={`w-full lg:w-[280px] xl:w-[290px] shrink-0 border-t lg:border-t-0 lg:border-l border-white/10 p-3.5 flex flex-col justify-between backdrop-blur-md transition-all ${
           isLight ? 'bg-white/60 text-slate-900' : isMono ? 'bg-black/25 text-white' : 'bg-black/35 text-white'
         }`}>
           <div>
             {/* Cabecera del Inspector */}
-            <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-white/10 mb-3">
+            <div className="flex items-center justify-between gap-2 pb-2 border-b border-white/10 mb-2.5">
               <span className={`text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border ${layerMeta.badgeColor}`}>
                 {layerMeta.category}
               </span>
@@ -609,7 +706,7 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
             </div>
 
             {/* Título y Descripción del Nodo */}
-            <div className="mb-3.5">
+            <div className="mb-2.5">
               <div className="flex items-center gap-2 mb-1">
                 <Cpu className="w-4 h-4 text-edumaster-cyan shrink-0" />
                 <h3 className="text-sm font-black tracking-tight m-0">
@@ -622,14 +719,14 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
             </div>
 
             {/* Grilla de Métricas del Nodo */}
-            <div className="grid grid-cols-2 gap-2 mb-3.5">
-              <div className={`p-2.5 rounded-xl border backdrop-blur-sm ${
+            <div className="grid grid-cols-2 gap-2 mb-2.5">
+              <div className={`p-2 rounded-xl border backdrop-blur-sm ${
                 isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.04] border-white/10'
               }`}>
                 <span className="text-[10px] opacity-60 block font-medium">Tensor Shape</span>
                 <span className="text-xs font-mono font-bold block mt-0.5">{activeNode.shape}</span>
               </div>
-              <div className={`p-2.5 rounded-xl border backdrop-blur-sm ${
+              <div className={`p-2 rounded-xl border backdrop-blur-sm ${
                 isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.04] border-white/10'
               }`}>
                 <span className="text-[10px] opacity-60 block font-medium">Activación</span>
@@ -638,10 +735,10 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
             </div>
 
             {/* Barra de Magnitud / Activación del Nodo */}
-            <div className={`p-3 rounded-xl border backdrop-blur-sm mb-3.5 ${
+            <div className={`p-2.5 rounded-xl border backdrop-blur-sm mb-2.5 ${
               isLight ? 'bg-slate-50 border-slate-200' : 'bg-white/[0.04] border-white/10'
             }`}>
-              <div className="flex items-center justify-between text-xs mb-1.5">
+              <div className="flex items-center justify-between text-xs mb-1">
                 <span className="font-bold text-[11px] flex items-center gap-1">
                   <TrendingUp className="w-3.5 h-3.5 opacity-70" /> Magnitud de Salida
                 </span>
@@ -649,7 +746,7 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
                   {activeNode.value.toFixed(2)}
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+              <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all duration-500 ${
                     isMono 
@@ -662,7 +759,7 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
             </div>
 
             {/* Fórmula Matemática de la Capa */}
-            <div className={`p-3 rounded-xl border backdrop-blur-sm mb-3.5 ${
+            <div className={`p-2.5 rounded-xl border backdrop-blur-sm mb-2.5 ${
               isLight ? 'bg-slate-100/70 border-slate-200 text-slate-800' : 'bg-white/[0.03] border-white/10 text-slate-200'
             }`}>
               <div className="flex items-center gap-1.5 text-[10px] font-bold opacity-60 uppercase tracking-wider mb-1">
