@@ -7,8 +7,7 @@ interface LiveConnectionBadgeProps {
 }
 
 /**
- * Indicador honesto de conexión: no hay WebSocket/SSE.
- * Con API configurada se usa REST /api/v1; sin ella, adaptadores DEMO locales.
+ * Indicador honesto y minimalista del estado de la plataforma.
  */
 export const LiveConnectionBadge: React.FC<LiveConnectionBadgeProps> = ({
   theme = 'monochrome'
@@ -18,20 +17,23 @@ export const LiveConnectionBadge: React.FC<LiveConnectionBadgeProps> = ({
   const demo = isDemoMode();
 
   return (
-    <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-mono border transition-colors ${
-      isLight 
-        ? 'bg-amber-50 text-amber-900 border-amber-300' 
-        : isMono 
-        ? 'bg-[#1E1C18] text-amber-200 border-[#3D3320]' 
-        : 'bg-amber-500/10 text-amber-300 border-amber-500/30'
-    }`} title={
-      demo
-        ? 'Sin VITE_API_BASE_URL: adaptadores DEMO locales, sin conexión a backend'
-        : 'API REST /api/v1 conectada; sin WebSocket/SSE y con datos sintéticos'
-    }>
-      <span className="w-2 h-2 rounded-full bg-amber-400" />
+    <div
+      className={`hidden sm:flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono border backdrop-blur-md transition-all ${
+        isLight 
+          ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-800' 
+          : isMono 
+          ? 'bg-white/[0.04] border-white/10 text-zinc-300' 
+          : 'bg-black/30 border-white/10 text-cyan-300'
+      }`}
+      title={
+        demo
+          ? 'Entorno local de demostración: adaptadores DEMO locales con datos sintéticos'
+          : 'API REST /api/v1 conectada'
+      }
+    >
+      <span className="w-2 h-2 rounded-full bg-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.8)]" />
       <span className="font-semibold">
-        {demo ? 'SIN API · DATOS SINTÉTICOS' : 'API REST · SIN WEBSOCKET'}
+        {demo ? 'DEMO · DATOS LOCALES' : 'API REST /api/v1'}
       </span>
     </div>
   );

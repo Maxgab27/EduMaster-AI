@@ -3,7 +3,6 @@ import {
   Search, 
   Bell, 
   ChevronDown, 
-  Database, 
   Check, 
   SlidersHorizontal,
   Calendar,
@@ -17,7 +16,6 @@ import {
 } from 'lucide-react';
 import { ApiMeta, AppNotification, NotificationPreferences, ThemeMode, UserProfile, UserRole } from '../../types';
 import { LiveConnectionBadge } from '../common/LiveConnectionBadge';
-import { isDemoMode } from '../../services/apiClient';
 import {
   getNotificationPreferences,
   listNotifications,
@@ -189,58 +187,62 @@ export const Topbar: React.FC<TopbarProps> = ({
         ? 'bg-white/50 border-slate-200/80 text-slate-900 shadow-sm' 
         : 'bg-[#030916]/45 border-white/10 text-slate-100 shadow-lg'
     }`}>
-      {/* Slogan & Breadcrumb */}
-      <div className="flex items-center gap-2 sm:gap-5 min-w-0">
+      {/* Breadcrumb e Indicadores de Estado */}
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0">
         <button
           ref={menuButtonRef}
           onClick={onOpenMobileNav}
           aria-label="Abrir menú de navegación"
           aria-controls="app-sidebar"
           aria-expanded={mobileNavOpen}
-          className={`md:hidden w-9 h-9 shrink-0 rounded-xl border flex items-center justify-center ${
-            isMono ? 'bg-[#1E222C] border-[#2A2F3D] text-white' : isLight ? 'bg-slate-100 border-slate-200 text-slate-800' : 'bg-[#0A1F3D] border-edumaster-cardBorder text-white'
+          className={`md:hidden w-9 h-9 shrink-0 rounded-xl border flex items-center justify-center backdrop-blur-md ${
+            isMono ? 'bg-white/[0.04] border-white/10 text-white' : isLight ? 'bg-white/60 border-slate-200 text-slate-800' : 'bg-black/25 border-white/10 text-white'
           }`}
         >
           <Menu className="w-4 h-4" />
         </button>
-        <div className="hidden lg:flex items-center gap-2 text-xs font-black tracking-widest uppercase opacity-85">
-          <span>Aprende</span>
-          <span className="opacity-40">•</span>
-          <span>Practica</span>
-          <span className="opacity-40">•</span>
-          <span>Destaca</span>
+
+        {/* Ubicación / Breadcrumb minimalista */}
+        <div className="hidden sm:flex items-center gap-2 text-xs font-medium">
+          <span className="opacity-50">Plataforma</span>
+          <span className="opacity-30">/</span>
+          <span className="font-bold opacity-90 tracking-wide">Dashboard</span>
         </div>
 
-        {/* Global Filter Trigger Dropdown (se oculta en celular) */}
+        {/* Global Filter Trigger Dropdown */}
         <div className="relative hidden sm:block">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-colors ${
-              isMono ? 'bg-[#1E222C] border-[#2A2F3D] text-gray-200 hover:text-white' : isLight ? 'bg-slate-100 border-slate-200 text-slate-700 hover:text-slate-900' : 'bg-[#0A1F3D] border-edumaster-cardBorder text-slate-300 hover:text-white'
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-medium transition-all backdrop-blur-md ${
+              isMono 
+                ? 'bg-white/[0.04] border-white/10 text-zinc-200 hover:bg-white/[0.08] hover:border-white/20' 
+                : isLight 
+                ? 'bg-white/60 border-slate-200/80 text-slate-700 hover:bg-white/80' 
+                : 'bg-black/25 border-white/10 text-slate-200 hover:bg-white/10'
             }`}
           >
-            <SlidersHorizontal className="w-3.5 h-3.5 opacity-80" />
-            <span>Filtros: {cohort.split(' ')[0]}</span>
+            <SlidersHorizontal className="w-3.5 h-3.5 opacity-75" />
+            <span>Filtro: {cohort.split(' ')[0]}</span>
             <ChevronDown className="w-3 h-3 opacity-60" />
           </button>
 
           {showFilters && (
             <div className={`absolute left-0 mt-2 w-72 border rounded-2xl p-4 shadow-2xl z-50 animate-in fade-in zoom-in-95 backdrop-blur-xl ${
-              isMono ? 'bg-[#1A1D24] border-[#3B4254] text-white' : isLight ? 'bg-white border-slate-300 text-slate-900 shadow-xl' : 'bg-[#0A1F3D] border-edumaster-cyan/50 text-white'
+              isMono ? 'glass-panel text-white' : isLight ? 'bg-white/90 border-slate-300 text-slate-900 shadow-xl' : 'glass-panel text-white'
             }`}>
               <span className="text-[10px] uppercase font-bold opacity-60 tracking-wider block mb-2">
                 Filtros Globales de Visualización
               </span>
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="opacity-75 block mb-1 text-[11px] flex items-center gap-1">
+                  <label className="opacity-75 mb-1 text-[11px] flex items-center gap-1">
                     <Calendar className="w-3 h-3" /> Periodo Académico
                   </label>
                   <select
                     value={period}
                     onChange={e => setPeriod(e.target.value)}
-                    className={`w-full border rounded-lg p-2 focus:outline-none ${
-                      isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : isMono ? 'bg-[#12141A] border-[#2A2F3D] text-white' : 'bg-black/40 border-white/10 text-white'
+                    className={`w-full border rounded-lg p-2 focus:outline-none backdrop-blur-md ${
+                      isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : isMono ? 'bg-black/40 border-white/10 text-white' : 'bg-black/40 border-white/10 text-white'
                     }`}
                   >
                     <option className={isLight ? 'bg-white text-slate-900' : 'bg-zinc-900 text-white'}>2026-II (Semestre Actual)</option>
@@ -249,14 +251,14 @@ export const Topbar: React.FC<TopbarProps> = ({
                   </select>
                 </div>
                 <div>
-                  <label className="opacity-75 block mb-1 text-[11px] flex items-center gap-1">
+                  <label className="opacity-75 mb-1 text-[11px] flex items-center gap-1">
                     <GraduationCap className="w-3 h-3" /> Cohorte
                   </label>
                   <select
                     value={cohort}
                     onChange={e => setCohort(e.target.value)}
-                    className={`w-full border rounded-lg p-2 focus:outline-none ${
-                      isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : isMono ? 'bg-[#12141A] border-[#2A2F3D] text-white' : 'bg-black/40 border-white/10 text-white'
+                    className={`w-full border rounded-lg p-2 focus:outline-none backdrop-blur-md ${
+                      isLight ? 'bg-slate-50 border-slate-300 text-slate-900' : isMono ? 'bg-black/40 border-white/10 text-white' : 'bg-black/40 border-white/10 text-white'
                     }`}
                   >
                     <option className={isLight ? 'bg-white text-slate-900' : 'bg-zinc-900 text-white'}>Todas las Cohortes</option>
@@ -278,27 +280,8 @@ export const Topbar: React.FC<TopbarProps> = ({
           )}
         </div>
 
-        {/* Badge honesto: los datos siguen siendo DEMO, con o sin API configurada */}
-        <div
-          className={`hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border ${
-            isLight 
-              ? 'bg-amber-100 border-amber-300 text-amber-800'
-              : isMono 
-              ? 'bg-[#1E222C] border-[#3B4254] text-zinc-200' 
-              : 'bg-amber-500/15 border-amber-500/40 text-amber-300'
-          }`}
-          title={isDemoMode()
-            ? 'Sin VITE_API_BASE_URL: adaptadores locales; sin WebSocket/SSE y sin autenticación real'
-            : 'API /api/v1 conectada; los datos siguen siendo sintéticos y NO son evidencia pedagógica'}
-        >
-          <Database className="w-3 h-3" />
-          <span>{isDemoMode() ? 'DATOS LOCALES DEMO · SIN API /api/v1' : 'API /api/v1 · DATOS DEMO'}</span>
-        </div>
-
-        {/* Realtime connection state badge (offline in this demo) */}
-        <div className="hidden lg:block">
-          <LiveConnectionBadge theme={theme} />
-        </div>
+        {/* Estado unificado del Sistema (sin duplicados) */}
+        <LiveConnectionBadge theme={theme} />
       </div>
 
       {/* Right Controls: Command Palette, AI Tutor, Theme Switcher, Score, Notifications, Profile */}
@@ -306,17 +289,17 @@ export const Topbar: React.FC<TopbarProps> = ({
         {/* Command Palette Trigger */}
         <button
           onClick={onOpenCommandPalette}
-          className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs transition-all ${
+          className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs transition-all backdrop-blur-md ${
             isLight 
-              ? 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700' 
+              ? 'bg-white/60 hover:bg-white/80 border-slate-200/80 text-slate-700' 
               : isMono 
-              ? 'bg-[#1E222C] hover:bg-[#282D3B] border-[#2A2F3D] text-zinc-300' 
-              : 'bg-[#0A1F3D] hover:bg-[#0D2B52] border-edumaster-cardBorder text-slate-300'
+              ? 'bg-white/[0.04] hover:bg-white/[0.08] border-white/10 text-zinc-300 hover:border-white/20' 
+              : 'bg-black/25 hover:bg-black/40 border-white/10 text-slate-300 hover:border-white/20'
           }`}
           title="Abrir Paleta de Comandos (Ctrl+K)"
         >
           <Search className="w-3.5 h-3.5 opacity-60" />
-          <span className="hidden lg:inline text-[11px]">Buscar / Comandos...</span>
+          <span className="hidden lg:inline text-[11px]">Buscar...</span>
           <span className="text-[10px] font-mono opacity-50 px-1 py-0.2 rounded border border-inherit">
             ⌘K
           </span>
@@ -325,11 +308,11 @@ export const Topbar: React.FC<TopbarProps> = ({
         {/* Floating AI Tutor Quick Trigger */}
         <button
           onClick={onOpenAITutor}
-          className={`px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-semibold transition-all ${
+          className={`px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-semibold transition-all backdrop-blur-md ${
             isLight 
-              ? 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100' 
+              ? 'bg-blue-50/80 border-blue-200 text-blue-700 hover:bg-blue-100' 
               : isMono 
-              ? 'bg-[#202532] border-[#3B4254] text-zinc-200 hover:text-white' 
+              ? 'bg-white/[0.04] border-white/10 text-zinc-200 hover:bg-white/[0.08] hover:border-white/20' 
               : 'bg-edumaster-blue/20 border-edumaster-cyan/40 text-edumaster-cyan hover:bg-edumaster-blue/30'
           }`}
           title="Abrir Asistente Tutor IA"
@@ -341,8 +324,8 @@ export const Topbar: React.FC<TopbarProps> = ({
         {/* Quick Theme Toggle Button */}
         <button
           onClick={cycleTheme}
-          className={`px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-semibold transition-all ${
-            isMono ? 'bg-zinc-900 border-white/20 text-white hover:bg-zinc-800' : isLight ? 'bg-slate-100 border-slate-300 text-slate-800' : 'bg-[#0A1F3D] border-edumaster-cardBorder text-edumaster-cyan'
+          className={`px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-semibold transition-all backdrop-blur-md ${
+            isMono ? 'bg-white/[0.04] border-white/10 text-white hover:bg-white/[0.08]' : isLight ? 'bg-white/60 border-slate-200/80 text-slate-800' : 'bg-black/25 border-white/10 text-edumaster-cyan'
           }`}
           title="Cambiar tema visual (Oscuro en Grises / Azul Cyber / Claro Minimalista)"
         >
@@ -365,8 +348,8 @@ export const Topbar: React.FC<TopbarProps> = ({
         </button>
 
         {/* Puntuación Global */}
-        <div className={`hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-2xl border shadow-sm ${
-          isMono ? 'bg-[#1E222C] border-[#2A2F3D]' : isLight ? 'bg-slate-100 border-slate-200' : 'bg-[#0A1F3D] border-edumaster-cardBorder'
+        <div className={`hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-2xl border shadow-sm backdrop-blur-md ${
+          isMono ? 'bg-white/[0.04] border-white/10' : isLight ? 'bg-white/60 border-slate-200/80' : 'bg-black/25 border-white/10'
         }`}>
           <div className="relative w-7 h-7 flex items-center justify-center">
             <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 36 36">
@@ -399,8 +382,8 @@ export const Topbar: React.FC<TopbarProps> = ({
           <button
             onClick={() => setShowNotifications(!showNotifications)}
             aria-label={`Notificaciones${unreadCount ? `, ${unreadCount} sin leer` : ''}`}
-            className={`w-9 h-9 rounded-xl border flex items-center justify-center relative transition-all ${
-              isMono ? 'bg-[#1E222C] border-[#2A2F3D] text-white' : isLight ? 'bg-slate-100 border-slate-200 text-slate-800' : 'bg-[#0A1F3D] border-edumaster-cardBorder text-slate-300'
+            className={`w-9 h-9 rounded-xl border flex items-center justify-center relative transition-all backdrop-blur-md ${
+              isMono ? 'bg-white/[0.04] border-white/10 text-white hover:bg-white/[0.08]' : isLight ? 'bg-white/60 border-slate-200 text-slate-800' : 'bg-black/25 border-white/10 text-slate-300'
             }`}
           >
             <Bell className="w-4 h-4" />
@@ -531,8 +514,8 @@ export const Topbar: React.FC<TopbarProps> = ({
         <div className="relative">
           <button
             onClick={() => setShowRoleMenu(!showRoleMenu)}
-            className={`flex items-center gap-3 p-1.5 rounded-2xl border transition-all ${
-              isMono ? 'bg-[#1E222C] border-[#2A2F3D] text-white' : isLight ? 'bg-slate-100 border-slate-200 text-slate-900' : 'bg-[#0A1F3D] border-edumaster-cardBorder text-white'
+            className={`flex items-center gap-3 p-1.5 rounded-2xl border transition-all backdrop-blur-md ${
+              isMono ? 'bg-white/[0.04] border-white/10 text-white hover:bg-white/[0.08]' : isLight ? 'bg-white/60 border-slate-200 text-slate-900' : 'bg-black/25 border-white/10 text-white'
             }`}
           >
             <img
