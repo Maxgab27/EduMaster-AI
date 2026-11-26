@@ -126,14 +126,14 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
       {/* Visual Header */}
       <div className={`flex flex-wrap items-center justify-between px-5 py-3 border-b backdrop-blur-md ${
         isMono
-          ? 'bg-[#181B23]/90 border-[#2A2F3D] text-gray-100'
+          ? 'bg-black/25 border-white/10 text-gray-100'
           : isLight
-          ? 'bg-slate-100/90 border-slate-200 text-slate-900'
-          : 'bg-black/40 border-white/10 text-white'
+          ? 'bg-white/40 border-slate-200/60 text-slate-900'
+          : 'bg-black/30 border-white/10 text-white'
       }`}>
         <div className="flex items-center gap-3">
           <div className={`w-8 h-8 rounded-xl p-0.5 border ${
-            isMono ? 'bg-[#202532] border-[#3B4254] text-white' : isLight ? 'bg-white border-slate-300 text-slate-900 shadow-sm' : 'bg-edumaster-blue/20 border-edumaster-blue text-edumaster-cyan'
+            isMono ? 'bg-white/10 border-white/15 text-white' : isLight ? 'bg-white border-slate-300 text-slate-900 shadow-sm' : 'bg-edumaster-blue/20 border-edumaster-blue text-edumaster-cyan'
           }`}>
             <div className="w-full h-full rounded-[10px] flex items-center justify-center">
               <Activity className="w-4 h-4 animate-pulse" />
@@ -211,8 +211,8 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
       </div>
 
       {/* Main Graph SVG Canvas */}
-      <div className={`relative flex-1 min-h-[340px] p-2 select-none flex items-center justify-center overflow-hidden ${
-        isMono ? 'bg-[#13151D]' : isLight ? 'bg-[#F8FAFC]' : 'bg-[#06152B]/80'
+      <div className={`relative flex-1 min-h-[340px] p-2 select-none flex items-center justify-center overflow-hidden backdrop-blur-md ${
+        isMono ? 'bg-black/25' : isLight ? 'bg-white/30' : 'bg-black/30'
       }`}>
         <svg 
           viewBox={`0 0 ${svgWidth} ${svgHeight}`} 
@@ -472,12 +472,12 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
       </div>
 
       {/* Real-time Telemetry Status Bar */}
-      <div className={`px-5 py-2.5 border-t flex flex-wrap items-center justify-between text-xs gap-3 ${
+      <div className={`px-5 py-2.5 border-t flex flex-wrap items-center justify-between text-xs gap-3 backdrop-blur-sm ${
         isLight
-          ? 'border-slate-200 bg-slate-50/80 text-slate-700'
+          ? 'border-slate-200/60 bg-white/40 text-slate-700'
           : isMono
-          ? 'border-[#2A2F3D] bg-[#161821] text-gray-300'
-          : 'border-white/10 bg-black/30 opacity-80'
+          ? 'border-white/10 bg-black/20 text-gray-300'
+          : 'border-white/10 bg-black/25 opacity-90 text-white'
       }`}>
         <div className="flex items-center gap-5">
           <div className="flex items-center gap-1.5">
@@ -505,7 +505,7 @@ export const NeuralVisualizer: React.FC<NeuralVisualizerProps> = ({
         <div className="flex items-center gap-2 text-[11px]">
           <span className="opacity-60">Trazabilidad:</span>
           <span className={`px-2 py-0.5 rounded-md font-mono font-bold border ${
-            isLight ? 'bg-white border-slate-200 text-slate-800' : isMono ? 'bg-[#202532] border-[#3B4254] text-zinc-200' : 'border-white/10'
+            isLight ? 'bg-white/80 border-slate-200 text-slate-800' : isMono ? 'bg-white/10 border-white/15 text-zinc-200' : 'bg-white/10 border-white/15 text-white'
           }`}>
             DEMO · sin medición de latencia
           </span>

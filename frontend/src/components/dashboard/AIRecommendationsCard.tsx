@@ -123,8 +123,8 @@ export const AIRecommendationsCard: React.FC<AIRecommendationsCardProps> = ({ th
   };
 
   return (
-    <div className={`flex flex-col h-full border rounded-2xl p-5 relative shadow-panel ${
-      isLight ? 'bg-white border-slate-200 text-slate-900' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-100' : 'glass-panel border-edumaster-cardBorder text-slate-100'
+    <div className={`glass-panel flex flex-col h-full border rounded-2xl p-5 relative shadow-panel ${
+      isLight ? 'border-slate-200/80 text-slate-900' : isMono ? 'border-white/10 text-zinc-100' : 'border-edumaster-cardBorder text-slate-100'
     }`}>
       <div className="flex items-center justify-between mb-3 gap-2">
         <div className="flex items-center gap-2">
@@ -170,29 +170,29 @@ export const AIRecommendationsCard: React.FC<AIRecommendationsCardProps> = ({ th
               <div
                 key={rec.id}
                 onClick={() => setSelectedRec(rec)}
-                className={`flex items-center justify-between px-3 py-2 rounded-xl border transition-all cursor-pointer group ${
+                className={`flex items-center justify-between px-3 py-2 rounded-xl border transition-all cursor-pointer group backdrop-blur-sm ${
                   isDescartada
                     ? 'opacity-40 line-through bg-black/20 border-transparent'
                     : isAceptada
                     ? (isLight
-                        ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                        ? 'bg-emerald-50/80 border-emerald-300 text-emerald-800'
                         : isMono
-                        ? 'bg-[#242A38] border-white text-white font-bold'
-                        : 'bg-emerald-950/25 border-emerald-500/40 text-emerald-200')
+                        ? 'bg-white/20 border-white text-white font-bold'
+                        : 'bg-emerald-950/30 border-emerald-500/50 text-emerald-200')
                     : (isLight
-                        ? 'bg-slate-50 border-slate-200 text-slate-800 hover:bg-slate-100 hover:border-slate-300 shadow-sm'
+                        ? 'bg-white/40 border-slate-200/60 text-slate-800 hover:bg-white/70 hover:border-slate-300 shadow-sm'
                         : isMono
-                        ? 'bg-[#1E222C] border-[#2A2F3D] text-gray-200 hover:bg-[#262B37] hover:border-[#3D4457] shadow-sm'
-                        : 'bg-black/30 border-white/10 hover:border-white/30 hover:bg-white/5 shadow-sm')
+                        ? 'bg-white/[0.04] border-white/10 text-gray-200 hover:bg-white/[0.08] hover:border-white/25 shadow-sm'
+                        : 'bg-black/25 border-white/10 text-slate-200 hover:border-white/30 hover:bg-black/35 shadow-sm')
                 }`}
               >
                 <div className="flex items-center gap-2.5 truncate">
                   <div className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 border ${
                     isLight
-                      ? 'bg-white border-slate-200 text-slate-700 shadow-sm'
+                      ? 'bg-white/80 border-slate-200 text-slate-700 shadow-sm'
                       : isMono
-                      ? 'bg-[#151821] border-[#2A2F3D] text-white shadow-inner'
-                      : 'bg-black/40 border-white/10'
+                      ? 'bg-white/10 border-white/15 text-white shadow-inner'
+                      : 'bg-white/10 border-white/15 text-cyan-300'
                   }`}>
                     {getRecIcon(rec.prefix)}
                   </div>

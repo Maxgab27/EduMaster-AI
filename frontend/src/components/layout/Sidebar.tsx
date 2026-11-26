@@ -70,10 +70,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
     } ${
       isMono 
-        ? 'backdrop-blur-2xl bg-[#0F131D]/80 border-r border-white/10 text-gray-100 shadow-2xl' 
+        ? 'backdrop-blur-2xl bg-[#070A12]/40 border-r border-white/10 text-gray-100 shadow-2xl' 
         : isLight 
-        ? 'backdrop-blur-2xl bg-white/80 border-r border-slate-200/80 text-slate-900 shadow-xl' 
-        : 'backdrop-blur-2xl bg-[#051124]/80 border-r border-white/10 text-slate-100 shadow-2xl'
+        ? 'backdrop-blur-2xl bg-white/50 border-r border-slate-200/80 text-slate-900 shadow-xl' 
+        : 'backdrop-blur-2xl bg-[#030916]/45 border-r border-white/10 text-slate-100 shadow-2xl'
     }`}>
       {/* Brand Header */}
       <div>

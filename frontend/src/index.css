@@ -7,17 +7,17 @@
   /* Glass Dark Gray Theme - Rich Grayscale / Slate-Charcoal with Frosted Glass */
   --bg-app: transparent;
   --bg-gradient: none;
-  --panel-bg: rgba(20, 24, 34, 0.65);
-  --panel-border: rgba(255, 255, 255, 0.12);
+  --panel-bg: rgba(14, 18, 28, 0.32);
+  --panel-border: rgba(255, 255, 255, 0.10);
   --panel-border-top: rgba(255, 255, 255, 0.22);
   --panel-hover-border: rgba(255, 255, 255, 0.35);
-  --panel-hover-glow: 0 8px 32px -4px rgba(0, 0, 0, 0.5), 0 0 20px -2px rgba(255, 255, 255, 0.12);
-  --header-bg: rgba(18, 22, 32, 0.72);
-  --sidebar-bg: rgba(15, 18, 26, 0.8);
-  --sub-surface: rgba(255, 255, 255, 0.05);
-  --sub-surface-alt: rgba(255, 255, 255, 0.08);
-  --sub-surface-highlight: rgba(255, 255, 255, 0.14);
-  --sub-border: rgba(255, 255, 255, 0.12);
+  --panel-hover-glow: 0 12px 40px -4px rgba(0, 0, 0, 0.5), 0 0 25px -2px rgba(255, 255, 255, 0.15);
+  --header-bg: rgba(12, 16, 24, 0.38);
+  --sidebar-bg: rgba(10, 14, 22, 0.42);
+  --sub-surface: rgba(255, 255, 255, 0.04);
+  --sub-surface-alt: rgba(255, 255, 255, 0.07);
+  --sub-surface-highlight: rgba(255, 255, 255, 0.12);
+  --sub-border: rgba(255, 255, 255, 0.10);
   --text-main: #F9FAFB;
   --text-sub: #D1D5DB;
   --text-muted: #9CA3AF;
@@ -34,17 +34,17 @@
 [data-theme="cyber"] {
   --bg-app: transparent;
   --bg-gradient: none;
-  --panel-bg: rgba(7, 24, 52, 0.62);
-  --panel-border: rgba(8, 127, 229, 0.35);
-  --panel-border-top: rgba(32, 200, 245, 0.5);
-  --panel-hover-border: rgba(32, 200, 245, 0.75);
-  --panel-hover-glow: 0 8px 32px -4px rgba(8, 127, 229, 0.4), 0 0 25px -2px rgba(32, 200, 245, 0.3);
-  --header-bg: rgba(5, 18, 38, 0.75);
-  --sidebar-bg: rgba(3, 14, 30, 0.82);
-  --sub-surface: rgba(8, 127, 229, 0.14);
-  --sub-surface-alt: rgba(8, 127, 229, 0.22);
-  --sub-surface-highlight: rgba(32, 200, 245, 0.25);
-  --sub-border: rgba(8, 127, 229, 0.32);
+  --panel-bg: rgba(4, 14, 32, 0.32);
+  --panel-border: rgba(8, 127, 229, 0.30);
+  --panel-border-top: rgba(32, 200, 245, 0.48);
+  --panel-hover-border: rgba(32, 200, 245, 0.70);
+  --panel-hover-glow: 0 12px 40px -4px rgba(8, 127, 229, 0.45), 0 0 25px -2px rgba(32, 200, 245, 0.35);
+  --header-bg: rgba(4, 12, 28, 0.38);
+  --sidebar-bg: rgba(3, 10, 22, 0.42);
+  --sub-surface: rgba(8, 127, 229, 0.10);
+  --sub-surface-alt: rgba(8, 127, 229, 0.15);
+  --sub-surface-highlight: rgba(32, 200, 245, 0.22);
+  --sub-border: rgba(8, 127, 229, 0.30);
   --text-main: #F8FAFC;
   --text-sub: #CBD5E1;
   --text-muted: #94A3B8;
@@ -52,8 +52,8 @@
   --accent-secondary: #20C8F5;
   --accent-contrast: #FFFFFF;
   --accent-glow: rgba(32, 200, 245, 0.4);
-  --badge-bg: rgba(8, 127, 229, 0.2);
-  --badge-border: rgba(8, 127, 229, 0.4);
+  --badge-bg: rgba(8, 127, 229, 0.18);
+  --badge-border: rgba(8, 127, 229, 0.35);
   --badge-text: #20C8F5;
   --divider: rgba(255, 255, 255, 0.12);
 }
@@ -62,17 +62,17 @@
   /* High-Contrast Crisp Light Minimalist with Frosted Glass */
   --bg-app: transparent;
   --bg-gradient: none;
-  --panel-bg: rgba(255, 255, 255, 0.72);
-  --panel-border: rgba(203, 213, 225, 0.7);
-  --panel-border-top: rgba(255, 255, 255, 0.95);
-  --panel-hover-border: rgba(148, 163, 184, 0.8);
+  --panel-bg: rgba(255, 255, 255, 0.45);
+  --panel-border: rgba(203, 213, 225, 0.60);
+  --panel-border-top: rgba(255, 255, 255, 0.90);
+  --panel-hover-border: rgba(148, 163, 184, 0.80);
   --panel-hover-glow: 0 10px 30px -3px rgba(31, 38, 135, 0.12);
-  --header-bg: rgba(255, 255, 255, 0.78);
-  --sidebar-bg: rgba(255, 255, 255, 0.82);
-  --sub-surface: rgba(241, 245, 249, 0.65);
-  --sub-surface-alt: rgba(226, 232, 240, 0.75);
-  --sub-surface-highlight: rgba(203, 213, 225, 0.8);
-  --sub-border: rgba(226, 232, 240, 0.8);
+  --header-bg: rgba(255, 255, 255, 0.55);
+  --sidebar-bg: rgba(255, 255, 255, 0.58);
+  --sub-surface: rgba(241, 245, 249, 0.55);
+  --sub-surface-alt: rgba(226, 232, 240, 0.65);
+  --sub-surface-highlight: rgba(203, 213, 225, 0.70);
+  --sub-border: rgba(226, 232, 240, 0.70);
   --text-main: #0F172A;
   --text-sub: #334155;
   --text-muted: #64748B;
@@ -80,8 +80,8 @@
   --accent-secondary: #1E293B;
   --accent-contrast: #FFFFFF;
   --accent-glow: rgba(15, 23, 42, 0.15);
-  --badge-bg: rgba(241, 245, 249, 0.8);
-  --badge-border: rgba(203, 213, 225, 0.8);
+  --badge-bg: rgba(241, 245, 249, 0.75);
+  --badge-border: rgba(203, 213, 225, 0.75);
   --badge-text: #0F172A;
   --divider: rgba(0, 0, 0, 0.08);
 }

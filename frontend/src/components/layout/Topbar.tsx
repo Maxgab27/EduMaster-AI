@@ -184,10 +184,10 @@ export const Topbar: React.FC<TopbarProps> = ({
   return (
     <header className={`h-16 border-b px-4 sm:px-6 flex items-center justify-between sticky top-0 z-30 transition-colors backdrop-blur-2xl ${
       isMono 
-        ? 'bg-[#0F131D]/80 border-white/10 text-gray-100 shadow-lg' 
+        ? 'bg-[#070A12]/40 border-white/10 text-gray-100 shadow-lg' 
         : isLight 
-        ? 'bg-white/80 border-slate-200/80 text-slate-900 shadow-sm' 
-        : 'bg-[#06152B]/80 border-white/10 text-slate-100 shadow-lg'
+        ? 'bg-white/50 border-slate-200/80 text-slate-900 shadow-sm' 
+        : 'bg-[#030916]/45 border-white/10 text-slate-100 shadow-lg'
     }`}>
       {/* Slogan & Breadcrumb */}
       <div className="flex items-center gap-2 sm:gap-5 min-w-0">

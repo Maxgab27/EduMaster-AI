@@ -117,27 +117,27 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
         {events.map((evt, idx) => (
           <div
             key={evt.id}
-            className={`flex items-center justify-between px-3 py-2 rounded-xl border transition-all ${
+            className={`flex items-center justify-between px-3 py-2 rounded-xl border transition-all backdrop-blur-sm ${
               idx === 0 
                 ? (isLight
-                    ? 'border-slate-300 bg-slate-100/90 text-slate-900 shadow-sm border-l-4 border-l-slate-900 animate-in slide-in-from-top-2 duration-300'
+                    ? 'border-slate-300 bg-white/70 text-slate-900 shadow-sm border-l-4 border-l-slate-900 animate-in slide-in-from-top-2 duration-300'
                     : isMono 
-                    ? 'border-[#3B4254] bg-[#242937] text-white shadow-md border-l-4 border-l-white animate-in slide-in-from-top-2 duration-300' 
-                    : 'border-edumaster-cyan/70 bg-[#0A1F3D] shadow-glowCyan')
+                    ? 'border-white/30 bg-white/10 text-white shadow-md border-l-4 border-l-white animate-in slide-in-from-top-2 duration-300' 
+                    : 'border-edumaster-cyan/70 bg-edumaster-cyan/15 text-white shadow-glowCyan')
                 : (isLight
-                    ? 'border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100'
+                    ? 'border-slate-200/60 bg-white/40 text-slate-800 hover:bg-white/60'
                     : isMono
-                    ? 'border-[#2A2F3D] bg-[#1E222C] text-gray-200 hover:bg-[#262B37]'
-                    : 'border-white/10 bg-black/30 hover:bg-white/5')
+                    ? 'border-white/10 bg-white/[0.04] text-gray-200 hover:bg-white/[0.08]'
+                    : 'border-white/10 bg-black/20 text-slate-200 hover:bg-black/30')
             }`}
           >
             <div className="flex items-center gap-2.5 truncate">
               <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
                 isLight
-                  ? 'bg-white border-slate-200 text-slate-700 shadow-sm'
+                  ? 'bg-white/80 border-slate-200 text-slate-700 shadow-sm'
                   : isMono
-                  ? 'bg-[#151821] border-[#2A2F3D] text-white shadow-inner'
-                  : 'bg-black/40 border-white/10'
+                  ? 'bg-white/10 border-white/15 text-white shadow-inner'
+                  : 'bg-white/10 border-white/15 text-cyan-300'
               }`}>
                 {getIcon(evt.icon)}
               </div>

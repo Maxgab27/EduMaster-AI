@@ -13,9 +13,10 @@ export const MetricCardsRow: React.FC<MetricCardsRowProps> = ({ metrics, theme =
 
   const getCardTheme = (index: number) => {
     if (isMono) {
+      const monoGlows = ['#F97316', '#06B6D4', '#A855F7', '#10B981'];
       return {
         icon: index === 0 ? <Users className="w-4 h-4 text-white" /> : index === 1 ? <BookOpen className="w-4 h-4 text-white" /> : index === 2 ? <Clock className="w-4 h-4 text-white" /> : <Award className="w-4 h-4 text-white" />,
-        glow: '#FFFFFF',
+        glow: monoGlows[index % 4],
         sparkline: index === 0 ? [30, 42, 38, 55, 48, 62, 75] : index === 1 ? [20, 25, 32, 40, 45, 52, 60] : index === 2 ? [35, 38, 45, 50, 68, 72, 89] : [15, 22, 28, 35, 42, 50, 58],
         strokeColor: '#FFFFFF'
       };
@@ -73,7 +74,7 @@ export const MetricCardsRow: React.FC<MetricCardsRowProps> = ({ metrics, theme =
           >
             {/* Ambient Corner Glow on Hover */}
             <div
-              className="absolute -top-12 -right-12 w-28 h-28 rounded-full opacity-10 group-hover:opacity-20 transition-opacity blur-2xl pointer-events-none"
+              className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-20 group-hover:opacity-40 transition-opacity blur-2xl pointer-events-none"
               style={{ backgroundColor: cTheme.glow }}
             />
 
@@ -81,12 +82,12 @@ export const MetricCardsRow: React.FC<MetricCardsRowProps> = ({ metrics, theme =
               <span className="text-xs font-bold opacity-75 uppercase tracking-wider">
                 {card.title}
               </span>
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center border shadow-inner transition-colors ${
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center border shadow-inner transition-colors backdrop-blur-sm ${
                 isLight
-                  ? 'bg-slate-100 border-slate-200 text-slate-800 group-hover:border-slate-300'
+                  ? 'bg-white/80 border-slate-200 text-slate-800 group-hover:border-slate-300'
                   : isMono
-                  ? 'bg-[#202532] border-[#3B4254] text-white group-hover:border-[#525C75]'
-                  : 'bg-black/40 border-white/10 group-hover:border-white/30'
+                  ? 'bg-white/10 border-white/15 text-white group-hover:border-white/30'
+                  : 'bg-black/30 border-white/10 group-hover:border-white/30'
               }`}>
                 {cTheme.icon}
               </div>
@@ -96,12 +97,12 @@ export const MetricCardsRow: React.FC<MetricCardsRowProps> = ({ metrics, theme =
               <span className="text-2xl font-black tracking-tight font-mono tabular-numbers">
                 {card.value}
               </span>
-              <div className={`flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full border ${
+              <div className={`flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full border backdrop-blur-sm ${
                 isLight
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700 font-bold'
+                  ? 'bg-emerald-500/15 border-emerald-300 text-emerald-800 font-bold'
                   : isMono
-                  ? 'bg-[#202532] border-[#3B4254] text-zinc-200 font-bold'
-                  : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30'
+                  ? 'bg-[#d4ff32]/15 border-[#d4ff32]/35 text-[#d4ff32] font-mono font-bold'
+                  : 'text-emerald-400 bg-emerald-500/15 border-emerald-500/35 font-mono font-bold'
               }`}>
                 <ArrowUpRight className="w-3.5 h-3.5" />
                 <span>{card.change}</span>

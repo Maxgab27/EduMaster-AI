@@ -38,12 +38,12 @@ export const CourseCompletionDonut: React.FC<CourseCompletionDonutProps> = ({ th
     : { completed: '#00BFA6', inProgress: '#087FE5', notStarted: '#EF4444' };
 
   return (
-    <div className={`flex flex-col border rounded-2xl p-4 shadow-panel transition-colors ${
+    <div className={`glass-panel flex flex-col border rounded-2xl p-4 shadow-panel transition-colors ${
       isLight 
-        ? 'bg-white border-slate-200' 
+        ? 'border-slate-200/80 text-slate-900' 
         : isMono 
-        ? 'bg-[#151821] border-[#2A2F3D]' 
-        : 'glass-panel border-edumaster-cardBorder'
+        ? 'border-white/10 text-white' 
+        : 'border-edumaster-cardBorder text-slate-100'
     }`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
@@ -139,18 +139,18 @@ export const CourseCompletionDonut: React.FC<CourseCompletionDonutProps> = ({ th
                 key={slice.label}
                 onMouseEnter={() => setHoveredSlice(slice.label)}
                 onMouseLeave={() => setHoveredSlice(null)}
-                className={`flex items-center justify-between gap-2.5 px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer ${
+                className={`flex items-center justify-between gap-2.5 px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer backdrop-blur-sm ${
                   isHovered 
                     ? (isLight
                         ? 'bg-slate-900 border-slate-900 text-white shadow-sm'
                         : isMono
-                        ? 'bg-white border-white text-zinc-950 font-black shadow-sm' 
-                        : 'bg-white/10 border-white/40') 
+                        ? 'bg-white/20 border-white text-white font-black shadow-sm' 
+                        : 'bg-white/15 border-white/40 text-white') 
                     : (isLight
-                        ? 'bg-slate-50 border-slate-200 text-slate-800 hover:bg-slate-100 hover:border-slate-300'
+                        ? 'bg-white/40 border-slate-200/60 text-slate-800 hover:bg-white/70 hover:border-slate-300'
                         : isMono
-                        ? 'bg-[#1C202B] border-[#2A2F3D] text-gray-200 hover:bg-[#252B3A]'
-                        : 'bg-[#0A1F3D]/60 border-white/10 hover:border-white/20')
+                        ? 'bg-white/[0.04] border-white/10 text-gray-200 hover:bg-white/[0.08]'
+                        : 'bg-black/20 border-white/10 text-slate-200 hover:bg-black/30')
                 }`}
               >
                 <div className="flex items-center gap-2 truncate">
