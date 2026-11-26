@@ -430,8 +430,8 @@ export const App: React.FC = () => {
                 <MetricCardsRow metrics={summary.metrics} theme={theme} />
 
                 {/* Row 2: Neural Visualizer (8 cols) & Compact Donut + Activity (4 cols) */}
-                <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-                  <div className="xl:col-span-8 h-[440px]">
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+                  <div className="xl:col-span-8 min-h-[460px] flex flex-col">
                     <NeuralVisualizer theme={theme} neural={summary.neural} />
                   </div>
                   <div className="xl:col-span-4 flex flex-col gap-4">
@@ -447,11 +447,11 @@ export const App: React.FC = () => {
                 </div>
 
                 {/* Row 3: High-Definition Geo Progress Map & Competency Heatmap */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  <div className="lg:col-span-7">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                  <div className="lg:col-span-7 flex flex-col">
                     <GeoProgressMap theme={theme} regions={summary.regions} />
                   </div>
-                  <div className="lg:col-span-5">
+                  <div className="lg:col-span-5 flex flex-col">
                     <SkillMasteryHeatmap theme={theme} skills={summary.skills} />
                   </div>
                 </div>
