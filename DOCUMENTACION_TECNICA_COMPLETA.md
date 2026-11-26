@@ -47,7 +47,7 @@ El trabajo se desarrolló con tres principios:
 - **Estado honesto:** todo lo que no es real está rotulado `DEMO`; no se presentan cifras de producción inventadas.
 - **Auditoría transversal:** las acciones relevantes generan eventos con actor, rol, correlación y detalle.
 
-El resultado es un sistema funcional en modo demostración, con backend activo en `backend/`, frontend en `frontend/`, documentación versionada, 7 pruebas E2E y un checklist de Railway que el usuario ejecuta por su cuenta. **No se realizó deploy desde esta sesión.**
+El resultado es un sistema funcional en modo demostración, con backend activo en `backend/`, frontend en `frontend/`, documentación versionada, 8 pruebas E2E y un checklist de Railway que el usuario ejecuta por su cuenta. **No se realizó deploy desde esta sesión.**
 
 ---
 
@@ -181,7 +181,7 @@ EduMaster-AI/
 ├── frontend/
 │   ├── dist/                       # build de producción
 │   ├── scripts/serve.mjs           # servidor estático para Railway
-│   ├── tests/demo-flows.spec.ts    # 7 pruebas E2E
+│   ├── tests/demo-flows.spec.ts    # 8 pruebas E2E
 │   ├── playwright.config.ts
 │   ├── railway.json
 │   └── src/
@@ -351,7 +351,7 @@ Scripts principales:
 | `dev` | `vite` | Desarrollo local. |
 | `build` | `tsc -b && vite build` | Compilación de producción. |
 | `lint` | `oxlint` | Análisis estático. |
-| `test:e2e` | `playwright test` | 7 pruebas de flujos DEMO. |
+| `test:e2e` | `playwright test` | 8 pruebas de flujos DEMO. |
 | `start` | `node scripts/serve.mjs` | Servidor estático en Railway. |
 
 El bundle se dividió por módulos para reducir la carga inicial. El build final sin `.env.local` no contiene `192.168.18.36` ni `127.0.0.1:8000`.
@@ -386,7 +386,7 @@ Esta identidad se envía como `X-Actor` y `X-Role` al backend. **No es autentica
 
 | Ubicación | Texto | Sentido |
 |---|---|---|
-| Topbar | `DATOS LOCALES DEMO · SIN API /api/v1` | No hay `VITE_API_BASE_URL`; se usan adaptadores locales. |
+| Topbar | `DEMO · DATOS LOCALES` | No hay `VITE_API_BASE_URL`; se usan adaptadores locales. |
 | Configuración | `DEMO · sin API /api/v1 · datos locales` | Misma condición explicada en el módulo. |
 | Visualizador neuronal | `DEMO · ANIMACIÓN ILUSTRATIVA` | La animación no es inferencia en tiempo real. |
 | Comunidad | `DEMO · SIMULADO` | La respuesta automática es una regla local. |
@@ -704,7 +704,7 @@ No se definen secretos de Supabase/OIDC ni credenciales externas. `frontend/.env
 | `GET /health` frontend | `{"status":"ok","service":"edumaster-ai-frontend","mode":"DEMO"}`. |
 | Fallback SPA | Verificado: rutas sin archivo vuelven a `index.html`. |
 | Path traversal | Bloqueado en `scripts/serve.mjs`. |
-| `npm.cmd run test:e2e` | 7 passed en 28.3 s, 0 errores de consola. |
+| `npm.cmd run test:e2e` | 8 passed en 36.3 s, 0 errores de consola. |
 | Reconstrucción tras rebase | `lint` y `build` limpios; `LandingPageView` y `LoginView` presentes en el bundle. |
 | Recaptura visual | 11 imágenes generadas desde la build final, 0 errores de consola. |
 | Git | `HEAD` y `@{u}` iguales; sin cambios pendientes. |
@@ -720,6 +720,7 @@ Archivo: `frontend/tests/demo-flows.spec.ts`
 5. Tutor IA: sugerencia, respuesta con peso DEMO y fuente clicable.
 6. SpeedGrader: validar feedback y mostrar comprobante de firma DEMO.
 7. CSV: descargas reales de auditoría y analítica.
+8. Landing y login: navegar desde la landing pública, ver perfiles DEMO y entrar al dashboard.
 
 `playwright.config.ts` levanta Vite en `127.0.0.1:5174` con `VITE_API_BASE_URL`, `VITE_CORE_API_BASE_URL` y `VITE_PUBLIC_ORIGIN` vacíos. Por eso las pruebas ejercitan el modo DEMO real, sin depender del `.env.local` del desarrollador.
 
@@ -781,7 +782,7 @@ Panel docente con rol `Docente / Instructor`: rúbrica, feedback validado, `X-Ac
 
 ![Configuración y respaldo](docs/imagenes/demo-respaldo.png)
 
-Preferencias compartidas, exportación/importación JSON y badge `DATOS LOCALES DEMO · SIN API /api/v1`.
+Preferencias compartidas, exportación/importación JSON y badge `DEMO · DATOS LOCALES`.
 
 ### 14.10 Auditoría y CSV
 
@@ -908,7 +909,7 @@ EduMaster.ai quedó como una entrega académica coherente y verificable:
 - Los módulos sin backend funcionan con adaptadores DEMO y rotulan su condición.
 - La auditoría, el QR, los CSV y el respaldo JSON son funcionales dentro del alcance DEMO.
 - Las preferencias se comparten entre pantallas y el estado persiste en el navegador.
-- Hay 7 pruebas E2E versionadas, lint limpio, build correcto y smoke test 34/34.
+- Hay 8 pruebas E2E versionadas, lint limpio, build correcto y smoke test 34/34.
 - Las capturas están incluidas en este documento y en el informe de práctica `.docx`.
 - El repositorio está sincronizado y el usuario tiene en `RAILWAY.md` la checklist para publicar cuando lo decida.
 

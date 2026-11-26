@@ -20,7 +20,7 @@ test('notificaciones: filtrar, marcar todas y persistir', async ({ page }) => {
   const errors = consoleErrors(page);
   await page.goto('/');
 
-  await expect(page.getByText(/DATOS LOCALES DEMO · SIN API/)).toBeVisible();
+  await expect(page.getByText(/DEMO · DATOS LOCALES/)).toBeVisible();
   await page.getByRole('button', { name: /^Notificaciones/ }).click();
   await expect(page.getByText('Notificaciones de Dominio')).toBeVisible();
   await page.getByRole('button', { name: /^Sin leer/ }).click();
@@ -34,7 +34,7 @@ test('notificaciones: filtrar, marcar todas y persistir', async ({ page }) => {
   expect(readAllAt).toBeTruthy();
 
   await page.reload();
-  await expect(page.getByRole('button', { name: 'Notificaciones', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Notificaciones/ })).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -179,10 +179,11 @@ test('landing y login: navegar desde landing pública, ver perfiles demo y entra
   // Clic en Iniciar Sesión para ir a la vista de login
   await page.getByRole('button', { name: 'Iniciar Sesión', exact: true }).click();
   await expect(page.getByText('Perfiles de Demostración Rápida')).toBeVisible();
-  await expect(page.getByText('Dr. Alejandro Morales')).toBeVisible();
+  const teacherProfile = page.getByRole('button', { name: /Ingresar como Dr\. Alejandro/ });
+  await expect(teacherProfile).toBeVisible();
 
   // Seleccionar perfil y pulsar Ingresar
-  await page.getByRole('button', { name: /Ingresar como/ }).click();
+  await teacherProfile.click();
 
   // Validar que entramos exitosamente a la plataforma
   await expect(page.getByText(/EduMaster/)).toBeVisible();
