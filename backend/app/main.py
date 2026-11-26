@@ -53,6 +53,7 @@ app.add_middleware(
         r"(https://.*\.vercel\.app|"
         r"https://.*\.railway\.app|"
         r"https://.*\.up\.railway\.app|"
+        r"https://.*\.onrender\.com|"
         r"http://(localhost|127\.0\.0\.1|"
         r"192\.168\.\d{1,3}\.\d{1,3}|"
         r"10\.\d{1,3}\.\d{1,3}\.\d{1,3}|"

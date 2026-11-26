@@ -8,7 +8,5 @@ services:
     region: oregon
     healthCheckPath: /health
     envVars:
-      - key: PORT
-        value: 8000
       - key: ENVIRONMENT
         value: production
