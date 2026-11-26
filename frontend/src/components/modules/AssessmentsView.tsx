@@ -111,6 +111,17 @@ export const AssessmentsView: React.FC<AssessmentsViewProps> = ({
         setSubmissions(submissionResponse.data);
         setMeta(assessmentResponse.meta);
         setError(null);
+
+        // Auto-abrir SpeedGrader si venimos de un clic en "Intervenir" o "Paso 2"
+        const targetId = localStorage.getItem('edumaster_target_submission_id');
+        if (targetId && canGrade) {
+          localStorage.removeItem('edumaster_target_submission_id');
+          const matched = submissionResponse.data.find(s => s.id === targetId) || submissionResponse.data[0];
+          if (matched) {
+            setActiveSubmission(matched);
+            setIsSpeedGraderOpen(true);
+          }
+        }
       })
       .catch(err => {
         if (err instanceof DOMException && err.name === 'AbortError') return;
@@ -118,7 +129,7 @@ export const AssessmentsView: React.FC<AssessmentsViewProps> = ({
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [reloadKey]);
+  }, [reloadKey, canGrade]);
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">

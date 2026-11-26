@@ -10,7 +10,8 @@ import {
   Clock,
   ShieldCheck,
   BrainCircuit,
-  UserCheck
+  UserCheck,
+  Sliders
 } from 'lucide-react';
 import { ThemeMode, NavTab } from '../../types';
 
@@ -64,6 +65,7 @@ export const BatchCohortManager: React.FC<BatchCohortManagerProps> = ({
   const isMono = theme === 'monochrome';
 
   const [students, setStudents] = useState<EvaluatedStudentItem[]>(() => DEFAULT_COHORT_20);
+  const [threshold, setThreshold] = useState<number>(0.40);
   const [filterLevel, setFilterLevel] = useState<string>('todos');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
@@ -224,18 +226,34 @@ export const BatchCohortManager: React.FC<BatchCohortManagerProps> = ({
     reader.readAsText(file);
   };
 
+  // Recalcular nivel de riesgo y sugerencia según el umbral interactivo seleccionado por el docente
+  const studentsWithDynamicThreshold = students.map(s => {
+    let risk_level = 'Bajo';
+    let suggested_action = s.suggested_action;
+    if (s.dropout_risk_score >= threshold) {
+      risk_level = 'Crítico';
+      suggested_action = 'Derivación prioritaria a tutoría académica y seguimiento docente síncrono.';
+    } else if (s.dropout_risk_score >= 0.15) {
+      risk_level = 'Moderado';
+      suggested_action = 'Recomendación de actividades de refuerzo formativo y recordatorio de plazos.';
+    } else {
+      suggested_action = 'Continuar con la trayectoria adaptativa regular.';
+    }
+    return { ...s, risk_level, suggested_action };
+  });
+
   // Filtrado y búsqueda
-  const filteredStudents = students.filter(s => {
+  const filteredStudents = studentsWithDynamicThreshold.filter(s => {
     const matchesLevel = filterLevel === 'todos' || s.risk_level.toLowerCase() === filterLevel.toLowerCase();
     const matchesQuery = s.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          s.student_id.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesLevel && matchesQuery;
   });
 
-  const totalProcessed = students.length;
-  const criticalCount = students.filter(s => s.risk_level === 'Crítico').length;
-  const moderateCount = students.filter(s => s.risk_level === 'Moderado').length;
-  const lowCount = students.filter(s => s.risk_level === 'Bajo').length;
+  const totalProcessed = studentsWithDynamicThreshold.length;
+  const criticalCount = studentsWithDynamicThreshold.filter(s => s.risk_level === 'Crítico').length;
+  const moderateCount = studentsWithDynamicThreshold.filter(s => s.risk_level === 'Moderado').length;
+  const lowCount = studentsWithDynamicThreshold.filter(s => s.risk_level === 'Bajo').length;
 
   return (
     <div className={`p-6 rounded-3xl border transition-all backdrop-blur-2xl shadow-xl mb-6 ${
@@ -369,7 +387,7 @@ export const BatchCohortManager: React.FC<BatchCohortManagerProps> = ({
             </span>
           </div>
           <span className="text-[11px] font-mono opacity-70">
-            Umbral de Decisión Docente: <strong className="text-rose-400">θ ≥ 40%</strong>
+            Umbral de Decisión Docente: <strong className="text-rose-400">θ ≥ {(threshold * 100).toFixed(0)}%</strong>
           </span>
         </div>
 
@@ -398,15 +416,58 @@ export const BatchCohortManager: React.FC<BatchCohortManagerProps> = ({
               <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" /> Zona Segura (&lt; 15%): {lowCount} alumnos
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" /> Alerta Preventiva (15-39%): {moderateCount} alumnos
+              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" /> Alerta Preventiva (15% - {Math.round(threshold * 100)}%): {moderateCount} alumnos
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" /> Intervención Urgente (≥ 40%): {criticalCount} alumnos
+              <span className="w-2 h-2 rounded-full bg-rose-500 inline-block" /> Intervención Urgente (≥ {Math.round(threshold * 100)}%): {criticalCount} alumnos
             </span>
           </div>
           <span className="italic opacity-80">
             *Garantía Ley 29733: Prohibida la exclusión o reprobación exclusivamente automatizada.
           </span>
+        </div>
+
+        {/* Control del Umbral Interactivo de Decisión */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-2.5 rounded-xl bg-black/20 mt-3 border border-white/5">
+          <div className="flex items-center gap-2">
+            <Sliders className="w-3.5 h-3.5 text-rose-400" />
+            <span className="text-[11px] font-bold">Ajustar Umbral de Decisión (θ):</span>
+            <span className="font-mono font-bold text-xs px-2 py-0.5 rounded bg-rose-500/20 text-rose-300">
+              {(threshold * 100).toFixed(0)}%
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <input
+              type="range"
+              min="0.20"
+              max="0.70"
+              step="0.05"
+              value={threshold}
+              onChange={e => setThreshold(parseFloat(e.target.value))}
+              className="w-32 sm:w-40 h-1.5 bg-slate-700 rounded-lg cursor-pointer accent-rose-500"
+            />
+            <div className="flex items-center gap-1">
+              {[
+                { val: 0.30, label: '30% (Estricto)' },
+                { val: 0.40, label: '40% (Óptimo)' },
+                { val: 0.50, label: '50% (Permisivo)' }
+              ].map(preset => (
+                <button
+                  key={preset.val}
+                  type="button"
+                  onClick={() => setThreshold(preset.val)}
+                  className={`text-[10px] px-2 py-0.5 rounded font-mono font-bold border transition-all ${
+                    Math.abs(threshold - preset.val) < 0.01
+                      ? 'bg-rose-500 text-white border-rose-500'
+                      : 'bg-white/5 hover:bg-white/10 border-white/10 opacity-75'
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -561,13 +622,23 @@ export const BatchCohortManager: React.FC<BatchCohortManagerProps> = ({
                 <td className="py-3 px-3 text-right">
                   {onNavigateTab && (
                     <button
-                      onClick={() => onNavigateTab('assessments')}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all border flex items-center gap-1 ml-auto whitespace-nowrap ${
+                      onClick={() => {
+                        if (student.name.includes('Mateo') || student.student_id === 'std-001') {
+                          localStorage.setItem('edumaster_target_submission_id', 'sub-102');
+                        } else if (student.name.includes('Lucía') || student.student_id === 'std-005') {
+                          localStorage.setItem('edumaster_target_submission_id', 'sub-103');
+                        } else {
+                          localStorage.setItem('edumaster_target_submission_id', 'sub-101');
+                        }
+                        localStorage.setItem('edumaster_target_student_name', student.name);
+                        onNavigateTab('assessments');
+                      }}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all border flex items-center gap-1 ml-auto whitespace-nowrap active:scale-95 ${
                         student.risk_level === 'Crítico'
-                          ? (isLight ? 'bg-rose-600 text-white hover:bg-rose-700 border-rose-600' : 'bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border-rose-500/40')
+                          ? (isLight ? 'bg-rose-600 text-white hover:bg-rose-700 border-rose-600' : 'bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border-rose-500/40 shadow-sm')
                           : (isLight ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300' : 'bg-white/10 hover:bg-white/20 text-slate-200 border-white/20')
                       }`}
-                      title="Intervenir y calificar en SpeedGrader"
+                      title={`Intervenir a ${student.name} y abrir SpeedGrader`}
                     >
                       <UserCheck className="w-3 h-3" />
                       <span>Intervenir</span>

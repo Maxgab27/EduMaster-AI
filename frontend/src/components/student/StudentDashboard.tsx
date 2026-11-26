@@ -122,6 +122,50 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
         </div>
       )}
 
+      {/* Tarjeta de Acompañamiento Formativo & Calificación Firmada (Human-in-the-Loop) */}
+      <div className={`p-5 rounded-3xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 transition-all ${
+        isLight
+          ? 'bg-gradient-to-r from-emerald-50/90 to-teal-50/80 border-emerald-200 text-slate-900 shadow-sm'
+          : isMono
+          ? 'bg-[#121B17] border-[#254233] text-zinc-100 shadow-md'
+          : 'bg-gradient-to-r from-emerald-950/40 via-teal-900/30 to-[#06152B] border-emerald-500/40 text-white shadow-glowCyan'
+      }`}>
+        <div className="space-y-1.5 max-w-2xl">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border flex items-center gap-1 ${
+              isLight ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+            }`}>
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              EVALUACIÓN DOCENTE CONFIRMADA · LEY 29733
+            </span>
+            <span className="text-[10px] font-mono opacity-70">
+              ID: sub-101 · Firmado por Dra. Elena López
+            </span>
+          </div>
+
+          <h3 className="text-sm md:text-base font-black tracking-tight m-0">
+            Laboratorio 3: Implementación de Atención Cruzada Multi-Cabeza
+          </h3>
+          <p className="text-xs opacity-85 m-0 leading-relaxed">
+            <strong>Retroalimentación Docente:</strong> "Excelente estructura tensorial y resolución del escalado 1/√d_k. La trayectoria de aprendizaje ha sido regularizada con éxito tras la revisión formativa."
+          </p>
+
+          <p className="text-[10px] font-mono opacity-65 m-0 break-all">
+            Firma Criptográfica SHA-256: <strong className="text-emerald-400">9c4e8b3a017f428ad14e9f7823b490ce512807e324abef81</strong>
+          </p>
+        </div>
+
+        <div className="flex md:flex-col items-end justify-between w-full md:w-auto shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-inherit">
+          <div className="text-right">
+            <span className="text-[10px] uppercase font-mono tracking-wider block opacity-70">Nota Oficial</span>
+            <span className="text-2xl font-black font-mono text-emerald-400">18.5 <span className="text-xs opacity-60">/ 20</span></span>
+          </div>
+          <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 mt-1">
+            Riesgo Superado (Bajo)
+          </span>
+        </div>
+      </div>
+
       {/* Student Personal KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className={`p-4 rounded-2xl border transition-all ${
