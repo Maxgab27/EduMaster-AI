@@ -166,12 +166,12 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
-      <div className={`p-6 rounded-3xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all shadow-md ${
+      <div className={`p-6 rounded-3xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all shadow-xl backdrop-blur-2xl ${
         isLight
-          ? 'bg-gradient-to-r from-emerald-50 to-teal-50/50 border-emerald-200 text-slate-900'
+          ? 'bg-white/80 border-white/60 text-slate-900 shadow-sm'
           : isMono
-          ? 'bg-[#181C26] border-[#3B4254] text-zinc-100'
-          : 'bg-gradient-to-r from-[#06152B] via-[#0A2540] to-[#0A1F3D] border-emerald-500/30 text-white'
+          ? 'bg-[#10141F]/80 border-white/10 text-zinc-100 shadow-xl'
+          : 'bg-[#06152B]/80 border-white/10 text-white shadow-xl'
       }`}>
         <div className="space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2 flex-wrap">
@@ -262,8 +262,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
       )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className={`p-4 rounded-2xl border transition-all ${
-          isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
+        <div className={`p-4 rounded-2xl border transition-all backdrop-blur-xl ${
+          isLight ? 'bg-white/75 border-white/60 shadow-sm' : isMono ? 'bg-white/[0.04] border-white/10 shadow-sm' : 'glass-panel border-white/10'
         }`}>
           <div className="flex items-center justify-between opacity-70 text-xs mb-2">
             <span>Entregas registradas</span>
@@ -273,8 +273,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
           <p className="text-[11px] opacity-70 mt-1 m-0">Dataset DEMO · {meta ? meta.source : '...'}</p>
         </div>
 
-        <div className={`p-4 rounded-2xl border transition-all ${
-          isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
+        <div className={`p-4 rounded-2xl border transition-all backdrop-blur-xl ${
+          isLight ? 'bg-white/75 border-white/60 shadow-sm' : isMono ? 'bg-white/[0.04] border-white/10 shadow-sm' : 'glass-panel border-white/10'
         }`}>
           <div className="flex items-center justify-between opacity-70 text-xs mb-2">
             <span>Por calificar</span>
@@ -284,8 +284,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
           <p className="text-[11px] opacity-70 mt-1 m-0">Requieren firma docente</p>
         </div>
 
-        <div className={`p-4 rounded-2xl border transition-all ${
-          isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
+        <div className={`p-4 rounded-2xl border transition-all backdrop-blur-xl ${
+          isLight ? 'bg-white/75 border-white/60 shadow-sm' : isMono ? 'bg-white/[0.04] border-white/10 shadow-sm' : 'glass-panel border-white/10'
         }`}>
           <div className="flex items-center justify-between opacity-70 text-xs mb-2">
             <span>En riesgo (DEMO)</span>
@@ -297,8 +297,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
           <p className="text-[11px] text-rose-400 font-medium mt-1 m-0">Cabeza C · riesgo &gt; 65%</p>
         </div>
 
-        <div className={`p-4 rounded-2xl border transition-all ${
-          isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
+        <div className={`p-4 rounded-2xl border transition-all backdrop-blur-xl ${
+          isLight ? 'bg-white/75 border-white/60 shadow-sm' : isMono ? 'bg-white/[0.04] border-white/10 shadow-sm' : 'glass-panel border-white/10'
         }`}>
           <div className="flex items-center justify-between opacity-70 text-xs mb-2">
             <span>Promedio oficial (DEMO)</span>
@@ -313,8 +313,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 space-y-4">
-          <div className={`p-6 rounded-3xl border transition-all ${
-            isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
+          <div className={`p-6 rounded-3xl border transition-all backdrop-blur-2xl ${
+            isLight ? 'bg-white/80 border-white/60 shadow-md' : isMono ? 'bg-white/[0.04] border-white/10 shadow-xl' : 'glass-panel border-white/10'
           }`}>
             <div className="flex items-center justify-between pb-4 border-b border-inherit mb-4">
               <div>
@@ -424,8 +424,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ theme = 'mon
         </div>
 
         <div className="lg:col-span-5 space-y-4">
-          <div className={`p-6 rounded-3xl border transition-all ${
-            isLight ? 'bg-white border-slate-200 shadow-sm' : isMono ? 'bg-[#151821] border-[#2A2F3D]' : 'glass-panel border-edumaster-cardBorder'
+          <div className={`p-6 rounded-3xl border transition-all backdrop-blur-2xl ${
+            isLight ? 'bg-white/80 border-white/60 shadow-md' : isMono ? 'bg-white/[0.04] border-white/10 shadow-xl' : 'glass-panel border-white/10'
           }`}>
             <div className="flex items-center justify-between pb-4 border-b border-inherit mb-4">
               <div>

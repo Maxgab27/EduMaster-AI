@@ -50,12 +50,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Continuing Study Hero Banner */}
-      <div className={`p-6 rounded-3xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all shadow-md relative overflow-hidden ${
+      <div className={`p-6 rounded-3xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-5 transition-all shadow-xl relative overflow-hidden backdrop-blur-2xl ${
         isLight
-          ? 'bg-gradient-to-r from-blue-50 to-indigo-50/50 border-blue-200 text-slate-900'
+          ? 'bg-white/80 border-white/60 text-slate-900 shadow-sm'
           : isMono
-          ? 'bg-[#181C26] border-[#3B4254] text-zinc-100'
-          : 'bg-gradient-to-r from-[#06152B] via-[#0A1F3D] to-[#0D2B52] border-edumaster-cyan/40 text-white'
+          ? 'bg-[#10141F]/80 border-white/10 text-zinc-100 shadow-xl'
+          : 'bg-[#06152B]/80 border-white/10 text-white shadow-xl'
       }`}>
         <div className="space-y-2 max-w-2xl relative z-10">
           <div className="flex items-center gap-2">

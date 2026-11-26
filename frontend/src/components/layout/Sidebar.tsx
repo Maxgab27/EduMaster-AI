@@ -69,12 +69,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       className={`fixed inset-y-0 left-0 w-72 flex flex-col justify-between shrink-0 select-none h-screen overflow-y-auto z-50 transition-all duration-200 md:sticky md:top-0 md:z-40 md:w-64 ${
       mobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
     } ${
-      isMono ? 'bg-[#151820] border-r border-[#2A2F3D] text-gray-100' : isLight ? 'bg-white border-r border-slate-200 text-slate-900' : 'bg-[#06152B]/95 border-r border-edumaster-cardBorder text-slate-100'
+      isMono 
+        ? 'backdrop-blur-2xl bg-[#0F131D]/80 border-r border-white/10 text-gray-100 shadow-2xl' 
+        : isLight 
+        ? 'backdrop-blur-2xl bg-white/80 border-r border-slate-200/80 text-slate-900 shadow-xl' 
+        : 'backdrop-blur-2xl bg-[#051124]/80 border-r border-white/10 text-slate-100 shadow-2xl'
     }`}>
       {/* Brand Header */}
       <div>
         <div className={`p-5 flex items-center gap-3 border-b relative ${
-          isMono ? 'border-[#2A2F3D]' : isLight ? 'border-slate-200' : 'border-edumaster-cardBorder/70'
+          isMono ? 'border-white/10' : isLight ? 'border-slate-200/70' : 'border-white/10'
         }`}>
           <button
             onClick={onClose}
@@ -142,11 +146,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Bottom Widgets: Precisión & Alumnos en Línea */}
       <div className={`p-4 space-y-3 border-t ${
-        isMono ? 'border-[#2A2F3D] bg-[#161821]' : isLight ? 'border-slate-200 bg-slate-50' : 'border-edumaster-cardBorder/70 bg-[#0A1F3D]/50'
+        isMono ? 'border-white/10 bg-transparent' : isLight ? 'border-slate-200/60 bg-transparent' : 'border-white/10 bg-transparent'
       }`}>
         {/* Precision Circular Gauge */}
-        <div className={`p-3 rounded-2xl border flex items-center gap-3 ${
-          isMono ? 'bg-[#1C202B] border-[#2A2F3D] shadow-sm' : isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#0A1F3D] border-edumaster-cardBorder shadow-panel'
+        <div className={`p-3 rounded-2xl border flex items-center gap-3 backdrop-blur-md ${
+          isMono ? 'bg-white/[0.04] border-white/10 shadow-sm' : isLight ? 'bg-white/75 border-slate-200 shadow-sm' : 'bg-white/[0.05] border-white/10 shadow-panel'
         }`}>
           <div className="relative w-11 h-11 shrink-0 flex items-center justify-center">
             <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 36 36">
@@ -177,8 +181,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Online Students Card */}
-        <div className={`p-3 rounded-2xl border ${
-          isMono ? 'bg-[#1C202B] border-[#2A2F3D]' : isLight ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#0A1F3D] border-edumaster-cardBorder'
+        <div className={`p-3 rounded-2xl border backdrop-blur-md ${
+          isMono ? 'bg-white/[0.04] border-white/10' : isLight ? 'bg-white/75 border-slate-200 shadow-sm' : 'bg-white/[0.05] border-white/10'
         }`}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold">Nuestros Alumnos</span>

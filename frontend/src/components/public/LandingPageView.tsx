@@ -35,22 +35,18 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
   const isLight = theme === 'light';
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${
-      isLight 
-        ? 'bg-slate-50 text-slate-900' 
-        : isMono 
-        ? 'bg-[#0E1117] text-zinc-100' 
-        : 'bg-[#030B18] text-slate-100'
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 bg-transparent ${
+      isLight ? 'text-slate-900' : 'text-slate-100'
     }`}>
       {/* =========================================================================
           1. TOP NAVIGATION BAR
       ========================================================================= */}
-      <header className={`sticky top-0 z-50 backdrop-blur-md border-b transition-colors ${
+      <header className={`sticky top-0 z-50 backdrop-blur-2xl border-b transition-colors ${
         isLight 
-          ? 'bg-white/90 border-slate-200 shadow-sm' 
+          ? 'bg-white/75 border-slate-200/70 shadow-sm' 
           : isMono 
-          ? 'bg-[#12151D]/90 border-[#242A38]' 
-          : 'bg-[#06152B]/85 border-white/10'
+          ? 'bg-[#0F131D]/75 border-white/10' 
+          : 'bg-[#06152B]/75 border-white/10'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Logo & Brand */}
@@ -238,12 +234,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             ].map((stat, idx) => (
               <div 
                 key={idx} 
-                className={`p-5 rounded-2xl border text-center transition-all hover:-translate-y-1 ${
+                className={`p-5 rounded-2xl border text-center transition-all hover:-translate-y-1 backdrop-blur-xl ${
                   isLight 
-                    ? 'bg-white border-slate-200 shadow-sm' 
+                    ? 'bg-white/70 border-white/50 shadow-sm' 
                     : isMono 
-                    ? 'bg-[#141822] border-[#282F40]' 
-                    : 'bg-[#081830]/80 border-white/10'
+                    ? 'bg-white/[0.05] border-white/10 shadow-lg' 
+                    : 'bg-white/[0.06] border-white/15 shadow-xl'
                 }`}
               >
                 <div className="flex justify-center mb-2">{stat.icon}</div>
@@ -258,12 +254,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               4. LIVE INTERACTIVE MOCKUP TEASER
           ========================================================================= */}
           <div className="mt-14 max-w-5xl mx-auto">
-            <div className={`p-4 sm:p-6 rounded-3xl border shadow-2xl relative overflow-hidden ${
+            <div className={`p-4 sm:p-6 rounded-3xl border shadow-2xl relative overflow-hidden backdrop-blur-2xl ${
               isLight 
-                ? 'bg-white border-slate-200' 
+                ? 'bg-white/75 border-white/60 shadow-xl' 
                 : isMono 
-                ? 'bg-[#151923] border-[#2C3345]' 
-                : 'bg-[#091C36] border-white/15'
+                ? 'bg-[#10141F]/75 border-white/15' 
+                : 'bg-[#06152B]/75 border-white/20'
             }`}>
               {/* Window controls bar */}
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
@@ -282,8 +278,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
               {/* Mock content grid */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Panel 1: Alumno en Riesgo */}
-                <div className={`p-4 rounded-2xl border ${
-                  isLight ? 'bg-slate-50 border-slate-200' : isMono ? 'bg-[#1C202B] border-[#2C3345]' : 'bg-[#061427] border-white/10'
+                <div className={`p-4 rounded-2xl border backdrop-blur-md ${
+                  isLight ? 'bg-white/60 border-slate-200/80' : isMono ? 'bg-white/[0.04] border-white/10' : 'bg-white/[0.05] border-white/10'
                 }`}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold">1. Diagnóstico de Riesgo</span>
@@ -298,8 +294,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 </div>
 
                 {/* Panel 2: SpeedGrader SOP 70-75 */}
-                <div className={`p-4 rounded-2xl border ${
-                  isLight ? 'bg-slate-50 border-slate-200' : isMono ? 'bg-[#1C202B] border-[#2C3345]' : 'bg-[#061427] border-white/10'
+                <div className={`p-4 rounded-2xl border backdrop-blur-md ${
+                  isLight ? 'bg-white/60 border-slate-200/80' : isMono ? 'bg-white/[0.04] border-white/10' : 'bg-white/[0.05] border-white/10'
                 }`}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold">2. SpeedGrader SOP</span>
@@ -314,8 +310,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
                 </div>
 
                 {/* Panel 3: Sello Criptográfico Inmutable */}
-                <div className={`p-4 rounded-2xl border ${
-                  isLight ? 'bg-slate-50 border-slate-200' : isMono ? 'bg-[#1C202B] border-[#2C3345]' : 'bg-[#061427] border-white/10'
+                <div className={`p-4 rounded-2xl border backdrop-blur-md ${
+                  isLight ? 'bg-white/60 border-slate-200/80' : isMono ? 'bg-white/[0.04] border-white/10' : 'bg-white/[0.05] border-white/10'
                 }`}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-bold">3. Sello Inmutable</span>
@@ -338,8 +334,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       {/* =========================================================================
           5. CORE PILLARS & FEATURES SECTION
       ========================================================================= */}
-      <section id="caso-de-uso" className={`py-20 border-t transition-colors ${
-        isLight ? 'bg-white border-slate-200' : isMono ? 'bg-[#10141D] border-[#222836]' : 'bg-[#040E1E] border-white/10'
+      <section id="caso-de-uso" className={`py-20 border-t transition-colors backdrop-blur-xl ${
+        isLight ? 'bg-white/40 border-slate-200/70' : isMono ? 'bg-black/25 border-white/10' : 'bg-black/25 border-white/10'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
@@ -393,20 +389,20 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             ].map((feature, idx) => (
               <div 
                 key={idx}
-                className={`p-6 rounded-3xl border transition-all hover:scale-102 hover:shadow-lg ${
+                className={`p-6 rounded-3xl border transition-all hover:scale-102 hover:shadow-xl backdrop-blur-xl ${
                   isLight 
-                    ? 'bg-slate-50 border-slate-200 hover:bg-white' 
+                    ? 'bg-white/70 border-white/60 hover:bg-white/90' 
                     : isMono 
-                    ? 'bg-[#151923] border-[#293041] hover:bg-[#1A1F2C]' 
-                    : 'bg-[#081830]/90 border-white/10 hover:border-blue-500/30'
+                    ? 'bg-white/[0.05] border-white/10 hover:bg-white/[0.08]' 
+                    : 'bg-white/[0.06] border-white/15 hover:border-blue-400/40'
                 }`}
               >
                 <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-2xl ${isLight ? 'bg-white shadow-sm' : isMono ? 'bg-[#1E2331]' : 'bg-white/5'}`}>
+                  <div className={`p-3 rounded-2xl ${isLight ? 'bg-white shadow-sm' : isMono ? 'bg-white/10' : 'bg-white/10'}`}>
                     {feature.icon}
                   </div>
                   <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
-                    isLight ? 'bg-slate-100 text-slate-700 border-slate-300' : isMono ? 'bg-[#1E2331] text-zinc-300 border-[#323B4E]' : 'bg-white/5 text-blue-300 border-white/10'
+                    isLight ? 'bg-slate-100 text-slate-700 border-slate-300' : isMono ? 'bg-white/10 text-zinc-300 border-white/15' : 'bg-white/10 text-blue-300 border-white/15'
                   }`}>
                     {feature.badge}
                   </span>
@@ -422,8 +418,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       {/* =========================================================================
           6. TECHNOLOGY STACK & ARCHITECTURE
       ========================================================================= */}
-      <section id="tecnologia" className={`py-20 border-t transition-colors ${
-        isLight ? 'bg-slate-100/60 border-slate-200' : isMono ? 'bg-[#0C0F15] border-[#1E2330]' : 'bg-[#020712] border-white/10'
+      <section id="tecnologia" className={`py-20 border-t transition-colors backdrop-blur-xl ${
+        isLight ? 'bg-slate-100/50 border-slate-200/70' : isMono ? 'bg-black/30 border-white/10' : 'bg-black/30 border-white/10'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
@@ -447,12 +443,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
             ].map((tech, idx) => (
               <div 
                 key={idx}
-                className={`p-4 rounded-2xl border text-center transition-all ${
+                className={`p-4 rounded-2xl border text-center transition-all backdrop-blur-lg ${
                   isLight 
-                    ? 'bg-white border-slate-200' 
+                    ? 'bg-white/70 border-white/60' 
                     : isMono 
-                    ? 'bg-[#151923] border-[#293041]' 
-                    : 'bg-[#06152B] border-white/10'
+                    ? 'bg-white/[0.04] border-white/10' 
+                    : 'bg-white/[0.05] border-white/15'
                 }`}
               >
                 <p className="font-bold text-sm mb-1">{tech.name}</p>
@@ -473,12 +469,12 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       ========================================================================= */}
       <section className="py-20 relative overflow-hidden">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <div className={`p-10 sm:p-14 rounded-3xl border shadow-2xl relative overflow-hidden ${
+          <div className={`p-10 sm:p-14 rounded-3xl border shadow-2xl relative overflow-hidden backdrop-blur-2xl ${
             isLight 
-              ? 'bg-blue-600 text-white border-blue-500' 
+              ? 'bg-gradient-to-br from-blue-600/90 to-indigo-700/90 text-white border-white/40' 
               : isMono 
-              ? 'bg-[#151923] border-[#2F3649]' 
-              : 'bg-gradient-to-br from-[#0A2247] to-[#040F22] border-blue-500/30'
+              ? 'bg-[#121622]/80 border-white/20' 
+              : 'bg-gradient-to-br from-[#0A2247]/85 to-[#040F22]/90 border-blue-500/40'
           }`}>
             <h3 className="text-3xl sm:text-4xl font-black tracking-tight mb-4">
               Experimenta el Futuro de la Gestión Académica
@@ -517,8 +513,8 @@ export const LandingPageView: React.FC<LandingPageViewProps> = ({
       {/* =========================================================================
           8. FOOTER
       ========================================================================= */}
-      <footer className={`py-12 border-t mt-auto text-xs transition-colors ${
-        isLight ? 'bg-white border-slate-200 text-slate-600' : isMono ? 'bg-[#0B0D13] border-[#1C202B] text-zinc-400' : 'bg-[#030914] border-white/10 text-slate-400'
+      <footer className={`py-12 border-t mt-auto text-xs transition-colors backdrop-blur-xl ${
+        isLight ? 'bg-white/60 border-slate-200/70 text-slate-600' : isMono ? 'bg-black/40 border-white/10 text-zinc-400' : 'bg-black/50 border-white/10 text-slate-400'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">

@@ -13,6 +13,7 @@ import { StudentDashboard } from './components/student/StudentDashboard';
 import { TeacherDashboard } from './components/teacher/TeacherDashboard';
 import { GlobalCommandPalette } from './components/common/GlobalCommandPalette';
 import { AITutorDrawer } from './components/common/AITutorDrawer';
+import { GlassBackground } from './components/common/GlassBackground';
 import { currentUser } from './data/mockData';
 import { getDashboardSummary } from './services/dashboardApi';
 import { canViewTab } from './auth/permissions';
@@ -266,61 +267,69 @@ export const App: React.FC = () => {
 
   // El comprobante es una página independiente: el celular la abre sin popup.
   if (receiptFolio) {
-    return <CertificateReceiptView folio={receiptFolio} theme={theme} />;
+    return (
+      <div data-theme={theme} className="min-h-screen relative font-sans">
+        <GlassBackground theme={theme} />
+        <CertificateReceiptView folio={receiptFolio} theme={theme} />
+      </div>
+    );
   }
 
   // Vista de Landing Page pública
   if (viewMode === 'landing') {
     return (
-      <Suspense fallback={
-        <div className={`min-h-screen flex items-center justify-center font-mono text-sm ${
-          isLight ? 'bg-slate-50 text-slate-600' : isMono ? 'bg-[#0E1117] text-zinc-400' : 'bg-[#030B18] text-blue-200'
-        }`}>
-          Cargando EduMaster.ai Enterprise...
-        </div>
-      }>
-        <LandingPageView
-          onLogin={() => setViewMode('login')}
-          onEnterApp={() => {
-            try {
-              localStorage.setItem('edumaster_authenticated', 'true');
-            } catch {}
-            setViewMode('app');
-          }}
-          theme={theme}
-          onThemeChange={handleThemeChange}
-        />
-      </Suspense>
+      <div data-theme={theme} className="min-h-screen relative font-sans">
+        <GlassBackground theme={theme} />
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center font-mono text-sm opacity-70">
+            Cargando EduMaster.ai Enterprise...
+          </div>
+        }>
+          <LandingPageView
+            onLogin={() => setViewMode('login')}
+            onEnterApp={() => {
+              try {
+                localStorage.setItem('edumaster_authenticated', 'true');
+              } catch {}
+              setViewMode('app');
+            }}
+            theme={theme}
+            onThemeChange={handleThemeChange}
+          />
+        </Suspense>
+      </div>
     );
   }
 
   // Vista de Login Demo
   if (viewMode === 'login') {
     return (
-      <Suspense fallback={
-        <div className={`min-h-screen flex items-center justify-center font-mono text-sm ${
-          isLight ? 'bg-slate-50 text-slate-600' : isMono ? 'bg-[#0E1117] text-zinc-400' : 'bg-[#030B18] text-blue-200'
-        }`}>
-          Cargando inicio de sesión...
-        </div>
-      }>
-        <LoginView
-          onLogin={handleLogin}
-          onBackToLanding={() => setViewMode('landing')}
-          theme={theme}
-          onThemeChange={handleThemeChange}
-        />
-      </Suspense>
+      <div data-theme={theme} className="min-h-screen relative font-sans">
+        <GlassBackground theme={theme} />
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center font-mono text-sm opacity-70">
+            Cargando inicio de sesión...
+          </div>
+        }>
+          <LoginView
+            onLogin={handleLogin}
+            onBackToLanding={() => setViewMode('landing')}
+            theme={theme}
+            onThemeChange={handleThemeChange}
+          />
+        </Suspense>
+      </div>
     );
   }
 
   return (
     <div 
       data-theme={theme}
-      className={`min-h-screen bg-edumaster-ambient flex font-sans selection:bg-white/20 selection:text-white transition-colors duration-300 ${
+      className={`min-h-screen bg-transparent flex font-sans selection:bg-white/20 selection:text-white transition-colors duration-300 relative ${
         isLight ? 'text-slate-900' : 'text-slate-100'
       }`}
     >
+      <GlassBackground theme={theme} />
       {/* Sidebar Navigation: drawer en celular, columna fija en escritorio */}
       {isMobileNavOpen && (
         <div

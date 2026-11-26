@@ -129,13 +129,13 @@ const TeacherSpeedGraderModalContent: React.FC<ContentProps> = ({
   }`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className={`w-full max-w-5xl h-[90vh] rounded-3xl border flex flex-col overflow-hidden shadow-2xl transition-colors ${
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-xl animate-in fade-in duration-200">
+      <div className={`w-full max-w-5xl h-[90vh] rounded-3xl border flex flex-col overflow-hidden shadow-2xl transition-colors backdrop-blur-2xl ${
         isLight
-          ? 'bg-white border-slate-300 text-slate-900'
+          ? 'bg-white/90 border-white/60 text-slate-900 shadow-2xl'
           : isMono
-          ? 'bg-[#151821] border-[#2A2F3D] text-zinc-100'
-          : 'bg-[#06152B] border-edumaster-cyan/40 text-slate-100'
+          ? 'bg-[#10141F]/90 border-white/15 text-zinc-100 shadow-2xl'
+          : 'bg-[#06152B]/90 border-white/20 text-slate-100 shadow-2xl'
       }`}>
         <div className={`px-6 py-4 border-b flex items-center justify-between shrink-0 ${
           isLight ? 'border-slate-200 bg-slate-50' : isMono ? 'border-[#2A2F3D] bg-[#1A1D24]' : 'border-edumaster-cardBorder bg-[#0A1F3D]'

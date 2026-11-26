@@ -102,17 +102,17 @@ export const LoginView: React.FC<LoginViewProps> = ({
   };
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${
-      isLight ? 'bg-slate-50 text-slate-900' : isMono ? 'bg-[#0E1117] text-zinc-100' : 'bg-[#030B18] text-slate-100'
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 bg-transparent ${
+      isLight ? 'text-slate-900' : 'text-slate-100'
     }`}>
       {/* Top Header */}
-      <header className={`h-16 px-6 border-b flex items-center justify-between transition-colors ${
-        isLight ? 'bg-white border-slate-200' : isMono ? 'bg-[#12151D] border-[#242A38]' : 'bg-[#06152B]/80 border-white/10'
+      <header className={`h-16 px-6 border-b flex items-center justify-between transition-colors backdrop-blur-2xl ${
+        isLight ? 'bg-white/75 border-slate-200/70 shadow-sm' : isMono ? 'bg-[#0F131D]/75 border-white/10' : 'bg-[#06152B]/75 border-white/10'
       }`}>
         <button
           onClick={onBackToLanding}
-          className={`text-xs font-semibold flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${
-            isLight ? 'bg-slate-100 border-slate-200 hover:bg-slate-200 text-slate-700' : isMono ? 'bg-[#1A1E29] border-[#2E3547] hover:bg-[#252A3A] text-zinc-300' : 'bg-white/5 border-white/10 hover:bg-white/10 text-slate-300'
+          className={`text-xs font-semibold flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all backdrop-blur-md ${
+            isLight ? 'bg-white/80 border-slate-200 hover:bg-white text-slate-700' : isMono ? 'bg-white/[0.06] border-white/10 hover:bg-white/[0.1] text-zinc-200' : 'bg-white/[0.06] border-white/10 hover:bg-white/[0.12] text-slate-200'
           }`}
         >
           <ArrowLeft className="w-3.5 h-3.5" />
@@ -126,8 +126,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
               const nextTheme = theme === 'monochrome' ? 'cyber' : theme === 'cyber' ? 'light' : 'monochrome';
               onThemeChange(nextTheme);
             }}
-            className={`p-2 rounded-lg border text-xs flex items-center gap-1.5 transition-colors ${
-              isLight ? 'bg-slate-100 border-slate-200' : isMono ? 'bg-[#1A1E29] border-[#2E3547]' : 'bg-white/5 border-white/10'
+            className={`p-2 rounded-lg border text-xs flex items-center gap-1.5 transition-colors backdrop-blur-md ${
+              isLight ? 'bg-white/80 border-slate-200 text-slate-700' : isMono ? 'bg-white/[0.06] border-white/10 text-zinc-300' : 'bg-white/[0.06] border-white/10 text-slate-300'
             }`}
             title={`Tema: ${theme}`}
           >
@@ -140,12 +140,12 @@ export const LoginView: React.FC<LoginViewProps> = ({
       <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-10">
         <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left Column: Form Card */}
-          <div className={`lg:col-span-7 p-6 sm:p-8 rounded-3xl border shadow-xl transition-all ${
+          <div className={`lg:col-span-7 p-6 sm:p-8 rounded-3xl border shadow-2xl transition-all backdrop-blur-2xl ${
             isLight 
-              ? 'bg-white border-slate-200' 
+              ? 'bg-white/80 border-white/60 shadow-xl' 
               : isMono 
-              ? 'bg-[#141822] border-[#293041]' 
-              : 'bg-[#06152B]/95 border-white/15'
+              ? 'bg-[#10141F]/80 border-white/15' 
+              : 'bg-[#06152B]/80 border-white/20'
           }`}>
             {/* Header / Brand */}
             <div className="flex items-center gap-3 mb-6">
@@ -282,18 +282,18 @@ export const LoginView: React.FC<LoginViewProps> = ({
                     key={profile.role}
                     type="button"
                     onClick={() => handleSelectProfile(profile)}
-                    className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between transition-all ${
+                    className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between transition-all backdrop-blur-xl ${
                       isSelected
                         ? isLight 
-                          ? 'bg-blue-50 border-blue-400 shadow-sm' 
+                          ? 'bg-blue-50/90 border-blue-400 shadow-md' 
                           : isMono 
-                          ? 'bg-[#202534] border-zinc-400 shadow-md' 
-                          : 'bg-blue-600/20 border-blue-400/60 shadow-lg'
+                          ? 'bg-white/[0.14] border-white/40 shadow-xl' 
+                          : 'bg-blue-600/30 border-blue-400/80 shadow-xl'
                         : isLight 
-                        ? 'bg-white border-slate-200 hover:bg-slate-50' 
+                        ? 'bg-white/70 border-white/50 hover:bg-white/90 shadow-sm' 
                         : isMono 
-                        ? 'bg-[#151923] border-[#262C3C] hover:bg-[#1A1F2C]' 
-                        : 'bg-[#081830]/80 border-white/10 hover:border-white/20'
+                        ? 'bg-white/[0.04] border-white/10 hover:bg-white/[0.08]' 
+                        : 'bg-white/[0.05] border-white/15 hover:bg-white/[0.1]'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
