@@ -1,0 +1,21 @@
+student_id,name,course,unexcused_absences,late_submissions_30d,sessions_14d,avg_quiz_score,hours_active_weekly
+std-001,Mateo Vargas Ramos,Modelado Secuencial con GRU & LSTM,5,4,2,9.5,2.0
+std-002,Elena Paredes Silva,Modelado Secuencial con GRU & LSTM,6,3,1,8.0,1.5
+std-003,Carlos Mendoza Quispe,Modelado Secuencial con GRU & LSTM,4,3,3,10.5,3.0
+std-004,Diego Huamán Castro,Modelado Secuencial con GRU & LSTM,5,5,2,7.5,1.8
+std-005,Lucía Benítez Flores,Modelado Secuencial con GRU & LSTM,4,4,3,11.0,2.5
+std-006,Valeria Quispe Morales,Modelado Secuencial con GRU & LSTM,2,2,4,11.8,4.5
+std-007,Jorge Alarcón Ríos,Modelado Secuencial con GRU & LSTM,3,2,5,12.0,5.0
+std-008,Camila Torres Salazar,Modelado Secuencial con GRU & LSTM,2,1,6,12.5,5.5
+std-009,Gabriel Espinoza Vega,Modelado Secuencial con GRU & LSTM,3,1,4,13.0,4.0
+std-010,Andrea Chávez Rojas,Modelado Secuencial con GRU & LSTM,2,3,5,11.5,4.8
+std-011,Rodrigo Navarro Paz,Modelado Secuencial con GRU & LSTM,2,2,6,13.2,5.2
+std-012,Natalia Fuentes Cruz,Modelado Secuencial con GRU & LSTM,3,2,4,12.2,4.2
+std-013,Sofía Ramírez Vargas,Modelado Secuencial con GRU & LSTM,0,0,15,18.5,10.0
+std-014,Álvaro Benítez Silva,Modelado Secuencial con GRU & LSTM,0,0,14,17.5,9.5
+std-015,Martín Cárdenas Gil,Modelado Secuencial con GRU & LSTM,1,0,12,16.0,8.0
+std-016,Claudia Miranda Solís,Modelado Secuencial con GRU & LSTM,0,1,11,15.5,7.5
+std-017,Fernando Vidal Lozano,Modelado Secuencial con GRU & LSTM,1,0,13,16.5,8.5
+std-018,Patricia Guerrero Meza,Modelado Secuencial con GRU & LSTM,0,0,16,19.0,11.0
+std-019,Kevin Romero Soto,Modelado Secuencial con GRU & LSTM,1,1,10,14.8,7.0
+std-020,Diana Cáceres Peña,Modelado Secuencial con GRU & LSTM,0,0,18,19.5,12.0
