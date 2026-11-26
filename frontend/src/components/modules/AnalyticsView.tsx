@@ -1,26 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { BarChart3, Download, AlertTriangle, CheckCircle2, RefreshCw } from 'lucide-react';
+import { 
+  BarChart3, 
+  Download, 
+  AlertTriangle, 
+  CheckCircle2, 
+  RefreshCw,
+  ArrowRight,
+  UserCheck
+} from 'lucide-react';
 import type {
   AnalyticsProgress,
   AnalyticsSkillMastery,
   ApiMeta,
+  AtRiskStudent,
+  NavTab,
   ThemeMode,
 } from '../../types';
 import { COHORT_OPTIONS, getAnalyticsProgress, getAnalyticsSkillMastery } from '../../services/analyticsApi';
+import { listAtRiskStudents } from '../../services/riskApi';
 import { writeAudit } from '../../services/auditSink';
 
 interface AnalyticsViewProps {
   theme?: ThemeMode;
+  onNavigateTab?: (tab: NavTab) => void;
 }
 
 function percent(value: number): string {
   return `${Math.round(value * 100)}%`;
 }
 
-export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ theme = 'monochrome' }) => {
+export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ 
+  theme = 'monochrome',
+  onNavigateTab
+}) => {
   const [cohort, setCohort] = useState('todos');
   const [progress, setProgress] = useState<AnalyticsProgress | null>(null);
   const [skills, setSkills] = useState<AnalyticsSkillMastery | null>(null);
+  const [risks, setRisks] = useState<AtRiskStudent[]>([]);
   const [meta, setMeta] = useState<ApiMeta | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,11 +51,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ theme = 'monochrom
     Promise.all([
       getAnalyticsProgress(cohort, controller.signal),
       getAnalyticsSkillMastery(controller.signal),
+      listAtRiskStudents(controller.signal)
     ])
-      .then(([progressResponse, skillsResponse]) => {
+      .then(([progressResponse, skillsResponse, risksResponse]) => {
         setProgress(progressResponse.data);
         setSkills(skillsResponse.data);
         setMeta(progressResponse.meta);
+        setRisks(risksResponse.data);
       })
       .catch(err => {
         if (err instanceof DOMException && err.name === 'AbortError') return;
@@ -171,6 +189,129 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ theme = 'monochrom
           }`}>
             <strong>Fuente:</strong> {progress.label} · <strong>Corte:</strong> {COHORT_OPTIONS.find(option => option.value === cohort)?.label ?? cohort}
           </div>
+
+          {/* NÚCLEO DEL CASO DE USO: TRIAJE DE ESTUDIANTES EN RIESGO DE DESERCIÓN */}
+          {risks.length > 0 && (
+            <div className={`p-6 rounded-3xl border transition-all backdrop-blur-2xl shadow-xl ${
+              isLight ? 'bg-white/80 border-rose-200 shadow-rose-500/5' : isMono ? 'bg-white/[0.04] border-white/10 shadow-2xl' : 'glass-panel border-rose-500/30 shadow-glowCyan'
+            }`}>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-inherit mb-4">
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+                    <h2 className="text-base font-black flex items-center gap-2 m-0">
+                      <AlertTriangle className="w-5 h-5 text-rose-400" />
+                      Triaje Predictivo: Detección Temprana de Deserción Escolar
+                    </h2>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold bg-rose-500/15 border border-rose-500/40 text-rose-300">
+                      /api/v1/students/at-risk · Inferencia MTL
+                    </span>
+                  </div>
+                  <p className="text-xs opacity-75 mt-1 m-0">
+                    Estudiantes evaluados por el modelo de IA explicable según ausencias, días inactivos y tareas vencidas.
+                  </p>
+                </div>
+
+                {onNavigateTab && (
+                  <button
+                    onClick={() => onNavigateTab('assessments')}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all shadow-sm shrink-0 ${
+                      isLight 
+                        ? 'bg-slate-900 text-white hover:bg-slate-800' 
+                        : isMono 
+                        ? 'bg-white text-zinc-950 font-black hover:bg-zinc-200' 
+                        : 'bg-edumaster-blue hover:bg-edumaster-blue/80 text-white border border-edumaster-cyan/40 shadow-glowBlue'
+                    }`}
+                  >
+                    <span>Ir a Calificar en SpeedGrader</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Grid de Alumnos Monitoreados */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {risks.map(student => (
+                  <div
+                    key={student.id}
+                    className={`p-4 rounded-2xl border transition-all space-y-3 ${
+                      student.status === 'critical'
+                        ? (isLight ? 'bg-rose-50/70 border-rose-200' : isMono ? 'bg-[#211618] border-[#4A262A]' : 'bg-rose-500/10 border-rose-500/30')
+                        : (isLight ? 'bg-amber-50/70 border-amber-200' : isMono ? 'bg-[#201C16] border-[#473B24]' : 'bg-amber-500/10 border-amber-500/30')
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={student.avatar}
+                          alt={student.name}
+                          className="w-10 h-10 rounded-full object-cover border border-inherit shrink-0 shadow-sm"
+                        />
+                        <div>
+                          <h3 className="text-sm font-black m-0">{student.name}</h3>
+                          <p className="text-[11px] opacity-70 m-0 font-medium">{student.course}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className={`text-xs font-mono font-black px-2.5 py-0.5 rounded-full border ${
+                          student.status === 'critical'
+                            ? 'bg-rose-500/20 border-rose-500/40 text-rose-400'
+                            : 'bg-amber-500/20 border-amber-500/40 text-amber-400'
+                        }`}>
+                          Riesgo: {student.riskScore}%
+                        </span>
+                        <span className="text-[10px] opacity-60 block mt-1 font-mono">
+                          {student.daysInactive}d inactivo · {student.missingAssignments} tareas sin entregar
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Barra de probabilidad de deserción */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] font-mono opacity-70">
+                        <span>Probabilidad de Abandono Escolar</span>
+                        <span className="font-bold">{student.riskScore}% / 100%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-black/20 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            student.status === 'critical' ? 'bg-rose-500' : 'bg-amber-500'
+                          }`}
+                          style={{ width: `${student.riskScore}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Diagnóstico Pedagógico Sugerido */}
+                    <div className={`p-3 rounded-xl text-xs leading-relaxed border ${
+                      isLight ? 'bg-white/90 border-slate-200 text-slate-800' : isMono ? 'bg-[#151821] border-[#2A2F3D] text-zinc-300' : 'bg-[#06152B]/70 border-white/10 text-slate-200'
+                    }`}>
+                      <span className="font-bold text-edumaster-cyan block mb-0.5">Acción Preventiva Sugerida:</span>
+                      {student.suggestedAction}
+                    </div>
+
+                    {onNavigateTab && (
+                      <div className="flex justify-end pt-1">
+                        <button
+                          onClick={() => onNavigateTab('assessments')}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all ${
+                            isLight
+                              ? 'bg-slate-900 text-white hover:bg-slate-800'
+                              : isMono
+                              ? 'bg-white text-zinc-950 font-black hover:bg-zinc-200'
+                              : 'bg-emerald-500 text-slate-950 font-bold hover:bg-emerald-400'
+                          }`}
+                        >
+                          <UserCheck className="w-3.5 h-3.5" />
+                          <span>Revisar entrega en SpeedGrader</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             <div className={`p-5 rounded-2xl border ${

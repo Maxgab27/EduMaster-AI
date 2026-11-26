@@ -8,6 +8,7 @@ import { CourseCompletionDonut } from './components/dashboard/CourseCompletionDo
 import { SkillMasteryHeatmap } from './components/dashboard/SkillMasteryHeatmap';
 import { RecentActivityFeed } from './components/dashboard/RecentActivityFeed';
 import { AIRecommendationsCard } from './components/dashboard/AIRecommendationsCard';
+import { UseCaseBanner } from './components/dashboard/UseCaseBanner';
 import { CertificatesView, CertificateReceiptView } from './components/modules/CertificatesView';
 import { StudentDashboard } from './components/student/StudentDashboard';
 import { TeacherDashboard } from './components/teacher/TeacherDashboard';
@@ -402,6 +403,9 @@ export const App: React.FC = () => {
             </div>
           )}
 
+          {/* Banner Interactivo del Caso de Uso (Paso 1, 2, 3 accesibles con 1 clic) */}
+          <UseCaseBanner theme={theme} onNavigateTab={setActiveTab} />
+
           {/* Conditional Module Rendering */}
           {activeTab === 'dashboard' && (
             user.role === 'estudiante' ? (
@@ -486,7 +490,7 @@ export const App: React.FC = () => {
           )}>
             {canViewTab(user.role, activeTab) && activeTab === 'learning-paths' && <LearningPathsView theme={theme} />}
             {canViewTab(user.role, activeTab) && activeTab === 'courses' && <CoursesView theme={theme} role={user.role} />}
-            {canViewTab(user.role, activeTab) && activeTab === 'analytics' && <AnalyticsView theme={theme} />}
+            {canViewTab(user.role, activeTab) && activeTab === 'analytics' && <AnalyticsView theme={theme} onNavigateTab={setActiveTab} />}
             {canViewTab(user.role, activeTab) && activeTab === 'ai-tutor' && <AITutorView theme={theme} />}
             {canViewTab(user.role, activeTab) && activeTab === 'assessments' && <AssessmentsView theme={theme} role={user.role} />}
             {canViewTab(user.role, activeTab) && activeTab === 'certificates' && (
