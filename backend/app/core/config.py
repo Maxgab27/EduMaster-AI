@@ -37,6 +37,7 @@ class Settings(BaseSettings):
         "http://localhost:4173",
         "http://127.0.0.1:4173",
         "https://*.vercel.app",
+        "https://frontend-five-rho-83.vercel.app",
         "https://edumaster-ai.vercel.app"
     ] + [
         origin.strip()
