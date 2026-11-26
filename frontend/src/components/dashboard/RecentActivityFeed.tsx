@@ -17,13 +17,18 @@ interface RecentActivityFeedProps {
   activity?: ActivityEvent[];
 }
 
+const MAX_VISIBLE_EVENTS = 5;
+
 export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
   onViewAll,
   theme = 'monochrome',
   activity = recentActivities
 }) => {
   const [simulatedEvents, setSimulatedEvents] = useState<ActivityEvent[]>([]);
-  const events = [...simulatedEvents, ...activity];
+
+  // Cola de capacidad fija: los nuevos eventos van arriba y los más antiguos se descartan para que el módulo no se agrande
+  const baseActivities = activity && activity.length > 0 ? activity : recentActivities;
+  const events = [...simulatedEvents, ...baseActivities].slice(0, MAX_VISIBLE_EVENTS);
 
   const isMono = theme === 'monochrome';
   const isLight = theme === 'light';
@@ -48,7 +53,7 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
   const handleSimulateEvent = () => {
     const samplePool: ActivityEvent[] = [
       {
-        id: `act-${Date.now()}`,
+        id: `act-${Date.now()}-1`,
         icon: 'check',
         title: 'Evaluación de Redes Neuronales aprobada',
         description: 'Estudiante Mateo Vargas obtuvo 18.5/20',
@@ -57,7 +62,7 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
         status: 'success'
       },
       {
-        id: `act-${Date.now()}`,
+        id: `act-${Date.now()}-2`,
         icon: 'award',
         title: 'Certificado de MLOps emitido',
         description: 'Folio EDU-2026-10492 (demo, sin blockchain real)',
@@ -66,22 +71,41 @@ export const RecentActivityFeed: React.FC<RecentActivityFeedProps> = ({
         status: 'success'
       },
       {
-        id: `act-${Date.now()}`,
+        id: `act-${Date.now()}-3`,
         icon: 'play',
         title: 'Nueva lección de Transformers',
         description: 'Cohorte 2026-II inició mecanismos de atención',
         timeAgo: 'Justo ahora',
         user: 'Andrés G.',
         status: 'info'
+      },
+      {
+        id: `act-${Date.now()}-4`,
+        icon: 'book',
+        title: 'Práctica de PyTorch completada',
+        description: 'Laboratorio de backpropagation y optimizadores',
+        timeAgo: 'Justo ahora',
+        user: 'Valeria C.',
+        status: 'success'
+      },
+      {
+        id: `act-${Date.now()}-5`,
+        icon: 'target',
+        title: 'Meta de aprendizaje alcanzada (90%)',
+        description: 'Retención de cohorte validada por modelo predictivo',
+        timeAgo: 'Justo ahora',
+        user: 'Cohorte ML',
+        status: 'warning'
       }
     ];
 
     const pick = samplePool[Math.floor(Math.random() * samplePool.length)];
-    setSimulatedEvents(prev => [pick, ...prev.slice(0, 4)]);
+    // Inserta al principio y elimina el más antiguo del final para que el contenedor NUNCA crezca
+    setSimulatedEvents(prev => [pick, ...prev].slice(0, MAX_VISIBLE_EVENTS));
   };
 
   return (
-    <div className="glass-panel flex flex-col h-full border rounded-2xl p-5 shadow-panel">
+    <div className="glass-panel flex flex-col h-full border rounded-2xl p-5 shadow-panel overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
